@@ -23,7 +23,7 @@ on:
   #   branches: [ "main" ]
 
 env:
-  IMAGE_NAME: achievement-unlocked-liberica/espresso-achievement
+  IMAGE_NAME: espresso-achievement
   GHA_PAT_REGISTRY_PUSH: ${{ secrets.GHA_PAT_REGISTRY_PUSH }}
 #
 jobs:
