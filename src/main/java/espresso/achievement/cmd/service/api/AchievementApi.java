@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,7 +34,7 @@ public class AchievementApi {
     }
 
     @Operation(summary = "Create New Achivement", description = "Creates a new Achievement from the provided command.")
-    @GetMapping("")
+    @PostMapping("")
     @ApiResponse(responseCode = "200:OK", description = "Creates a new Achievement from the provided command.")
     public ResponseEntity<ApiResult<String>> createAchievement(@ModelAttribute CreateAchivementCommand command) {
 

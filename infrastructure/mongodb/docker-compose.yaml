@@ -1,0 +1,32 @@
+version: '3.7'
+
+services:
+
+  mongo:
+    container_name: mongodb-liberica
+    image: bitnami/mongodb:latest
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongousr
+      MONGO_INITDB_ROOT_PASSWORD: mongopwd
+      MONGO_INITDB_DATABASE: admin
+    volumes:
+          - mongodb_data_container:/data/db
+
+  # mongo-express:
+  #   depends_on:
+  #     - mongo
+  #   image: mongo-express:latest
+  #   restart: always
+  #   ports:
+  #     - 31002:31002
+  #   environment:
+  #     ME_CONFIG_MONGODB_ADMINUSERNAME: mongousr
+  #     ME_CONFIG_MONGODB_ADMINPASSWORD: mongopwd
+  #     ME_CONFIG_MONGODB_URL: mongodb://mongousr:mongopwd@mongo:31001/
+
+volumes:
+  mongodb_data_container:
+    driver: local
