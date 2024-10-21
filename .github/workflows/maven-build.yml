@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Java CI with Maven
+name: Achievement Unlocked - CI/C
 
 on:
   workflow_dispatch:
@@ -27,47 +27,63 @@ env:
   GHA_PAT_REGISTRY_PUSH: ${{ secrets.GHA_PAT_REGISTRY_PUSH }}
 #
 jobs:
-  # This pushes the image to GitHub Packages.
-  push:
+  publish:
     runs-on: ubuntu-latest
     permissions:
-      packages: write
       contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: Publish package
+        run: mvn --batch-mode deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Step - Build Image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
-        #
-      - name: Step - Log In to GitHub Container Registry
 
-        run: echo "${{ env.GHA_PAT_REGISTRY_PUSH }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-        #
-      - name: Step - Push Image to GitHub Container Registry
-        run: |
-          # Set the GitHub Container Registry image name.
-          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+  # This pushes the image to GitHub Packages.
+  # push:
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     packages: write
+  #     contents: read
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-          # Change all uppercase characters to lowercase.
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+  #     - name: Step - Build Image
+  #       run: docker build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
+  #       #
+  #     - name: Step - Log In to GitHub Container Registry
+  #       run: echo "${{ env.GHA_PAT_REGISTRY_PUSH }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+  #       #
+  #     - name: Step - Push Image to GitHub Container Registry
+  #       run: |
+  #         # Set the GitHub Container Registry image name.
+  #         IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
 
-          # Remove the git ref prefix from the version.
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+  #         # Change all uppercase characters to lowercase.
+  #         IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
-          # Remove the "v" prefix from the tag name.
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+  #         # Remove the git ref prefix from the version.
+  #         VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
 
-          # This uses the Docker `latest` tag convention.
-          [ "$VERSION" == "main" ] && VERSION=latest
+  #         # Remove the "v" prefix from the tag name.
+  #         [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
+  #         # This uses the Docker `latest` tag convention.
+  #         [ "$VERSION" == "main" ] && VERSION=latest
 
-          # Tag the docker image witht he image name and version
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+  #         echo IMAGE_ID=$IMAGE_ID
+  #         echo VERSION=$VERSION
 
-          # Push the image to the GitHub Container Registry
-          docker push $IMAGE_ID:$VERSION
+  #         # Tag the docker image witht he image name and version
+  #         docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+
+  #         # Push the image to the GitHub Container Registry
+  #         docker push $IMAGE_ID:$VERSION
 
 
 
