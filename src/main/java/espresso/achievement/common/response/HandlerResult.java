@@ -1,4 +1,4 @@
-package espresso.achievement.cmd.application.commandHandlers;
+package espresso.achievement.common.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +17,7 @@ public class HandlerResult<T> {
             return success(null, null);
         }
     
-        public static <T> HandlerResult<T> success(T data, String message) {
+        public static <T> HandlerResult<T> success(String message, T data) {
             return HandlerResult.<T>builder()
             .message(message != null ? message : "SUCCESS!")
             .data(data)
@@ -25,10 +25,15 @@ public class HandlerResult<T> {
             .build();
         }
     
-        public static <T> HandlerResult<T> error(String message) {
+        public static <T> HandlerResult<T> error(String message, T data) {
             return HandlerResult.<T>builder()
             .message(message != null ? message :"ERROR!")
+            .data(data)
             .success(false)
             .build();
+        }
+
+        public boolean HasData() {
+            return data != null;
         }
     }

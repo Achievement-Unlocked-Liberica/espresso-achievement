@@ -21,4 +21,12 @@ public class UserProfile extends Entity{
 
     @Getter
     String email;
+
+    public void cleanForSerialization() {
+        this.setId(null);
+        this.setTimestamp(null);
+
+        this.firstName = null;
+        this.lastName = null;
+    }
 }

@@ -3,6 +3,7 @@ package espresso.achievement.cmd.domain.entities;
 import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.util.Date;
 
@@ -18,6 +19,7 @@ public abstract class Entity {
     @Setter
     private UUID id;
 
+    @Indexed(unique = true)
     @Getter
     @Setter
     private String key;

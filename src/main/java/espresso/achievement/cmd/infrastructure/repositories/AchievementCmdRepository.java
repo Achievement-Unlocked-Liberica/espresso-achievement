@@ -3,14 +3,14 @@ package espresso.achievement.cmd.infrastructure.repositories;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import espresso.achievement.cmd.domain.contracts.IAchievementRepository;
+import espresso.achievement.cmd.domain.contracts.IAchievementCmdRepository;
 import espresso.achievement.cmd.domain.entities.Achievement;
 
 @Repository
-public class AchievementRepository implements IAchievementRepository {
+public class AchievementCmdRepository implements IAchievementCmdRepository {
 
     @Autowired
-    AchievementMongoDBProvider achievementMongoDBProvider;
+    AchievementCmdMongoDBProvider achievementMongoDBProvider;
 
     @Override
     public void save(Achievement achievement) {

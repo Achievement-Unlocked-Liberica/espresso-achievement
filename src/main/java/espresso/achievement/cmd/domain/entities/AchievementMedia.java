@@ -1,27 +1,42 @@
 package espresso.achievement.cmd.domain.entities;
 
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class AchievementMedia extends Entity {
-    
-    @Getter
-    String mediaPath;
 
-    @Getter
-    String originalName;
+    private boolean isUploaded;
+    private String mediaPath;
+    private String originalName;
+    private String originalHash;
+    private String mimeType;
+    private Integer size;
+    private String encoding;
 
-    @Getter
-    String mimeType;
+    public static AchievementMedia createPreMedia(String originalName, String mimeType, String encoding, Integer size) {
 
-    @Getter
-    Integer size;
+        AchievementMedia preMedia = new AchievementMedia(
+                false,
+                null,
+                originalName,
+                originalName.hashCode() +"",
+                mimeType,
+                size,
+                encoding);
 
-    @Getter
-    String encoding;
+        preMedia.setKey(KeyGenerator.generateShortString());
 
-    //buffer: Buffer;    
+        return preMedia;
+    }
+
+
 }

@@ -23,6 +23,8 @@ public class UserRepository implements IUserRepository {
         userProfile.setKey(userKey);
         userProfile.setTimestamp(new Date());
 
+        userProfile.cleanForSerialization();
+        
         return userProfile;
     }
 

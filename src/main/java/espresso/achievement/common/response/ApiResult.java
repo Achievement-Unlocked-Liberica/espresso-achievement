@@ -1,4 +1,4 @@
-package espresso.achievement.cmd.service.api;
+package espresso.achievement.common.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +16,7 @@ public class ApiResult<T> {
         return success(null, null);
     }
 
-    public static <T> ApiResult<T> success(T data, String message) {
+    public static <T> ApiResult<T> success(String message,T data) {
         return ApiResult.<T>builder()
         .message(message != null ? message : "SUCCESS!")
         .data(data)
@@ -24,9 +24,10 @@ public class ApiResult<T> {
         .build();
     }
 
-    public static <T> ApiResult<T> error(String message) {
+    public static <T> ApiResult<T> error(String message,T data) {
         return ApiResult.<T>builder()
         .message(message != null ? message :"ERROR!")
+        .data(data)
         .success(false)
         .build();
     }

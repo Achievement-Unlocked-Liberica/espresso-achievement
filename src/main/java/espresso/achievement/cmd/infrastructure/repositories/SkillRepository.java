@@ -19,10 +19,15 @@ public class SkillRepository implements ISkillRepository {
     }
 
     @Override
-    public List<Skill>  getSkills(String[] skillKeys) {
-        return Arrays.stream(MockSkillProvider.getSkills())
-                        .filter(skill -> Arrays.asList(skillKeys).contains(skill.getKey()))
-                        .collect(Collectors.toList());
+    public List<Skill> getSkills(String[] skillKeys) {
+        List<Skill> skillList = Arrays.stream(MockSkillProvider.getSkills())
+                .filter(skill -> Arrays.asList(skillKeys).contains(skill.getKey()))
+                .collect(Collectors.toList());
+
+        skillList.forEach(skill -> skill.cleanForSerialization());
+
+        // clkean the entity for serialization by keeping minimal property values
+        return Collections.unmodifiableList(skillList);
     }
 
     @Override
@@ -31,19 +36,16 @@ public class SkillRepository implements ISkillRepository {
         throw new UnsupportedOperationException("Unimplemented method 'getSkillByKey'");
     }
 
-
-
-
     // ! Mocking Provider
     private static class MockSkillProvider {
         private static final Skill[] skills = new Skill[] {
-            new Skill("Strength", "STR", "Represents physical power and brute force"),
-            new Skill("Dexterity", "DEX", "Represents agility, reflexes, and hand-eye coordination"),
-            new Skill("Constitution", "CON", "Represents endurance, stamina, and overall health"),
-            new Skill("Intelligence", "INT", "Represents mental acuity, knowledge, and problem-solving abilities"),
-            new Skill("Wisdom", "WIS", "Represents intuition, perception, and insight"),
-            new Skill("Charisma", "CHA", "Represents charm, persuasiveness, and social skills"),
-            new Skill("Luck", "LUC", "Represents fortune, chance, and serendipity")
+                new Skill("Strength", "STR", "Represents physical power and brute force"),
+                new Skill("Dexterity", "DEX", "Represents agility, reflexes, and hand-eye coordination"),
+                new Skill("Constitution", "CON", "Represents endurance, stamina, and overall health"),
+                new Skill("Intelligence", "INT", "Represents mental acuity, knowledge, and problem-solving abilities"),
+                new Skill("Wisdom", "WIS", "Represents intuition, perception, and insight"),
+                new Skill("Charisma", "CHA", "Represents charm, persuasiveness, and social skills"),
+                new Skill("Luck", "LUC", "Represents fortune, chance, and serendipity")
         };
 
         public static Skill[] getSkills() {
