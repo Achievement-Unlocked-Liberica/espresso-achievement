@@ -60,6 +60,11 @@
 			<artifactId>spring-boot-starter-data-mongodb</artifactId>
 		</dependency>
 
+
+		<dependency>
+			<groupId>com.azure.spring</groupId>
+			<artifactId>spring-cloud-azure-starter-storage</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -87,4 +92,16 @@
 			<url>https://maven.pkg.github.com/achievement-unlocked-liberica/espresso-achievement</url>
 		</repository>
 	</distributionManagement>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.azure.spring</groupId>
+				<artifactId>spring-cloud-azure-dependencies</artifactId>
+				<version>5.18.0</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>

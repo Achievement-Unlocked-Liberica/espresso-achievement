@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import espresso.achievement.cmd.service.api.AchievementCmdApi;
+import espresso.achievement.service.api.AchievementCmdApi;
 
 // @SpringBootTest
 class AchievementApplicationTests {
