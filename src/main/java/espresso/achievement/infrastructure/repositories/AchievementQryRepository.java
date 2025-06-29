@@ -1,19 +1,21 @@
 package espresso.achievement.infrastructure.repositories;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import espresso.achievement.domain.contracts.IAchievementQryRepository;
 import espresso.achievement.domain.readModels.AchievementDetailReadModel;
 import espresso.achievement.domain.readModels.AchievementSummaryReadModel;
 
-@Repository
+@Component
 public class AchievementQryRepository implements IAchievementQryRepository {
 
     @Autowired
-    AchievementQryMongoDBProvider achievementMongoDBProvider;
+    AchievementPSQLProvider achievementPSQLProvider;
 
     @Override
     public AchievementDetailReadModel getAchievementDetailByKey(String key) {
@@ -23,7 +25,7 @@ public class AchievementQryRepository implements IAchievementQryRepository {
                 throw new IllegalArgumentException("The key is null");
             }
 
-            List<AchievementDetailReadModel> entities = this.achievementMongoDBProvider.findDetailByKey(key);
+            List<AchievementDetailReadModel> entities = new ArrayList<AchievementDetailReadModel>();  //this.achievementMongoDBProvider.findDetailByKey(key);
 
             return entities.isEmpty()
                     ? null
@@ -44,7 +46,7 @@ public class AchievementQryRepository implements IAchievementQryRepository {
                 throw new IllegalArgumentException("The key is null");
             }
 
-            List<AchievementSummaryReadModel> entities = this.achievementMongoDBProvider.findSummaryByKey(key);
+            List<AchievementSummaryReadModel> entities = new ArrayList<AchievementSummaryReadModel>(); //this.achievementMongoDBProvider.findSummaryByKey(key);
 
             return entities.isEmpty()
                     ? null
@@ -65,7 +67,7 @@ public class AchievementQryRepository implements IAchievementQryRepository {
                 throw new IllegalArgumentException("The key is null");
             }
 
-            List<AchievementSummaryReadModel> entities = this.achievementMongoDBProvider.findSummaryByUserKey(userKey);
+            List<AchievementSummaryReadModel> entities = new ArrayList<AchievementSummaryReadModel>(); //this.achievementMongoDBProvider.findSummaryByUserKey(userKey);
 
             return entities.isEmpty()
                     ? null

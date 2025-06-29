@@ -4,23 +4,30 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import org.springframework.data.mongodb.core.index.Indexed;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import espresso.common.domain.models.DomainEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+@Data
+@EqualsAndHashCode(callSuper = false)
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class AchievementMedia extends Entity {
-
-    @Indexed(name = "achievement_media_idx",  unique = false)
-    @Setter
-    private String key;
+// @Entity(name = "AchievementMedia")
+// @Table(name = "AchievementMedias")
+public class AchievementMedia extends DomainEntity {
 
     private boolean isUploaded;
     private String mediaPath;
@@ -30,19 +37,21 @@ public class AchievementMedia extends Entity {
     private Integer size;
     private String encoding;
 
+    // @JsonBackReference
+    // @ManyToOne
+    // @JoinColumn(name = "achievementId", nullable = false)
+    // private Achievement achievement;
+
     public static AchievementMedia createPreMedia(String originalName, String mimeType, String encoding, Integer size) {
 
-        AchievementMedia preMedia = new AchievementMedia(
-                null,
-                false,
-                null,
-                originalName,
-                originalName.hashCode() + "",
-                mimeType,
-                size,
-                encoding);
+        AchievementMedia preMedia = new AchievementMedia();
+ 
+        preMedia.setOriginalName(originalName);
+        preMedia.setMimeType(mimeType);
+        preMedia.setSize(size);
+        preMedia.setEncoding(encoding);
 
-        preMedia.setKey(KeyGenerator.generateShortString());
+        preMedia.setEntityKey(KeyGenerator.generateShortString());
 
         return preMedia;
     }

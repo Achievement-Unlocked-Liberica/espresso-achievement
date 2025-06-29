@@ -2,37 +2,57 @@ package espresso.achievement.domain.entities;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import espresso.achievement.domain.events.NewAchievementCreated;
-import lombok.Getter;
+import espresso.common.domain.models.DomainAggregate;
+import espresso.common.domain.models.DomainEntity;
+import espresso.common.domain.support.StringListConverter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 /**
  * Represents an achievement entity.
  */
-@Getter
-@Setter
-@ToString
+@Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-@Document(collection = "achievements")
-public class Achievement extends Aggregate {
+@AllArgsConstructor
+@Entity(name = "Achievement")
+@Table(name = "Achievements")
+// @Table(name = "achievements", indexes = {@Index(name = "achievement_idx", columnList = "key", unique = true)})
+public class Achievement extends DomainEntity {
 
-    @Indexed(name = "achievement_idx",  unique = true)
-    @Setter
-    private String key;
-
+    
     String title;
     String description;
     Date completedDate;
-    List<Skill> skills;
+
+    @Convert(converter = StringListConverter.class)
+    List<String> skills;
+
+    //@JsonManagedReference 
+    //@OneToMany(mappedBy = "achievement", cascade = CascadeType.ALL)
+    @Transient
     List<AchievementMedia> media;
+
+    //@OneToOne(cascade = CascadeType.ALL)
+    //@JoinColumn(name = "userProfileId")
+    @Transient
     UserProfile userProfile;
+
+    @Enumerated(EnumType.STRING)
     AchievementVisibilityStatus achievementVisibility;
 
     /*
@@ -44,14 +64,12 @@ public class Achievement extends Aggregate {
      */
     protected Achievement(boolean initializeEntity) {
         if (initializeEntity == true) {
-            this.setTimestamp(new Date());
-            this.setId(UUID.randomUUID());
-            this.setKey(KeyGenerator.generateShortString());
+            this.initializeEntity();
         }
     }
 
     public static Achievement create(String title, String description, Date completedDate, boolean isPublic,
-            UserProfile userProfile, List<Skill> skills, List<AchievementMedia> media) {
+            UserProfile userProfile, List<String> skills) {
 
         Achievement entity = new Achievement();
 
@@ -66,7 +84,6 @@ public class Achievement extends Aggregate {
         entity.userProfile = userProfile;
 
         entity.setSkills(skills);
-        entity.setMedia(media);
 
         entity.raiseNewAchievementCreatedEvent();
 
@@ -74,12 +91,10 @@ public class Achievement extends Aggregate {
     }
 
     private void initializeEntity() {
-        this.setTimestamp(new Date());
-        this.setId(UUID.randomUUID());
-        this.setKey(KeyGenerator.generateShortString());
+        this.setEntityKey(KeyGenerator.generateShortString());
     }
 
-    public void setSkills(List<Skill> skills) {
+    public void setSkills(List<String> skills) {
         this.skills = skills;
     }
 
@@ -87,27 +102,16 @@ public class Achievement extends Aggregate {
         this.media = media;
     }
 
-    /**
-     * Represents the visibility status of an achievement.
-     */
-    public enum AchievementVisibilityStatus {
-        UNKNOWN,
-        PRIVATE,
-        FRIENDS,
-        FRIENDS_OF_FRIENDS,
-        EVERYONE
-    }
-
     // #region Domain Events
 
     public void raiseNewAchievementCreatedEvent() {
-        this.domainEvents.add(new NewAchievementCreated(
-                this.getKey(),
-                this.getUserProfile().getKey(),
-                this.getCompletedDate(),
-                this.getSkills().stream().map(Skill::getAbbreviation).toArray(String[]::new),
-                this.getMedia().stream().map(AchievementMedia::getKey).toArray(String[]::new)
-            ));
+        // this.domainEvents.add(new NewAchievementCreated(
+        //         this.getEntityKey(),
+        //         this.getUserProfile().getEntityKey(),
+        //         this.getCompletedDate(),
+        //         this.getSkills().stream().toArray(String[]::new),
+        //         this.getMedia().stream().map(AchievementMedia::getEntityKey).toArray(String[]::new)
+        //     ));
     }
 
     // #endregion Domain Events

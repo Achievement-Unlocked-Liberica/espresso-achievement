@@ -1,4 +1,4 @@
-package espresso.achievement.service.api;
+package espresso.achievement.service;
 
 import java.util.List;
 
@@ -19,7 +19,6 @@ import espresso.achievement.domain.queries.GetAchievementSummaryByKeyQuery;
 import espresso.achievement.domain.readModels.AchievementDetailReadModel;
 import espresso.achievement.domain.readModels.AchievementSummaryReadModel;
 import espresso.achievement.domain.readModels.MediaStorageDetailReadModel;
-import espresso.achievement.service.helpers.ApiMessageHelper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;

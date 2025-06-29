@@ -10,7 +10,7 @@ import espresso.achievement.domain.entities.KeyGenerator;
 import espresso.achievement.domain.entities.PreMedia;
 import espresso.achievement.domain.queries.GetAchievementMediaStorageQuery;
 import espresso.achievement.domain.readModels.MediaStorageDetailReadModel;
-import espresso.achievement.service.configuration.AppConfiguration;
+import espresso.achievement.service.AppConfiguration;
 import lombok.NoArgsConstructor;
 
 @Service

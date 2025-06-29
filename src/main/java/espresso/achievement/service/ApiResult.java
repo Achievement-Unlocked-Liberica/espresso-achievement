@@ -1,4 +1,4 @@
-package espresso.achievement.service.api;
+package espresso.achievement.service;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

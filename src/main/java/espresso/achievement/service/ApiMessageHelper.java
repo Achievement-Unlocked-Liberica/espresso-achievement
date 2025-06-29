@@ -1,4 +1,4 @@
-package espresso.achievement.service.helpers;
+package espresso.achievement.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;

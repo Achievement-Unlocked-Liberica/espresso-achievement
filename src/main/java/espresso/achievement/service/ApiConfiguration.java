@@ -1,4 +1,4 @@
-package espresso.achievement.service.configuration;
+package espresso.achievement.service;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 public class ApiConfiguration {
 
     @Bean
-    public MessageSource messageSource() {
+    MessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
         messageSource.setBasename("messages/achievement_api_messages");
         messageSource.setDefaultEncoding("UTF-8");

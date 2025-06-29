@@ -1,10 +1,10 @@
 package espresso.achievement.domain.entities;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@NoArgsConstructor
+@Data
 public class Skill {
    
     private String abbreviation;
