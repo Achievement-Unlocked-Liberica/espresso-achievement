@@ -6,10 +6,9 @@ import java.time.OffsetDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-
+import espresso.AppConfiguration;
 import espresso.achievement.domain.entities.KeyGenerator;
 import espresso.achievement.domain.readModels.MediaStorageDetailReadModel;
-import espresso.achievement.service.AppConfiguration;
 
 @Component
 public class MediaQryBlobDBProvider {

@@ -1,41 +1,26 @@
 package espresso.achievement.service;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import espresso.achievement.domain.commands.CreateAchivementCommand;
 import espresso.achievement.domain.contracts.IAchievementCommandHandler;
-import espresso.achievement.domain.entities.Achievement;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonCmdApi;
-import espresso.achievement.application.response.HandlerResult;
+import espresso.ApiMessageHelper;
 
 @RestController("Achievement Cmd Api")
 @RequestMapping("/api/cmd/achievement")
 @Tag(name = "Achievement Command API", description = "API for handling Achievement commands.")
 public class AchievementCmdApi extends CommonCmdApi {
-
-	@Autowired
-	private ApiMessageHelper apiMsgHelper;
 
 	@Autowired
 	private IAchievementCommandHandler achivementCommandHandler;

@@ -1,4 +1,4 @@
-package espresso.achievement.service;
+package espresso;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import espresso.achievement.service.ApiResult;
 
 @ControllerAdvice
 public class ApiExceptionHandlers {

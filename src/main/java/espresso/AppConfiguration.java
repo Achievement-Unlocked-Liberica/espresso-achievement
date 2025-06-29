@@ -1,4 +1,4 @@
-package espresso.achievement.service;
+package espresso;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
