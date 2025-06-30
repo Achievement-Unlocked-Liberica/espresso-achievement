@@ -1,4 +1,4 @@
-package espresso.user.application.commandHandlers;
+package espresso.user.application.handlers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

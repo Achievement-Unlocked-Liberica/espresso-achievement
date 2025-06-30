@@ -16,8 +16,8 @@ import espresso.common.domain.support.KeyGenerator;
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "RegisteredUser")
-@Table(name = "RegisteredUsers")
+@Entity(name = "User")
+@Table(name = "Users")
 public class User extends DomainEntity {
 
     @Id

@@ -25,3 +25,11 @@ X-API-Version: 1
   "lastName": "Smith",
   "birthDate": "1992-08-22"
 }
+
+
+### Get User by Entity Key
+GET http://localhost:8080/api/qry/user?entityKey=zxgOC8Z&size=sm HTTP/1.1
+accept: application/json
+X-API-Version: 1
+
+###

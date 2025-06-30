@@ -33,7 +33,7 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
             }
 
             // Get the profile of the user that is creating the achievemnet
-            User user = userRepository.findByKey(command.getUserKey());
+            User user = userRepository.findByKey(command.getUserKey(), User.class);
 
             // Get the skills of the achievement to be created
             List<String> skills = Arrays.asList(command.getSkills());

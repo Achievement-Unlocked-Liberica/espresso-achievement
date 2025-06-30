@@ -28,7 +28,8 @@ public class UserRepository implements IUserRepository {
     }
 
     @Override
-    public User findByKey(String key) {
-        return userJpaRepository.findByEntityKey(key);
+    public <T> T findByKey(String entityKey, Class<T> type) {
+
+        return this.userJpaRepository.findByKey(entityKey, type);
     }
 }
