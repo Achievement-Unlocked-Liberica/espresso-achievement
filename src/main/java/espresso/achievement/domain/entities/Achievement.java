@@ -17,6 +17,7 @@ import espresso.achievement.domain.events.NewAchievementCreated;
 import espresso.common.domain.models.DomainAggregate;
 import espresso.common.domain.models.DomainEntity;
 import espresso.common.domain.support.StringListConverter;
+import espresso.user.domain.entities.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -50,7 +51,7 @@ public class Achievement extends DomainEntity {
     //@OneToOne(cascade = CascadeType.ALL)
     //@JoinColumn(name = "userProfileId")
     @Transient
-    UserProfile userProfile;
+    User user;
 
     @Enumerated(EnumType.STRING)
     AchievementVisibilityStatus achievementVisibility;
@@ -69,7 +70,7 @@ public class Achievement extends DomainEntity {
     }
 
     public static Achievement create(String title, String description, Date completedDate, boolean isPublic,
-            UserProfile userProfile, List<String> skills) {
+            User userProfile, List<String> skills) {
 
         Achievement entity = new Achievement();
 
@@ -81,7 +82,7 @@ public class Achievement extends DomainEntity {
         entity.achievementVisibility = isPublic
                 ? AchievementVisibilityStatus.EVERYONE
                 : AchievementVisibilityStatus.PRIVATE;
-        entity.userProfile = userProfile;
+        entity.user = userProfile;
 
         entity.setSkills(skills);
 

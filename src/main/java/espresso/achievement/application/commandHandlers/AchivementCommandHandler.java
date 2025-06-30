@@ -1,28 +1,18 @@
 package espresso.achievement.application.commandHandlers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import espresso.achievement.domain.contracts.IAchievementCommandHandler;
-import espresso.achievement.domain.contracts.IMediaQryRepository;
-import espresso.achievement.application.response.HandlerResult;
 import espresso.achievement.domain.commands.CreateAchivementCommand;
 import espresso.achievement.domain.contracts.IAchievementCmdRepository;
-import espresso.achievement.domain.contracts.ISkillRepository;
-import espresso.achievement.domain.contracts.IUserRepository;
+import espresso.user.domain.contracts.IUserRepository;
+import espresso.user.domain.entities.User;
 import espresso.achievement.domain.entities.Achievement;
-import espresso.achievement.domain.entities.AchievementMedia;
-import espresso.achievement.domain.entities.PreMedia;
-import espresso.achievement.domain.entities.Skill;
-import espresso.achievement.domain.entities.UserProfile;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
-import lombok.NoArgsConstructor;
 
 @Service
 public class AchivementCommandHandler implements IAchievementCommandHandler {
@@ -43,7 +33,7 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
             }
 
             // Get the profile of the user that is creating the achievemnet
-            UserProfile userProfile = userRepository.getUserByKey(command.getUserKey());
+            User user = userRepository.findByKey(command.getUserKey());
 
             // Get the skills of the achievement to be created
             List<String> skills = Arrays.asList(command.getSkills());
@@ -53,7 +43,7 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
                     command.getDescription(),
                     command.getCompletedDate(),
                     command.getIsPublic(),
-                    userProfile,
+                    user,
                     skills);
 
             Achievement savedEntity = achievementRepository.save(entity);
