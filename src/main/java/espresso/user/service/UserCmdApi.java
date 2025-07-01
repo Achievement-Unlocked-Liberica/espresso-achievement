@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonCmdApi;
 import espresso.user.domain.commands.AddUserCommand;
@@ -30,24 +29,6 @@ public class UserCmdApi extends CommonCmdApi {
     @ApiResponse(responseCode = "400:BAD_REQUEST", description = "Validation error in the request.")
     @ApiResponse(responseCode = "500:INTERNAL_SERVER_ERROR", description = "An internal error occurred.")
     public ResponseEntity<ServiceResponse<Object>> createUser(@RequestBody AddUserCommand command) {
-
-        ServiceResponse<Object> apiResponse = null;
-
-        try {
-            HandlerResponse<Object> handlerResponse = userCommandHandler.handle(command);
-
-            apiResponse = processHandlerResult(handlerResponse);
-
-            return ResponseEntity
-                    .status(apiResponse.getHttpStatus())
-                    .body(apiResponse);
-
-        } catch (Exception ex) {
-            apiResponse = processHandlerError(ex);
-        }
-
-        return ResponseEntity
-                .status(apiResponse.getHttpStatus())
-                .body(apiResponse);
+        return executeCommand(command, userCommandHandler::handle);
     }
 }

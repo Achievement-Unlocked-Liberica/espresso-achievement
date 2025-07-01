@@ -12,10 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import espresso.achievement.domain.commands.CreateAchivementCommand;
 import espresso.achievement.domain.contracts.IAchievementCommandHandler;
-import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonCmdApi;
-import espresso.ApiMessageHelper;
 
 @RestController("Achievement Cmd Api")
 @RequestMapping("/api/cmd/achievement")
@@ -31,24 +29,6 @@ public class AchievementCmdApi extends CommonCmdApi {
 	@ApiResponse(responseCode = "400:BAD_REQUEST", description = "Validation error in the request.")
 	@ApiResponse(responseCode = "500:INTERNAL_SERVER_ERROR", description = "An internal error occurred.")
 	public ResponseEntity<ServiceResponse<Object>> createAchievement(@RequestBody CreateAchivementCommand command) {
-
-		ServiceResponse<Object> apiResponse = null;
-
-		try {
-			HandlerResponse<Object> handlerResponse = achivementCommandHandler.handle(command);
-
-			apiResponse = processHandlerResult(handlerResponse);
-
-			return ResponseEntity
-					.status(apiResponse.getHttpStatus())
-					.body(apiResponse);
-
-		} catch (Exception ex) {
-			apiResponse = processHandlerError(ex);
-		}
-
-		return ResponseEntity
-				.status(apiResponse.getHttpStatus())
-				.body(apiResponse);
+		return executeCommand(command, achivementCommandHandler::handle);
 	}
 }

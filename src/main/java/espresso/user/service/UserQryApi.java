@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonQryApi;
 import espresso.user.domain.queries.GetUserByKeyQuery;
@@ -29,62 +28,20 @@ public class UserQryApi extends CommonQryApi {
     @GetMapping(value = "", headers = "X-API-Version=1")
     @ApiResponse(responseCode = "200:OK", description = "Get User by Key.")
     public ResponseEntity<ServiceResponse<Object>> getUserByKey(GetUserByKeyQuery qry) {
-        ServiceResponse<Object> apiResponse = null;
-        try {
-            HandlerResponse<Object> handlerResponse = usersQueryHandler.handle(qry);
-
-            apiResponse = processHandlerResult(handlerResponse);
-
-            return ResponseEntity
-                    .status(apiResponse.getHttpStatus())
-                    .body(apiResponse);
-        } catch (Exception ex) {
-            apiResponse = processHandlerError(ex);
-        }
-        return ResponseEntity
-                .status(apiResponse.getHttpStatus())
-                .body(apiResponse);
+        return executeQuery(qry, usersQueryHandler::handle);
     }
 
     @Operation(summary = "Check if Username Exists", description = "Check if a username already exists in the system.")
     @GetMapping(value = "/check-username", headers = "X-API-Version=1")
     @ApiResponse(responseCode = "200:OK", description = "Returns true if username exists, false otherwise.")
     public ResponseEntity<ServiceResponse<Object>> checkUserNameExists(GetUserNameExistsQuery qry) {
-        ServiceResponse<Object> apiResponse = null;
-        try {
-            HandlerResponse<Object> handlerResponse = usersQueryHandler.handle(qry);
-
-            apiResponse = processHandlerResult(handlerResponse);
-
-            return ResponseEntity
-                    .status(apiResponse.getHttpStatus())
-                    .body(apiResponse);
-        } catch (Exception ex) {
-            apiResponse = processHandlerError(ex);
-        }
-        return ResponseEntity
-                .status(apiResponse.getHttpStatus())
-                .body(apiResponse);
+        return executeQuery(qry, usersQueryHandler::handle);
     }
 
     @Operation(summary = "Check if Email Exists", description = "Check if an email already exists in the system.")
     @GetMapping(value = "/check-email", headers = "X-API-Version=1")
     @ApiResponse(responseCode = "200:OK", description = "Returns true if email exists, false otherwise.")
     public ResponseEntity<ServiceResponse<Object>> checkEmailExists(GetEmailExistsQuery qry) {
-        ServiceResponse<Object> apiResponse = null;
-        try {
-            HandlerResponse<Object> handlerResponse = usersQueryHandler.handle(qry);
-
-            apiResponse = processHandlerResult(handlerResponse);
-
-            return ResponseEntity
-                    .status(apiResponse.getHttpStatus())
-                    .body(apiResponse);
-        } catch (Exception ex) {
-            apiResponse = processHandlerError(ex);
-        }
-        return ResponseEntity
-                .status(apiResponse.getHttpStatus())
-                .body(apiResponse);
+        return executeQuery(qry, usersQueryHandler::handle);
     }
 }
