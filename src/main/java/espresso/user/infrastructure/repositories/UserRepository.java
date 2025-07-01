@@ -28,6 +28,11 @@ public class UserRepository implements IUserRepository {
     }
 
     @Override
+    public boolean checkUsernameExists(String username) {
+        return userJpaRepository.checkUsernameExists(username);
+    }
+
+    @Override
     public <T> T findByKey(String entityKey, Class<T> type) {
 
         return this.userJpaRepository.findByKey(entityKey, type);

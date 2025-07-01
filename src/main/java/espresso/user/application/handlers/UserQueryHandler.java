@@ -7,6 +7,7 @@ import espresso.common.domain.queries.QuerySizeType;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
 import espresso.user.domain.queries.GetUserByKeyQuery;
+import espresso.user.domain.queries.GetUserNameExistsQuery;
 import espresso.user.domain.contracts.IUserQueryHandler;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.UserDtoLg;
@@ -40,6 +41,26 @@ public class UserQueryHandler implements IUserQueryHandler {
                     : HandlerResponse.error(null, ResponseType.NOT_FOUND);
 
             return response;
+
+        } catch (Exception ex) {
+            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+        }
+    }
+
+    @Override
+    public HandlerResponse<Object> handle(GetUserNameExistsQuery qry) {
+        try {
+            // Validate the query
+            var validationErrors = qry.validate();
+
+            if (!validationErrors.isEmpty()) {
+                return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
+            }
+
+            // Check if username exists in the database
+            boolean usernameExists = this.userRepository.checkUsernameExists(qry.getUsername());
+
+            return HandlerResponse.success(usernameExists);
 
         } catch (Exception ex) {
             return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);

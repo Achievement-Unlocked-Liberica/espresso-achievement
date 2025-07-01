@@ -3,14 +3,15 @@ package espresso.user.domain.contracts;
 import espresso.common.domain.queries.QuerySizeType;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.user.domain.queries.GetUserByKeyQuery;
+import espresso.user.domain.queries.GetUserNameExistsQuery;
 
 public interface IUserQueryHandler {   
      
     HandlerResponse<Object> handle(GetUserByKeyQuery qry);
     
-    // HandlerResponse<Object> handle(CheckEmailExistsQuery qry);
+    HandlerResponse<Object> handle(GetUserNameExistsQuery qry);
     
-    // HandlerResponse<Object> handle(CheckUsernameExistsQuery qry);
+    // HandlerResponse<Object> handle(CheckEmailExistsQuery qry);
 
     Class<?> getDtoSize(QuerySizeType querySizeType);
 }
