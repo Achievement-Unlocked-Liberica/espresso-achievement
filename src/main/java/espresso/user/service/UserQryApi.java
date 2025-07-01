@@ -11,6 +11,7 @@ import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonQryApi;
 import espresso.user.domain.queries.GetUserByKeyQuery;
 import espresso.user.domain.queries.GetUserNameExistsQuery;
+import espresso.user.domain.queries.GetEmailExistsQuery;
 import espresso.user.domain.contracts.IUserQueryHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -49,6 +50,27 @@ public class UserQryApi extends CommonQryApi {
     @GetMapping(value = "/check-username", headers = "X-API-Version=1")
     @ApiResponse(responseCode = "200:OK", description = "Returns true if username exists, false otherwise.")
     public ResponseEntity<ServiceResponse<Object>> checkUserNameExists(GetUserNameExistsQuery qry) {
+        ServiceResponse<Object> apiResponse = null;
+        try {
+            HandlerResponse<Object> handlerResponse = usersQueryHandler.handle(qry);
+
+            apiResponse = processHandlerResult(handlerResponse);
+
+            return ResponseEntity
+                    .status(apiResponse.getHttpStatus())
+                    .body(apiResponse);
+        } catch (Exception ex) {
+            apiResponse = processHandlerError(ex);
+        }
+        return ResponseEntity
+                .status(apiResponse.getHttpStatus())
+                .body(apiResponse);
+    }
+
+    @Operation(summary = "Check if Email Exists", description = "Check if an email already exists in the system.")
+    @GetMapping(value = "/check-email", headers = "X-API-Version=1")
+    @ApiResponse(responseCode = "200:OK", description = "Returns true if email exists, false otherwise.")
+    public ResponseEntity<ServiceResponse<Object>> checkEmailExists(GetEmailExistsQuery qry) {
         ServiceResponse<Object> apiResponse = null;
         try {
             HandlerResponse<Object> handlerResponse = usersQueryHandler.handle(qry);

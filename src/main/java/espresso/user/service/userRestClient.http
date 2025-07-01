@@ -43,3 +43,15 @@ X-API-Version: 1
 GET http://localhost:8080/api/qry/user/check-username?username=nonexistentuser HTTP/1.1
 accept: application/json
 X-API-Version: 1
+
+
+### Check if email exists (should return true if user was created above)
+GET http://localhost:8080/api/qry/user/check-email?email=john.doe@example.com HTTP/1.1
+accept: application/json
+X-API-Version: 1
+
+
+### Check if email exists (should return false for non-existing email)
+GET http://localhost:8080/api/qry/user/check-email?email=nonexistent@example.com HTTP/1.1
+accept: application/json
+X-API-Version: 1

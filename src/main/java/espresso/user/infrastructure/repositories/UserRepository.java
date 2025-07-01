@@ -33,6 +33,11 @@ public class UserRepository implements IUserRepository {
     }
 
     @Override
+    public boolean checkEmailExists(String email) {
+        return userJpaRepository.checkEmailExists(email);
+    }
+
+    @Override
     public <T> T findByKey(String entityKey, Class<T> type) {
 
         return this.userJpaRepository.findByKey(entityKey, type);

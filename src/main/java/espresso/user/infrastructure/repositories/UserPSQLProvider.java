@@ -18,6 +18,9 @@ public interface UserPSQLProvider extends JpaRepository<User, Long> {
     @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.username = ?1")
     boolean checkUsernameExists(String username);
 
+    @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.email = ?1")
+    boolean checkEmailExists(String email);
+
     @Query("SELECT u FROM User u WHERE u.entityKey = :entityKey")
     <T> T findByKey(String entityKey, Class<T> type);
 }
