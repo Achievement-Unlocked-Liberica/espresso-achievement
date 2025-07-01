@@ -8,6 +8,7 @@ public interface IUserRepository {
     User findByEmail(String email);
     boolean checkUsernameExists(String username);
     boolean checkEmailExists(String email);
-
     <T> T findByKey(String entityKey, Class<T> type);
+
+    void updateProfilePicture(Long id, String pictureUrl);
 }

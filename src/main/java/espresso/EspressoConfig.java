@@ -22,8 +22,8 @@ public class EspressoConfig implements WebMvcConfigurer {
     OpenAPI OpenApiConfig() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Lulo Project - Bernese - Core")
-                        .description("These are the core services of the lulo project.")
+                        .title("Achievement Unlocked Project - Espresso - Core")
+                        .description("These are the core services of the espresso project.")
                         .version("1.0.0"));
     }
 }

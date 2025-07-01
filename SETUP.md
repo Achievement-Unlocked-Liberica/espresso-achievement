@@ -124,6 +124,7 @@ helm package helm/bernese-core -d helm/packages
 ```
 
 ```
+//REVIEW THIS LINE
 helm install bernese-core-service helm/packages/bernese-core-service-0.1.0.tgz --set image.tag=latest -n lulo-services --create-namespace
 ```
 

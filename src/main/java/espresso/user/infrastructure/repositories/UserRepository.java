@@ -42,4 +42,10 @@ public class UserRepository implements IUserRepository {
 
         return this.userJpaRepository.findByKey(entityKey, type);
     }
+
+    @Override
+    public void updateProfilePicture(Long id, String pictureUrl) {
+
+        this.userJpaRepository.updateProfilePicture(id, pictureUrl);
+    }
 }

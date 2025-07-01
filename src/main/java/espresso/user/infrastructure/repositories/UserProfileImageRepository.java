@@ -1,0 +1,38 @@
+package espresso.user.infrastructure.repositories;
+
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Repository;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import espresso.user.domain.contracts.IUserProfileImageRepository;
+import espresso.user.domain.entities.UserProfileImage;
+
+@Repository
+public class UserProfileImageRepository implements IUserProfileImageRepository {
+
+    @Autowired
+    private Environment environment;
+
+    @Autowired
+    UserProfilePictureS3Provider s3DataProvider;
+
+    @Override
+    public UserProfileImage save(UserProfileImage userProfileImage) {
+        // Implementation for saving the user profile image
+        try {
+            String directory = environment.getProperty("user.profilePicture.directory");
+
+            String objectStoragePath = s3DataProvider.uploadImage(directory, userProfileImage);
+
+            // Clear the image data to avoid sending large binary data in the response
+            userProfileImage.setImageData(null);
+
+            userProfileImage.setProfileImageUrl(objectStoragePath);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return userProfileImage; // Placeholder return
+    }
+
+}

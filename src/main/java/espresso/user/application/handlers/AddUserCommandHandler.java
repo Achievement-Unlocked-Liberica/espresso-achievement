@@ -6,15 +6,21 @@ import org.springframework.stereotype.Service;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
 import espresso.user.domain.commands.AddUserCommand;
+import espresso.user.domain.commands.UpdateProfilePictureCommand;
 import espresso.user.domain.contracts.IUserCommandHandler;
+import espresso.user.domain.contracts.IUserProfileImageRepository;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
+import espresso.user.domain.entities.UserProfileImage;
 
 @Service
 public class AddUserCommandHandler implements IUserCommandHandler {
 
     @Autowired
     private IUserRepository userRepository;
+
+    @Autowired
+    private IUserProfileImageRepository userProfileImageRepository;
 
     public HandlerResponse<Object> handle(AddUserCommand command) {
         try {
@@ -52,4 +58,31 @@ public class AddUserCommandHandler implements IUserCommandHandler {
             return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
         }
     }
+
+    @Override
+    public HandlerResponse<Object> handle(UpdateProfilePictureCommand cmd) {
+        try {
+            // Validate the command
+            var validationErrors = cmd.validate();
+
+            if (!validationErrors.isEmpty()) {
+                return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
+            }
+
+            // Retrieve the RegisteredUser by key
+            User user = userRepository.findByKey(cmd.getRegisteredUserKey(), User.class);
+
+            UserProfileImage entity = UserProfileImage.create(user, cmd.getImage().getOriginalFilename(),
+                    cmd.getImage().getContentType(), cmd.getImage().getBytes());
+
+            UserProfileImage savedEntity = userProfileImageRepository.save(entity);
+
+            userRepository.updateProfilePicture(user.getId(), savedEntity.getProfileImageUrl());
+
+            return HandlerResponse.success(savedEntity);
+        } catch (Exception ex) {
+            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+        }
+    }
+
 }
