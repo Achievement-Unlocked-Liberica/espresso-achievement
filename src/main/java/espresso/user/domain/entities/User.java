@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
 import lombok.*;
 import espresso.common.domain.models.DomainEntity;
@@ -17,7 +19,11 @@ import espresso.common.domain.support.KeyGenerator;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "User")
-@Table(name = "Users")
+@Table(name = "Users", indexes = {
+        @Index(name = "user_entitykey_idx", columnList = "entitykey", unique = true),
+        @Index(name = "user_username_idx", columnList = "username", unique = true),
+        @Index(name = "user_email_idx", columnList = "email", unique = true)
+})
 public class User extends DomainEntity {
 
     @Id
@@ -35,7 +41,12 @@ public class User extends DomainEntity {
     private String firstName;
     private String lastName;
     private LocalDate birthDate;
-    private String profilePictureUrl;
+    // private String profilePictureUrl;
+
+    @JsonManagedReference
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "profileImageId", referencedColumnName = "id")
+    UserProfileImage profileImage;
 
     private boolean emailVerified;
     private boolean ageVerified;
@@ -93,18 +104,6 @@ public class User extends DomainEntity {
 
         if (birthDate != null) {
             this.birthDate = birthDate;
-        }
-    }
-
-    /**
-     * Updates the profile picture URL of the registered user
-     * 
-     * @param profilePictureUrl The new profile picture URL (can be null to skip
-     *                          update)
-     */
-    public void setProfilePicture(String profilePictureUrl) {
-        if (profilePictureUrl != null) {
-            this.profilePictureUrl = profilePictureUrl;
         }
     }
 

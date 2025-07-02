@@ -22,6 +22,7 @@ public class AddUserCommandHandler implements IUserCommandHandler {
     @Autowired
     private IUserProfileImageRepository userProfileImageRepository;
 
+
     public HandlerResponse<Object> handle(AddUserCommand command) {
         try {
             // Validate the command
@@ -72,12 +73,21 @@ public class AddUserCommandHandler implements IUserCommandHandler {
             // Retrieve the RegisteredUser by key
             User user = userRepository.findByKey(cmd.getRegisteredUserKey(), User.class);
 
-            UserProfileImage entity = UserProfileImage.create(user, cmd.getImage().getOriginalFilename(),
-                    cmd.getImage().getContentType(), cmd.getImage().getBytes());
+            if (user == null) {
+                return HandlerResponse.error("User not found", ResponseType.NOT_FOUND);
+            }
+
+            UserProfileImage entity = UserProfileImage.create(
+                    user,
+                    cmd.getImage().getOriginalFilename(),
+                    cmd.getImage().getContentType(),
+                    cmd.getImage().getBytes());
 
             UserProfileImage savedEntity = userProfileImageRepository.save(entity);
 
-            userRepository.updateProfilePicture(user.getId(), savedEntity.getProfileImageUrl());
+            user.setProfileImage(savedEntity);
+
+            userRepository.save(user);
 
             return HandlerResponse.success(savedEntity);
         } catch (Exception ex) {

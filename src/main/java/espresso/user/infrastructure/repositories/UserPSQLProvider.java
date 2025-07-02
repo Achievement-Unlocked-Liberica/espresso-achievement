@@ -27,9 +27,4 @@ public interface UserPSQLProvider extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.entityKey = :entityKey")
     <T> T findByKey(String entityKey, Class<T> type);
 
-    @Modifying
-    @Transactional
-    @Query("UPDATE User u SET u.profilePictureUrl = :pictureUrl WHERE u.id = :id")
-    void updateProfilePicture(@Param("id") Long id, @Param("pictureUrl") String pictureUrl);
-
 }

@@ -16,6 +16,9 @@ public class UserProfileImageRepository implements IUserProfileImageRepository {
     @Autowired
     UserProfilePictureS3Provider s3DataProvider;
 
+    @Autowired
+    UserProfilePicturePSQLProvider psqlProvider;
+
     @Override
     public UserProfileImage save(UserProfileImage userProfileImage) {
         // Implementation for saving the user profile image
@@ -28,6 +31,10 @@ public class UserProfileImageRepository implements IUserProfileImageRepository {
             userProfileImage.setImageData(null);
 
             userProfileImage.setProfileImageUrl(objectStoragePath);
+
+            UserProfileImage savedEntity = psqlProvider.save(userProfileImage);
+
+            return savedEntity;
 
         } catch (Exception e) {
             e.printStackTrace();
