@@ -14,7 +14,7 @@ import espresso.user.domain.entities.User;
 import espresso.user.domain.entities.UserProfileImage;
 
 @Service
-public class AddUserCommandHandler implements IUserCommandHandler {
+public class UserCommandHandler implements IUserCommandHandler {
 
     @Autowired
     private IUserRepository userRepository;
