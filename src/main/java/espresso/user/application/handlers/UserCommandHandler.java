@@ -27,6 +27,7 @@ public class UserCommandHandler implements IUserCommandHandler {
         try {
             // Validate the command
             var validationErrors = command.validate();
+
             if (!validationErrors.isEmpty()) {
                 return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
             }
@@ -47,6 +48,7 @@ public class UserCommandHandler implements IUserCommandHandler {
             User entity = User.create(
                     command.getUsername(),
                     command.getEmail(),
+                    command.getPassword(),
                     command.getFirstName(),
                     command.getLastName(),
                     command.getBirthDate());

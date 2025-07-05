@@ -10,6 +10,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import espresso.common.domain.models.DomainEntity;
 import espresso.common.domain.support.KeyGenerator;
+import espresso.common.domain.support.PasswordService;
 
 //TODO: Add the birthDate to the vertical feature
 //TODO: Add the profilePictureUrl to the vertical feature
@@ -38,6 +39,10 @@ public class User extends DomainEntity {
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;
+
+    @Column(name = "passwordHash", nullable = false)
+    private String passwordHash;
+    
     private String firstName;
     private String lastName;
     private LocalDate birthDate;
@@ -56,7 +61,7 @@ public class User extends DomainEntity {
     private boolean active;
     private OffsetDateTime registeredAt;
 
-    public static User create(String username, String email, String firstName, String lastName,
+    public static User create(String username, String email, String password, String firstName, String lastName,
             LocalDate birthDate) {
         User entity = new User();
 
@@ -64,6 +69,7 @@ public class User extends DomainEntity {
 
         entity.setUsername(username);
         entity.setEmail(email);
+        entity.setPasswordHash(PasswordService.hashPassword(password));
         entity.setFirstName(firstName);
         entity.setLastName(lastName);
         entity.setBirthDate(birthDate);
@@ -105,6 +111,25 @@ public class User extends DomainEntity {
         if (birthDate != null) {
             this.birthDate = birthDate;
         }
+    }
+
+    /**
+     * Verifies a plain text password against the stored hash
+     * 
+     * @param plainPassword The plain text password to verify
+     * @return true if the password matches, false otherwise
+     */
+    public boolean verifyPassword(String plainPassword) {
+        return PasswordService.verifyPassword(plainPassword, this.passwordHash);
+    }
+
+    /**
+     * Updates the user's password with a new hashed password
+     * 
+     * @param newPassword The new plain text password
+     */
+    public void updatePassword(String newPassword) {
+        this.passwordHash = PasswordService.hashPassword(newPassword);
     }
 
 }

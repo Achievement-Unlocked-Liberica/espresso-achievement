@@ -29,9 +29,9 @@ public class AddUserCommand extends CommonCommand{
     @Email(message = "LOCALIZE: EMAIL MUST BE A VALID EMAIL ADDRESS")
     private String email;
 
-    // @NotBlank(message = "LOCALIZE: PASSWORD MUST NOT BE BLANK")
-    // @Size(min = 8, max = 100, message = "LOCALIZE: PASSWORD MUST BE BETWEEN 8 AND 100 CHARACTERS")
-    // private String password;
+    @NotBlank(message = "LOCALIZE: PASSWORD MUST NOT BE BLANK")
+    @Size(min = 8, max = 100, message = "LOCALIZE: PASSWORD MUST BE BETWEEN 8 AND 100 CHARACTERS")
+    private String password;
 
     @NotBlank(message = "LOCALIZE: FIRSTNAME MUST NOT BE BLANK")
     @Size(max = 100, message = "LOCALIZE: FIRSTNAME MUST NOT BE GREATER THAN 100 CHARACTERS")
@@ -40,7 +40,8 @@ public class AddUserCommand extends CommonCommand{
     @NotBlank(message = "LOCALIZE: LASTNAME MUST NOT BE BLANK")
     @Size(max = 100, message = "LOCALIZE: LASTNAME MUST NOT BE GREATER THAN 100 CHARACTERS")
     private String lastName;
-      @NotNull(message = "LOCALIZE: BIRTHDATE MUST NOT BE BLANK")
+
+    @NotNull(message = "LOCALIZE: BIRTHDATE MUST NOT BE BLANK")
     @Past(message = "LOCALIZE: BIRTHDATE MUST BE A PAST DATE")
     private LocalDate birthDate;
 }

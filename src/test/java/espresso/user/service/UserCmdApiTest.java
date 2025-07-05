@@ -47,6 +47,7 @@ class UserCmdApiTest {
         validAddUserCommand = new AddUserCommand(
             "johndoe123",
             "john.doe@example.com",
+            "securePassword123",
             "John",
             "Doe",
             LocalDate.of(1990, 5, 15)
@@ -376,6 +377,7 @@ class UserCmdApiTest {
         AddUserCommand minCommand = new AddUserCommand(
             "abcde", // minimum 5 chars
             "a@b.co", // minimum valid email
+            "password", // minimum 8 chars password
             "J", // minimum first name
             "D", // minimum last name
             LocalDate.of(2000, 1, 1) // valid past date
@@ -404,6 +406,7 @@ class UserCmdApiTest {
         AddUserCommand maxCommand = new AddUserCommand(
             longUsername,
             "very.long.email.address@example-domain.com",
+            "a".repeat(100), // max 100 chars password
             longFirstName,
             longLastName,
             LocalDate.of(1950, 12, 31)

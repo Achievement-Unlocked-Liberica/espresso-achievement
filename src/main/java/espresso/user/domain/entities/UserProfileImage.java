@@ -3,15 +3,10 @@ package espresso.user.domain.entities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import espresso.common.domain.models.ValueEntity;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
@@ -25,9 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "UserProfileImage")
-@Table(name = "UserProfileImages", indexes = {
-        @Index(name = "user_profile_image_user_idx", columnList = "userId", unique = true)
-})
+@Table(name = "UserProfileImages")
 public class UserProfileImage extends ValueEntity {
 
     @Id
@@ -35,7 +28,7 @@ public class UserProfileImage extends ValueEntity {
     private Long id;
 
     @JsonBackReference
-    @OneToOne(mappedBy = "profileImage")
+    @OneToOne(mappedBy = "profileImage", cascade = jakarta.persistence.CascadeType.ALL)
     private User user;
 
     private String imageName;
