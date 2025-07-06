@@ -21,15 +21,6 @@ public class EspressoConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    OpenAPI OpenApiConfig() {
-        return new OpenAPI()
-                .info(new Info()
-                        .title("Achievement Unlocked Project - Espresso - Core")
-                        .description("These are the core services of the espresso project.")
-                        .version("1.0.0"));
-    }
-
-    @Bean
     MessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
         messageSource.setBasename("messages/achievement_api_messages");

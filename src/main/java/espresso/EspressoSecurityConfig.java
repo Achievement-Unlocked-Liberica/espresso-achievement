@@ -22,7 +22,11 @@ public class EspressoSecurityConfig {
             
             // Configure authorization
             .authorizeHttpRequests(authz -> authz
-                // Allow all requests for now (no authentication required)
+                // Allow Swagger/OpenAPI endpoints
+                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/api-docs/**", "/v3/api-docs/**").permitAll()
+                // Allow actuator endpoints for health checks
+                .requestMatchers("/actuator/**").permitAll()
+                // Allow all other requests for now (no authentication required)
                 .anyRequest().permitAll()
             );
 
