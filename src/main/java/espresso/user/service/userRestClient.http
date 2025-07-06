@@ -1,5 +1,5 @@
 ### Create a new User
-POST http://localhost:8080/api/cmd/user HTTP/1.1
+POST https://localhost:8443/api/cmd/user HTTP/1.1
 Content-Type: application/json
 accept: application/json
 X-API-Version: 1
@@ -15,7 +15,7 @@ X-API-Version: 1
 
 
 ### Create another User
-POST http://localhost:8080/api/cmd/user HTTP/1.1
+POST https://localhost:8443/api/cmd/user HTTP/1.1
 Content-Type: application/json
 accept: application/json
 X-API-Version: 1
@@ -31,36 +31,36 @@ X-API-Version: 1
 
 
 ### Get User by Entity Key
-GET http://localhost:8080/api/qry/user?entityKey=3ctn0Jm&size=lg HTTP/1.1
+GET https://localhost:8443/api/qry/user?entityKey=3ctn0Jm&size=lg HTTP/1.1
 accept: application/json
 X-API-Version: 1
 
 
 ### Check if username exists (should return true if user was created above)
-GET http://localhost:8080/api/qry/user/check-username?username=johndoe123 HTTP/1.1
+GET https://localhost:8443/api/qry/user/check-username?username=johndoe123 HTTP/1.1
 accept: application/json
 X-API-Version: 1
 
 
 ### Check if username exists (should return false for non-existing user)
-GET http://localhost:8080/api/qry/user/check-username?username=nonexistentuser HTTP/1.1
+GET https://localhost:8443/api/qry/user/check-username?username=nonexistentuser HTTP/1.1
 accept: application/json
 X-API-Version: 1
 
 
 ### Check if email exists (should return true if user was created above)
-GET http://localhost:8080/api/qry/user/check-email?email=john.doe@example.com HTTP/1.1
+GET https://localhost:8443/api/qry/user/check-email?email=john.doe@example.com HTTP/1.1
 accept: application/json
 X-API-Version: 1
 
 
 ### Check if email exists (should return false for non-existing email)
-GET http://localhost:8080/api/qry/user/check-email?email=nonexistent@example.com HTTP/1.1
+GET https://localhost:8443/api/qry/user/check-email?email=nonexistent@example.com HTTP/1.1
 accept: application/json
 X-API-Version: 1
 
 ### Upload a profile picture for a registered user
-PUT http://localhost:8080/api/cmd/user/3ctn0Jm/picture
+PUT https://localhost:8443/api/cmd/user/3ctn0Jm/picture
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 X-API-Version: 1
 
