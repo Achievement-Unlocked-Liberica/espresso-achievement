@@ -1,4 +1,4 @@
-package espresso.security.service;
+package espresso.security.application.handlers;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -14,6 +14,7 @@ import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
 import espresso.security.domain.commands.AuthCredentialsCommand;
 import espresso.security.domain.entities.JWTUserToken;
+import espresso.security.infrastructure.repositories.JWTRepository;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
 
@@ -24,7 +25,7 @@ public class CredentialsCommandHandlerTest {
     private IUserRepository userRepository;
 
     @Mock
-    private JWTService jwtService;
+    private JWTRepository jwtRepository;
 
     @InjectMocks
     private CredentialsCommandHandler credentialsCommandHandler;
@@ -50,7 +51,7 @@ public class CredentialsCommandHandlerTest {
     void handle_ValidCredentials_ReturnsSuccessWithToken() {
         // Arrange
         when(userRepository.findByUsername("testuser")).thenReturn(mockUser);
-        when(jwtService.generateToken(mockUser)).thenReturn(mockToken);
+        when(jwtRepository.generateToken(mockUser)).thenReturn(mockToken);
 
         // Act
         HandlerResponse<Object> result = credentialsCommandHandler.handle(validCommand);
@@ -62,7 +63,7 @@ public class CredentialsCommandHandlerTest {
         assertTrue(result.getData() instanceof JWTUserToken);
         
         verify(userRepository).findByUsername("testuser");
-        verify(jwtService).generateToken(mockUser);
+        verify(jwtRepository).generateToken(mockUser);
     }
 
     @Test

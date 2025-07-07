@@ -21,9 +21,13 @@ This module contains authentication and authorization functionality for the Espr
   - Expiration time
   - User information (userKey, username, email, firstName, lastName)
 
-### Services
-- `JWTService`: Handles JWT token generation and validation
+### Application Layer
 - `CredentialsCommandHandler`: Processes authentication commands
+
+### Infrastructure Layer
+- `JWTRepository`: Handles JWT token generation and validation
+
+### Service Layer  
 - `SecurityCmdApi`: REST API controller for authentication endpoints
 
 ### Contracts

@@ -1,4 +1,4 @@
-package espresso.security.service;
+package espresso.security.infrastructure.repositories;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -7,7 +7,7 @@ import java.util.Date;
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import espresso.security.domain.entities.JWTUserToken;
 import espresso.user.domain.entities.User;
@@ -15,8 +15,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
-@Service
-public class JWTService {
+@Repository
+public class JWTRepository {
 
     @Value("${app.jwt.secret}")
     private String jwtSecret;
