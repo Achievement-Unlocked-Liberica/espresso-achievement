@@ -40,6 +40,10 @@ public class CommonApi {
                     return ServiceResponse.error(HttpStatus.BAD_REQUEST, result.getData());
                 case NOT_FOUND:
                     return ServiceResponse.error(HttpStatus.NOT_FOUND, result.getData());
+                case UNAUTHORIZED:
+                    return ServiceResponse.error(HttpStatus.UNAUTHORIZED, result.getData());
+                case FORBIDDEN:
+                    return ServiceResponse.error(HttpStatus.FORBIDDEN, result.getData());
                 default:
                     return ServiceResponse.error(HttpStatus.INTERNAL_SERVER_ERROR, result.getData());
             }

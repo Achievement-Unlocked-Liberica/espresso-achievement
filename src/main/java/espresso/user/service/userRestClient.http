@@ -7,7 +7,7 @@ X-API-Version: 1
 {
   "username": "johndoe123",
   "email": "john.doe@example.com",
-  "password": "securePassword123",
+  "password": "P@ssw0rd123",
   "firstName": "John",
   "lastName": "Doe",
   "birthDate": "1990-05-15"
