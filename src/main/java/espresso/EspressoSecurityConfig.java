@@ -43,6 +43,8 @@ public class EspressoSecurityConfig {
                 .requestMatchers("/actuator/**").permitAll()
                 // Allow authentication endpoint (login)
                 .requestMatchers("/api/cmd/security/auth").permitAll()
+                // Allow registration endpoint (register)
+                .requestMatchers("/api/cmd/security/register").permitAll()
                 // Require authentication for all other API endpoints
                 .requestMatchers("/api/**").authenticated()
                 // Allow all other requests (static resources, etc.)

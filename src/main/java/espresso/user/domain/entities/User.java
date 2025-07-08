@@ -82,6 +82,32 @@ public class User extends DomainEntity {
     }
 
     /**
+     * Creates a new User entity for registration with basic information only
+     * 
+     * @param username The username for the new user
+     * @param email    The email address for the new user
+     * @param password The plain text password (will be hashed)
+     * @return A new User entity ready for registration
+     */
+    public static User createForRegistration(String username, String email, String password) {
+        User entity = new User();
+
+        entity.setEntityKey(KeyGenerator.generateKey(7));
+        entity.setUsername(username);
+        entity.setEmail(email);
+        entity.setPasswordHash(PasswordService.hashPassword(password));
+
+        entity.registeredAt = OffsetDateTime.now(ZoneOffset.UTC);
+        entity.active = true;
+        entity.emailVerified = false;
+        entity.ageVerified = false;
+        entity.phoneVerified = false;
+        entity.addressVerified = false;
+
+        return entity;
+    }
+
+    /**
      * Updates the basic profile information of the registered user
      * 
      * @param username  The new username (can be null to skip update)

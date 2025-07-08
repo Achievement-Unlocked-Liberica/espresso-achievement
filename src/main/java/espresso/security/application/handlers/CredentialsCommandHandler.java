@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+import espresso.security.application.handlers.RegisterUserCommandHandler;
 import espresso.security.domain.commands.AuthCredentialsCommand;
+import espresso.security.domain.commands.RegisterUserCommand;
 import espresso.security.domain.contracts.ISecurityCommandHandler;
 import espresso.security.domain.entities.JWTAuthToken;
 import espresso.security.domain.entities.JWTUserToken;
@@ -22,6 +24,9 @@ public class CredentialsCommandHandler implements ISecurityCommandHandler {
 
     @Autowired
     private JWTAuthToken jwtAuthToken;
+
+    @Autowired
+    private RegisterUserCommandHandler registerUserCommandHandler;
 
     @Override
     public HandlerResponse<Object> handle(AuthCredentialsCommand command) {
@@ -56,5 +61,10 @@ public class CredentialsCommandHandler implements ISecurityCommandHandler {
         } catch (Exception ex) {
             return HandlerResponse.error("LOCALIZE: AUTHENTICATION FAILED - " + ex.getMessage(), ResponseType.INTERNAL_ERROR);
         }
+    }
+
+    @Override
+    public HandlerResponse<Object> handle(RegisterUserCommand command) {
+        return registerUserCommandHandler.handle(command);
     }
 }
