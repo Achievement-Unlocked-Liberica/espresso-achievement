@@ -84,4 +84,40 @@ public class JWTAuthToken {
             return true;
         }
     }
+
+    /**
+     * Validates JWT token and returns true if valid
+     */
+    public boolean isValidToken(String token) {
+        try {
+            validateToken(token);
+            return !isTokenExpired(token);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Extracts user key from JWT token
+     */
+    public String extractUserKey(String token) {
+        try {
+            Claims claims = validateToken(token);
+            return claims.get("userKey", String.class);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Extracts email from JWT token
+     */
+    public String extractEmail(String token) {
+        try {
+            Claims claims = validateToken(token);
+            return claims.get("email", String.class);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

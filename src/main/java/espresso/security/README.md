@@ -8,6 +8,8 @@ This module contains authentication and authorization functionality for the Espr
 - User credential validation
 - Secure password verification
 - Token generation with user information
+- **Automatic JWT token validation for all API endpoints**
+- **Authorization header-based security**
 
 ## Components
 
@@ -24,6 +26,11 @@ This module contains authentication and authorization functionality for the Espr
 
 ### Application Layer
 - `CredentialsCommandHandler`: Processes authentication commands
+
+### Infrastructure Layer
+- `JWTAuthenticationFilter`: Intercepts HTTP requests and validates JWT tokens
+- `JWTAuthenticationEntryPoint`: Handles authentication errors
+- `CustomUserDetailsService`: Loads user details for Spring Security
 
 ### Service Layer  
 - `SecurityCmdApi`: REST API controller for authentication endpoints
@@ -84,6 +91,28 @@ app.jwt.expiration=86400000  # 24 hours in milliseconds
 - Active user validation
 - Comprehensive input validation with localized error messages
 - Domain-driven JWT token creation and validation
+- **Automatic protection of all `/api/**` endpoints (except `/api/cmd/security/auth`)**
+- **JWT token validation on every request via `JWTAuthenticationFilter`**
+- **Proper error handling for missing or invalid tokens**
+
+## API Security
+
+### Protected Endpoints
+All API endpoints under `/api/**` require a valid JWT token in the Authorization header, except:
+- `/api/cmd/security/auth` (authentication endpoint)
+- `/swagger-ui/**` (API documentation)
+- `/actuator/**` (health checks)
+
+### Authorization Header Format
+```
+Authorization: Bearer <your-jwt-token-here>
+```
+
+### Authentication Flow
+1. **Login**: POST to `/api/cmd/security/auth` with username/password
+2. **Get Token**: Receive JWT token in response
+3. **Use Token**: Include token in Authorization header for all subsequent API calls
+4. **Token Validation**: Every request is automatically validated by `JWTAuthenticationFilter`
 
 ## Testing
 

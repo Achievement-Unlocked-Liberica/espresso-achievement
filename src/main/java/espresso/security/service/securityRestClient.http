@@ -3,7 +3,8 @@
 # Base URL
 @baseUrl = http://localhost:8080
 
-### Authenticate User - Login
+### Authenticate User - Login (Get JWT Token)
+# @name login
 POST {{baseUrl}}/api/cmd/security/auth
 Content-Type: application/json
 
@@ -12,8 +13,25 @@ Content-Type: application/json
   "password": "P@ssw0rd123"
 }
 
+### Extract token from previous request (for VS Code REST Client)
+@authToken = {{login.response.body.data.token}}
+
+### Test Protected Endpoint with JWT Token
+GET {{baseUrl}}/api/cmd/user
+Authorization: Bearer {{authToken}}
+
+### Test Another Protected Endpoint with JWT Token
+GET {{baseUrl}}/api/qry/user/johndoe123
+Authorization: Bearer {{authToken}}
+
+### Test Protected Endpoint without Authorization Header (Should fail)
+GET {{baseUrl}}/api/cmd/user
+
+### Test Protected Endpoint with Invalid Token (Should fail)
+GET {{baseUrl}}/api/cmd/user
+Authorization: Bearer invalid-token-here
+
 ### Authenticate User - Sample with Variables
-# @name login
 POST {{baseUrl}}/api/cmd/security/auth
 Content-Type: application/json
 
