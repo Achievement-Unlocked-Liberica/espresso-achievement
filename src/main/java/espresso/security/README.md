@@ -20,12 +20,10 @@ This module contains authentication and authorization functionality for the Espr
   - Token type (Bearer)
   - Expiration time
   - User information (userKey, username, email, firstName, lastName)
+- `JWTAuthToken`: Domain service for JWT token generation and validation
 
 ### Application Layer
 - `CredentialsCommandHandler`: Processes authentication commands
-
-### Infrastructure Layer
-- `JWTRepository`: Handles JWT token generation and validation
 
 ### Service Layer  
 - `SecurityCmdApi`: REST API controller for authentication endpoints
@@ -82,9 +80,10 @@ app.jwt.expiration=86400000  # 24 hours in milliseconds
 ## Security Features
 
 - Passwords are securely hashed using the existing `PasswordService`
-- JWT tokens include user claims and expiration
+- JWT tokens include user claims and expiration via `JWTAuthToken` domain service
 - Active user validation
 - Comprehensive input validation with localized error messages
+- Domain-driven JWT token creation and validation
 
 ## Testing
 

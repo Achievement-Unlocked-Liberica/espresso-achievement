@@ -9,8 +9,8 @@ import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
 import espresso.security.domain.commands.AuthCredentialsCommand;
 import espresso.security.domain.contracts.ISecurityCommandHandler;
+import espresso.security.domain.entities.JWTAuthToken;
 import espresso.security.domain.entities.JWTUserToken;
-import espresso.security.infrastructure.repositories.JWTRepository;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
 
@@ -21,7 +21,7 @@ public class CredentialsCommandHandler implements ISecurityCommandHandler {
     private IUserRepository userRepository;
 
     @Autowired
-    private JWTRepository jwtRepository;
+    private JWTAuthToken jwtAuthToken;
 
     @Override
     public HandlerResponse<Object> handle(AuthCredentialsCommand command) {
@@ -49,7 +49,7 @@ public class CredentialsCommandHandler implements ISecurityCommandHandler {
             }
 
             // Generate JWT token
-            JWTUserToken jwtToken = jwtRepository.generateToken(user);
+            JWTUserToken jwtToken = jwtAuthToken.generateToken(user);
 
             return HandlerResponse.success(jwtToken);
 
