@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+import espresso.common.domain.support.NameGenerator;
 import espresso.security.domain.commands.RegisterUserCommand;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
@@ -45,7 +46,7 @@ public class RegisterUserCommandHandler {
             );
 
             // Save the user
-            User savedUser = userRepository.save(newUser);
+            User savedUser = userRepository.save(newUser);            
 
             return HandlerResponse.success(savedUser);
 

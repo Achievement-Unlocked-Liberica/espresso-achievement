@@ -9,9 +9,9 @@ POST {{baseUrl}}/api/cmd/security/register
 Content-Type: application/json
 
 {
-  "username": "newuser123",
+  "username": "pedrof",
   "password": "NewPass123@",
-  "email": "newuser@example.com"
+  "email": "pedrof@example.com"
 }
 
 ### Authenticate User - Login (Get JWT Token)

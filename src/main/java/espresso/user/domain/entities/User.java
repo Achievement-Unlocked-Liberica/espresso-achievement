@@ -10,6 +10,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import espresso.common.domain.models.DomainEntity;
 import espresso.common.domain.support.KeyGenerator;
+import espresso.common.domain.support.NameGenerator;
 import espresso.common.domain.support.PasswordService;
 
 //TODO: Add the birthDate to the vertical feature
@@ -42,7 +43,7 @@ public class User extends DomainEntity {
 
     @Column(name = "passwordHash", nullable = false)
     private String passwordHash;
-    
+
     private String firstName;
     private String lastName;
     private LocalDate birthDate;
@@ -103,6 +104,13 @@ public class User extends DomainEntity {
         entity.ageVerified = false;
         entity.phoneVerified = false;
         entity.addressVerified = false;
+
+        String randomName = NameGenerator.generateProfileName();
+
+        if (randomName != null && !randomName.isEmpty()) {
+            entity.firstName = randomName.split(" ")[0];
+            entity.lastName = randomName.split(" ")[1];
+        }
 
         return entity;
     }
