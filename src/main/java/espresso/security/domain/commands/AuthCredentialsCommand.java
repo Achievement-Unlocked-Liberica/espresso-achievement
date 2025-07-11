@@ -18,14 +18,8 @@ import espresso.common.domain.commands.CommonCommand;
 public class AuthCredentialsCommand extends CommonCommand {
 
     @NotBlank(message = "LOCALIZE: USERNAME MUST NOT BE BLANK")
-    @Size(min = 5, max = 50, message = "LOCALIZE: USERNAME MUST BE BETWEEN 5 AND 50 CHARACTERS")
     private String username;
 
     @NotBlank(message = "LOCALIZE: PASSWORD MUST NOT BE BLANK")
-    @Size(min = 8, max = 100, message = "LOCALIZE: PASSWORD MUST BE BETWEEN 8 AND 100 CHARACTERS")
-    @Pattern(
-        regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$",
-        message = "LOCALIZE: PASSWORD MUST CONTAIN AT LEAST ONE LOWERCASE LETTER, ONE UPPERCASE LETTER, ONE NUMBER, AND ONE SPECIAL CHARACTER (@$!%*?&)"
-    )
     private String password;
 }

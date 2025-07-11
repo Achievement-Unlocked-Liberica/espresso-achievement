@@ -20,8 +20,8 @@ POST {{baseUrl}}/api/cmd/security/auth
 Content-Type: application/json
 
 {
-  "username": "johndoe123",
-  "password": "P@ssw0rd123"
+  "username": "newuser123",
+  "password": "NewPass123@"
 }
 
 ### Extract token from previous request (for VS Code REST Client)
