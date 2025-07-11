@@ -29,6 +29,14 @@ X-API-Version: 1
   "birthDate": "1992-08-22"
 }
 
+### Get My User
+@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuZXd1c2VyMTIzIiwidXNlcktleSI6IjhuRWpXYWkiLCJlbWFpbCI6Im5ld3VzZXJAZXhhbXBsZS5jb20iLCJpYXQiOjE3NTIyMTczNDAsImV4cCI6MTc1MjMwMzczOX0.ltimCPMeENqayqX61sjRPvlfu0G_iHhxum-OR0xn47HCZOMAumjJliqIq2q-zBlD
+GET https://localhost:8443/api/qry/user/me HTTP/1.1
+accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuZXd1c2VyMTIzIiwidXNlcktleSI6IjhuRWpXYWkiLCJlbWFpbCI6Im5ld3VzZXJAZXhhbXBsZS5jb20iLCJpYXQiOjE3NTIyMTc2MzAsImV4cCI6MTc1MjMwNDAzMH0.kfN6xHrffGdlbDJOxu1821KCjbvQqnkzXxBpV5lRup-iRLFaaj4pHM_pz_EnkCrJ
+X-API-Version: 1
+
+
 
 ### Get User by Entity Key
 GET https://localhost:8443/api/qry/user?entityKey=3ctn0Jm&size=lg HTTP/1.1

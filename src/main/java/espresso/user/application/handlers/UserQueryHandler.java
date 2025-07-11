@@ -9,6 +9,7 @@ import espresso.common.domain.responses.ResponseType;
 import espresso.user.domain.queries.GetUserByKeyQuery;
 import espresso.user.domain.queries.GetUserNameExistsQuery;
 import espresso.user.domain.queries.GetEmailExistsQuery;
+import espresso.user.domain.queries.GetMyUserQuery;
 import espresso.user.domain.contracts.IUserQueryHandler;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.UserDtoLg;
@@ -82,6 +83,28 @@ public class UserQueryHandler implements IUserQueryHandler {
             boolean emailExists = this.userRepository.checkEmailExists(qry.getEmail());
 
             return HandlerResponse.success(emailExists);
+
+        } catch (Exception ex) {
+            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+        }
+    }
+
+    @Override
+    public HandlerResponse<Object> handle(GetMyUserQuery qry) {
+        try {
+            // Validate the query
+            var validationErrors = qry.validate();
+
+            if (!validationErrors.isEmpty()) {
+                return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
+            }
+
+            // Get the user by entity key using UserDtoLg (same as GetUserByKeyQuery)
+            Object userDto = this.userRepository.findByKey(qry.getEntityKey(), UserDtoLg.class);
+
+            return userDto != null
+                    ? HandlerResponse.success(userDto)
+                    : HandlerResponse.error("User not found", ResponseType.NOT_FOUND);
 
         } catch (Exception ex) {
             return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
