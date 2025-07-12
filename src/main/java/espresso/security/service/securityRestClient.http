@@ -20,7 +20,7 @@ POST {{baseUrl}}/api/cmd/security/auth
 Content-Type: application/json
 
 {
-  "username": "newuser123",
+  "username": "pedrof",
   "password": "NewPass123@"
 }
 

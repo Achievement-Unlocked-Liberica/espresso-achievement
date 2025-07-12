@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonQryApi;
+import espresso.common.service.operational.ApiLogger;
 import espresso.user.domain.queries.GetUserByKeyQuery;
 import espresso.user.domain.queries.GetUserNameExistsQuery;
 import espresso.user.domain.queries.GetEmailExistsQuery;
@@ -33,6 +34,7 @@ public class UserQryApi extends CommonQryApi {
     @Operation(summary = "Get Single User By Key", description = "Get a single user by their entity key.")
     @GetMapping(value = "", headers = "X-API-Version=1")
     @ApiResponse(responseCode = "200:OK", description = "Get User by Key.")
+    @ApiLogger("Get user by entity key")
     public ResponseEntity<ServiceResponse<Object>> getUserByKey(GetUserByKeyQuery qry) {
         return executeQuery(qry, usersQueryHandler::handle);
     }
@@ -40,6 +42,7 @@ public class UserQryApi extends CommonQryApi {
     @Operation(summary = "Check if Username Exists", description = "Check if a username already exists in the system.")
     @GetMapping(value = "/check-username", headers = "X-API-Version=1")
     @ApiResponse(responseCode = "200:OK", description = "Returns true if username exists, false otherwise.")
+    @ApiLogger("Check username availability")
     public ResponseEntity<ServiceResponse<Object>> checkUserNameExists(GetUserNameExistsQuery qry) {
         return executeQuery(qry, usersQueryHandler::handle);
     }
@@ -47,6 +50,7 @@ public class UserQryApi extends CommonQryApi {
     @Operation(summary = "Check if Email Exists", description = "Check if an email already exists in the system.")
     @GetMapping(value = "/check-email", headers = "X-API-Version=1")
     @ApiResponse(responseCode = "200:OK", description = "Returns true if email exists, false otherwise.")
+    @ApiLogger("Check email availability")
     public ResponseEntity<ServiceResponse<Object>> checkEmailExists(GetEmailExistsQuery qry) {
         return executeQuery(qry, usersQueryHandler::handle);
     }
@@ -56,6 +60,7 @@ public class UserQryApi extends CommonQryApi {
     @ApiResponse(responseCode = "200:OK", description = "Returns the authenticated user's profile.")
     @ApiResponse(responseCode = "401:UNAUTHORIZED", description = "User not authenticated.")
     @ApiResponse(responseCode = "404:NOT_FOUND", description = "User profile not found.")
+    @ApiLogger("Get authenticated user profile")
     // public ResponseEntity<ServiceResponse<Object>> getMyUserProfile(@AuthenticationPrincipal JWTAuthenticationToken jwt) {
     public ResponseEntity<ServiceResponse<Object>> getMyUserProfile() {
         // Get authentication from SecurityContext

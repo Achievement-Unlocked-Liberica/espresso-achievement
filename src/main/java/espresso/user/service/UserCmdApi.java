@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonCmdApi;
+import espresso.common.service.operational.ApiLogger;
 import espresso.user.domain.commands.AddUserCommand;
 import espresso.user.domain.commands.UpdateProfilePictureCommand;
 import espresso.user.domain.contracts.IUserCommandHandler;
@@ -34,6 +35,7 @@ public class UserCmdApi extends CommonCmdApi {
     @ApiResponse(responseCode = "201:CREATED", description = "Created a new User successfully.")
     @ApiResponse(responseCode = "400:BAD_REQUEST", description = "Validation error in the request.")
     @ApiResponse(responseCode = "500:INTERNAL_SERVER_ERROR", description = "An internal error occurred.")
+    @ApiLogger("Create new user")
     public ResponseEntity<ServiceResponse<Object>> createUser(@RequestBody AddUserCommand command) {
         return executeCommand(command, userCommandHandler::handle);
     }
@@ -44,6 +46,7 @@ public class UserCmdApi extends CommonCmdApi {
     @ApiResponse(responseCode = "404:NOT_FOUND", description = "User not found.")
     @ApiResponse(responseCode = "500:INTERNAL_SERVER_ERROR", description = "An internal error occurred.")
     @PutMapping("/{key}/picture")
+    @ApiLogger("Upload user profile picture")
     public ResponseEntity<ServiceResponse<Object>> updateProfilePicture(@RequestParam MultipartFile image,
             @PathVariable String key) {
 

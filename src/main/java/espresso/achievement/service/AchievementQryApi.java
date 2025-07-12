@@ -20,6 +20,7 @@ import espresso.achievement.domain.queries.GetAchievementSummaryByKeyQuery;
 import espresso.achievement.domain.readModels.AchievementDetailReadModel;
 import espresso.achievement.domain.readModels.AchievementSummaryReadModel;
 import espresso.achievement.domain.readModels.MediaStorageDetailReadModel;
+import espresso.common.service.operational.ApiLogger;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -41,6 +42,7 @@ public class AchievementQryApi {
 	@Operation(summary = "Health Check", description = "Checks the health of the API.")
 	@GetMapping("/health")
 	@ApiResponse(responseCode = "200:OK", description = "API is healthy.")
+	@ApiLogger("Achievement API health check")
 	public ResponseEntity<ApiResult<String>> healthCheck() {
 
 		String message = apiMsgHelper.getMessage("achievementQryHealthy", null);
@@ -55,6 +57,7 @@ public class AchievementQryApi {
 	@Operation(summary = "Get Achievement by Key", description = "Retrieves an existing Achievemnt by its Key.")
 	@GetMapping("/detail")
 	@ApiResponse(responseCode = "200:OK", description = "Retrieves an existing Achievemnt by its Key.")
+	@ApiLogger("Get achievement detail by key")
 	public ResponseEntity<ApiResult<Object>> getAchivementDetailByKey(
 		@Valid GetAchievementDetailByKeyQuery query) {
 
@@ -82,6 +85,7 @@ public class AchievementQryApi {
 	@Operation(summary = "Get Achievement by Key", description = "Retrieves an existing Achievemnt by its Key.")
 	@GetMapping("/summary")
 	@ApiResponse(responseCode = "200:OK", description = "Retrieves an existing Achievemnt by its Key.")
+	@ApiLogger("Get achievement summary by key")
 	public ResponseEntity<ApiResult<Object>> getAchivementSummaryByKey(
 		@Valid GetAchievementSummaryByKeyQuery query) {
 
@@ -109,6 +113,7 @@ public class AchievementQryApi {
 	@Operation(summary = "Get Achievements by User", description = "Retrieves the existing Achievements for a user.")
 	@GetMapping("/summary/user")
 	@ApiResponse(responseCode = "200:OK", description = "Retrieves the existing Achievements for a user.")
+	@ApiLogger("Get achievement summaries by user")
 	public ResponseEntity<ApiResult<Object>> getAchivementSummariesByUser(
 		@Valid GetAchievementSummariesByUserQuery query) {
 
@@ -139,6 +144,7 @@ public class AchievementQryApi {
 	@Operation(summary = "Get Achievement Media storage endpoints and keys", description = "Retrieves the endpoint and access keys for uploading media files for an achievement.")
 	@GetMapping("/media/storage")
 	@ApiResponse(responseCode = "200:OK", description = "Retrieves the endpoint and access keys for uploading media files for an achievement.")
+	@ApiLogger("Get achievement media storage details")
 	public ResponseEntity<ApiResult<Object>> getAchivementMediaStorage(
 		@Valid GetAchievementMediaStorageQuery query) {
 

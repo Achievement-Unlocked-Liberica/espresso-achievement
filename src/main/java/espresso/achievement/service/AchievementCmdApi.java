@@ -14,6 +14,7 @@ import espresso.achievement.domain.commands.CreateAchivementCommand;
 import espresso.achievement.domain.contracts.IAchievementCommandHandler;
 import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonCmdApi;
+import espresso.common.service.operational.ApiLogger;
 
 @RestController("Achievement Cmd Api")
 @RequestMapping("/api/cmd/achievement")
@@ -28,6 +29,7 @@ public class AchievementCmdApi extends CommonCmdApi {
 	@ApiResponse(responseCode = "201:CREATED", description = "Created a new Achievement successfully.")
 	@ApiResponse(responseCode = "400:BAD_REQUEST", description = "Validation error in the request.")
 	@ApiResponse(responseCode = "500:INTERNAL_SERVER_ERROR", description = "An internal error occurred.")
+	@ApiLogger("Create new achievement")
 	public ResponseEntity<ServiceResponse<Object>> createAchievement(@RequestBody CreateAchivementCommand command) {
 		return executeCommand(command, achivementCommandHandler::handle);
 	}

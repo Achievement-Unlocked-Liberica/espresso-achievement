@@ -9,12 +9,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
 import espresso.common.domain.responses.ServiceResponse;
+import espresso.common.service.operational.ApiLogger;
 
 public class CommonApi {
 
     @Operation(summary = "Health Check", description = "Checks the health of the API.")
     @GetMapping(value = "/health", headers = "X-API-Version=1")
     @ApiResponse(responseCode = "200:OK", description = "API is healthy.")
+    @ApiLogger("Common API health check")
     public ResponseEntity<String> healthCheckV1() {
         return ResponseEntity.ok("OK V1.0");
     }
