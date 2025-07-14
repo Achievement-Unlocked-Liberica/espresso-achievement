@@ -4,13 +4,16 @@ accept: */*
 X-API-Version: 1
 
 ### Create a new Achievement
+
+@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5IjoiOHF1dmtseiIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiT2RpbiIsImxhc3ROYW1lIjoiQm9sZGhhbW1lciIsImlhdCI6MTc1MjQ3NTk4MSwiZXhwIjoxNzUyNTYyMzgxfQ.uiNfafKuIbJDPBT3TkaZXLVa_bUfQtBe-qpFswGHRfZVfnnMBNmBj6KBmFSYeO5h
 POST http://localhost:8080/api/cmd/achievement HTTP/1.1
 Content-Type: application/json
 accept: application/json
 X-API-Version: 1
+Authorization: Bearer {{authToken}}
 
 {
-  "userKey": "user123",
+  "userKey": "8quvklz",
   "title": "Completed Java Spring Boot Course",
   "description": "Successfully completed a comprehensive Spring Boot development course covering REST APIs, JPA, and microservices architecture.",
   "completedDate": "2024-12-15",
