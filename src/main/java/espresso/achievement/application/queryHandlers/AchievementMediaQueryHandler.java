@@ -7,8 +7,6 @@ import espresso.AppConfiguration;
 import espresso.achievement.application.response.HandlerResult;
 import espresso.achievement.domain.contracts.IAchievementMediaQueryHandler;
 import espresso.achievement.domain.contracts.IMediaQryRepository;
-import espresso.achievement.domain.entities.KeyGenerator;
-import espresso.achievement.domain.entities.PreMedia;
 import espresso.achievement.domain.queries.GetAchievementMediaStorageQuery;
 import espresso.achievement.domain.readModels.MediaStorageDetailReadModel;
 import lombok.NoArgsConstructor;

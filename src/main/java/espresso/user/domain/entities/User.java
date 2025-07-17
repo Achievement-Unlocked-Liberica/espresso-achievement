@@ -3,11 +3,14 @@ package espresso.user.domain.entities;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 import lombok.*;
+import espresso.achievement.domain.entities.Achievement;
 import espresso.common.domain.models.DomainEntity;
 import espresso.common.domain.support.KeyGenerator;
 import espresso.common.domain.support.NameGenerator;
@@ -52,7 +55,11 @@ public class User extends DomainEntity {
     @JsonManagedReference
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "profileImageId", referencedColumnName = "id")
-    UserProfileImage profileImage;
+    private UserProfileImage profileImage;
+
+    // @JsonBackReference
+    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // private List<Achievement> achievements;
 
     private boolean emailVerified;
     private boolean ageVerified;

@@ -6,15 +6,17 @@ import java.util.List;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import jakarta.persistence.Column;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
-import espresso.achievement.domain.events.NewAchievementCreated;
-import espresso.common.domain.models.DomainAggregate;
 import espresso.common.domain.models.DomainEntity;
 import espresso.common.domain.support.StringListConverter;
 import espresso.user.domain.entities.User;
@@ -36,25 +38,25 @@ import lombok.NoArgsConstructor;
 public class Achievement extends DomainEntity {
 
     
-    String title;
-    String description;
-    Date completedDate;
+    private String title;
+    private String description;
+    private Date completedDate;
+
+    @JsonManagedReference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", referencedColumnName = "id")
+    private User user;
 
     @Convert(converter = StringListConverter.class)
-    List<String> skills;
+    private List<String> skills;
 
-    //@JsonManagedReference 
-    //@OneToMany(mappedBy = "achievement", cascade = CascadeType.ALL)
-    @Transient
-    List<AchievementMedia> media;
-
-    //@OneToOne(cascade = CascadeType.ALL)
-    //@JoinColumn(name = "userProfileId")
-    @Transient
-    User user;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "achievement")
+    @JoinColumn(name = "achievementMediaId", referencedColumnName = "id")
+    private AchievementMedia media;
 
     @Enumerated(EnumType.STRING)
-    AchievementVisibilityStatus achievementVisibility;
+    private AchievementVisibilityStatus achievementVisibility;
 
     /*
      * The constructor is package-private to prevent the creation of an achievement
@@ -70,7 +72,7 @@ public class Achievement extends DomainEntity {
     }
 
     public static Achievement create(String title, String description, Date completedDate, boolean isPublic,
-            User userProfile, List<String> skills) {
+            User user, List<String> skills) {
 
         Achievement entity = new Achievement();
 
@@ -82,8 +84,8 @@ public class Achievement extends DomainEntity {
         entity.achievementVisibility = isPublic
                 ? AchievementVisibilityStatus.EVERYONE
                 : AchievementVisibilityStatus.PRIVATE;
-        entity.user = userProfile;
 
+        entity.setUser(user);
         entity.setSkills(skills);
 
         entity.raiseNewAchievementCreatedEvent();
@@ -92,16 +94,16 @@ public class Achievement extends DomainEntity {
     }
 
     private void initializeEntity() {
-        this.setEntityKey(KeyGenerator.generateShortString());
+        this.setEntityKey(espresso.common.domain.support.KeyGenerator.generateKey(7));
     }
 
-    public void setSkills(List<String> skills) {
-        this.skills = skills;
-    }
+    // public void setSkills(List<String> skills) {
+    //     this.skills = skills;
+    // }
 
-    public void setMedia(List<AchievementMedia> media) {
-        this.media = media;
-    }
+    // public void setMedia(AchievementMedia media) {
+    //     this.media = media;
+    // }
 
     // #region Domain Events
 

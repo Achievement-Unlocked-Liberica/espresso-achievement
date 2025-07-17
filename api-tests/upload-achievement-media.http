@@ -1,0 +1,37 @@
+### Upload Achievement Media API Test
+
+# First, create an achievement (you need to be authenticated)
+POST https://localhost:8443/api/cmd/achievement
+Content-Type: application/json
+
+{
+    "title": "Test Achievement",
+    "description": "A test achievement for media upload",
+    "completedDate": "2025-01-15T10:30:00",
+    "isPublic": true,
+    "userKey": "USER001",
+    "skills": ["Communication", "Leadership"]
+}
+
+###
+
+@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5IjoiS2phc0ticCIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiRGlhbmEiLCJsYXN0TmFtZSI6IkNoYXNlIiwiaWF0IjoxNzUyNzMzNjgyLCJleHAiOjE3NTI4MjAwODJ9.BaQ5Y443G0tHX4XCJ9NXIwqEqF3b2vAkaI_rnspsAg3Ov_f3ZDq4k_v2h4mDReYA
+# Upload media for the achievement (replace ACHI001 with actual key from response above)
+POST https://localhost:8443/api/cmd/achievement/GcbvRLJ/media
+Content-Type: multipart/form-data; boundary=boundary123
+X-API-Version: 1
+Authorization: Bearer {{authToken}}
+
+--boundary123
+Content-Disposition: form-data; name="image"; filename="achievement-image.jpg"
+Content-Type: image/jpeg
+
+< C:\Users\midor\Pictures\pedroMandalorian.jpg
+--boundary123--
+
+###
+
+# Alternative using curl (for command line testing)
+# curl -X POST https://localhost:8443/api/cmd/achievement/ACHI001/media \
+#   -F "image=@/path/to/your/image.jpg" \
+#   -H "Authorization: Bearer your-jwt-token"

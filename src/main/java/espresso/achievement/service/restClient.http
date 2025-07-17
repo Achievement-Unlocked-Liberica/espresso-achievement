@@ -5,7 +5,7 @@ X-API-Version: 1
 
 ### Create a new Achievement
 
-@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5IjoiOHF1dmtseiIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiT2RpbiIsImxhc3ROYW1lIjoiQm9sZGhhbW1lciIsImlhdCI6MTc1MjQ3NTk4MSwiZXhwIjoxNzUyNTYyMzgxfQ.uiNfafKuIbJDPBT3TkaZXLVa_bUfQtBe-qpFswGHRfZVfnnMBNmBj6KBmFSYeO5h
+@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5IjoiS2phc0ticCIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiRGlhbmEiLCJsYXN0TmFtZSI6IkNoYXNlIiwiaWF0IjoxNzUyNzMzMDA5LCJleHAiOjE3NTI4MTk0MDl9.d5FPJhsrrA-fMkQkoy8cDBJ3v7EIrKG19EoDqfDFxaNYfijDxvOf0bkz3e8Prgf7
 POST http://localhost:8080/api/cmd/achievement HTTP/1.1
 Content-Type: application/json
 accept: application/json
@@ -13,7 +13,7 @@ X-API-Version: 1
 Authorization: Bearer {{authToken}}
 
 {
-  "userKey": "8quvklz",
+  "userKey": "KjasKbp",
   "title": "Completed Java Spring Boot Course",
   "description": "Successfully completed a comprehensive Spring Boot development course covering REST APIs, JPA, and microservices architecture.",
   "completedDate": "2024-12-15",

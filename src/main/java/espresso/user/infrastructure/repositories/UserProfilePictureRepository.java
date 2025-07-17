@@ -4,11 +4,11 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import espresso.user.domain.contracts.IUserProfileImageRepository;
+import espresso.user.domain.contracts.IUserProfilePictureRepository;
 import espresso.user.domain.entities.UserProfileImage;
 
 @Repository
-public class UserProfileImageRepository implements IUserProfileImageRepository {
+public class UserProfilePictureRepository implements IUserProfilePictureRepository {
 
     @Autowired
     private Environment environment;

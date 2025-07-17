@@ -3,11 +3,9 @@ package espresso.achievement.infrastructure.repositories;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 import espresso.achievement.domain.contracts.IAchievementCmdRepository;
 import espresso.achievement.domain.entities.Achievement;
-
 
 @Primary
 @Component
@@ -36,4 +34,8 @@ public class AchievementCmdRepository implements IAchievementCmdRepository {
 
     }
 
+    @Override
+    public <T> T findByKey(String entityKey, Class<T> type) {
+        return this.achievementPSQLProvider.findByKey(entityKey, type);
+    }
 }

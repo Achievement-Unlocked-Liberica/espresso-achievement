@@ -1,5 +1,7 @@
 package espresso.user.application.handlers;
 
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -8,7 +10,7 @@ import espresso.common.domain.responses.ResponseType;
 import espresso.user.domain.commands.AddUserCommand;
 import espresso.user.domain.commands.UpdateProfilePictureCommand;
 import espresso.user.domain.contracts.IUserCommandHandler;
-import espresso.user.domain.contracts.IUserProfileImageRepository;
+import espresso.user.domain.contracts.IUserProfilePictureRepository;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
 import espresso.user.domain.entities.UserProfileImage;
@@ -20,7 +22,7 @@ public class UserCommandHandler implements IUserCommandHandler {
     private IUserRepository userRepository;
 
     @Autowired
-    private IUserProfileImageRepository userProfileImageRepository;
+    private IUserProfilePictureRepository userProfileImageRepository;
 
 
     public HandlerResponse<Object> handle(AddUserCommand command) {
@@ -79,11 +81,19 @@ public class UserCommandHandler implements IUserCommandHandler {
                 return HandlerResponse.error("User not found", ResponseType.NOT_FOUND);
             }
 
+             // Convert MultipartFile to byte array
+            byte[] imageData;
+            try {
+                imageData = cmd.getImage().getBytes();
+            } catch (IOException e) {
+                return HandlerResponse.error("Failed to process image: " + e.getMessage(), ResponseType.INTERNAL_ERROR);
+            }
+
             UserProfileImage entity = UserProfileImage.create(
                     user,
                     cmd.getImage().getOriginalFilename(),
                     cmd.getImage().getContentType(),
-                    cmd.getImage().getBytes());
+                    imageData);
 
             UserProfileImage savedEntity = userProfileImageRepository.save(entity);
 

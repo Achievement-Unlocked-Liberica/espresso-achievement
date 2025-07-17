@@ -1,23 +1,30 @@
 package espresso.achievement.domain.entities;
 
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
-
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Lob;
 
 import espresso.common.domain.models.DomainEntity;
+import espresso.common.domain.models.ValueEntity;
+import espresso.common.domain.support.KeyGenerator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+
+import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -25,51 +32,59 @@ import lombok.Getter;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-// @Entity(name = "AchievementMedia")
-// @Table(name = "AchievementMedias")
-public class AchievementMedia extends DomainEntity {
+@Entity(name = "AchievementMedia")
+@Table(name = "AchievementMedias")
+public class AchievementMedia extends ValueEntity {
 
-    private boolean isUploaded;
-    private String mediaPath;
-    private String originalName;
-    private String originalHash;
-    private String mimeType;
-    private Integer size;
-    private String encoding;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    // @JsonBackReference
-    // @ManyToOne
-    // @JoinColumn(name = "achievementId", nullable = false)
-    // private Achievement achievement;
+    @JsonBackReference
+    @OneToOne(mappedBy = "media")
+    private Achievement achievement;
 
-    public static AchievementMedia createPreMedia(String originalName, String mimeType, String encoding, Integer size) {
+    @Column(name = "imageName", nullable = false)
+    private String imageName;
 
-        AchievementMedia preMedia = new AchievementMedia();
- 
-        preMedia.setOriginalName(originalName);
-        preMedia.setMimeType(mimeType);
-        preMedia.setSize(size);
-        preMedia.setEncoding(encoding);
+    @Column(name = "contentType")
+    private String contentType;
 
-        preMedia.setEntityKey(KeyGenerator.generateShortString());
+    @Lob
+    @Column(name = "imageData")
+    private byte[] imageData;
 
-        return preMedia;
+    @Column(name = "mediaUrl")
+    private String mediaUrl;
+
+    @Column(name = "uploadTimestamp", nullable = false)
+    private LocalDateTime uploadTimestamp;
+
+    @Column(name = "fileSize")
+    private Long fileSize;
+
+    /**
+     * Static factory method to create a new AchievementMedia instance
+     * 
+     * @param achievement the achievement to associate with this media
+     * @param imageName the name of the uploaded image
+     * @param contentType the MIME type of the image
+     * @param imageData the binary data of the image
+     * @return a new AchievementMedia instance
+     */
+    public static AchievementMedia create(Achievement achievement, String imageName, String contentType, byte[] imageData) {
+        AchievementMedia media = new AchievementMedia();
+        // media.setAchievement(achievement);
+        media.setImageName(imageName);
+        media.setContentType(contentType);
+        media.setImageData(imageData);
+        media.setUploadTimestamp(LocalDateTime.now());
+        
+        if (imageData != null) {
+            media.setFileSize((long) imageData.length);
+        }
+        
+        return media;
     }
 
 }
-
-
-/*
-    private String storageUrl;
-    private String containerName;
-    private String mediaPath;
-    private String accessToken;
-
-
-PreMedia preMedia = new PreMedia(
-    appConfiguration.getCloudConfig().getStorageUrl(),
-    "media-files",
-    "/pre-media/" + achievement.getKey() + "/uploaded",
-    KeyGenerator.generateKeyString(24)
-);
-*/
