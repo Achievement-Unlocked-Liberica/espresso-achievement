@@ -33,7 +33,7 @@ public class UploadAchievementMediaCommandTest {
             imageData
         );
 
-        command = new UploadAchievementMediaCommand("ACHI001", mockFile); // 7 characters
+        command = new UploadAchievementMediaCommand("ACHI001", "USER123", mockFile); // 7 characters
 
         Set<String> errors = command.validate();
         
@@ -52,7 +52,7 @@ public class UploadAchievementMediaCommandTest {
             createValidImageData()
         );
 
-        command = new UploadAchievementMediaCommand("", mockFile);
+        command = new UploadAchievementMediaCommand("", "USER123", mockFile);
 
         Set<String> errors = command.validate();
         assertFalse(errors.isEmpty(), "Empty achievement key should cause validation error");
@@ -60,7 +60,7 @@ public class UploadAchievementMediaCommandTest {
 
     @Test
     void testMissingImage() {
-        command = new UploadAchievementMediaCommand("ACHI001", null); // 7 characters
+        command = new UploadAchievementMediaCommand("ACHI001", "USER123", null); // 7 characters
 
         Set<String> errors = command.validate();
         assertTrue(errors.stream().anyMatch(error -> error.contains("ACHIEVEMENT MEDIA CANNOT BE EMPTY")), 
@@ -76,7 +76,7 @@ public class UploadAchievementMediaCommandTest {
             "Not an image".getBytes()
         );
 
-        command = new UploadAchievementMediaCommand("ACHI001", mockFile); // 7 characters
+        command = new UploadAchievementMediaCommand("ACHI001", "USER123", mockFile); // 7 characters
 
         Set<String> errors = command.validate();
         assertTrue(errors.stream().anyMatch(error -> error.contains("INVALID FILE TYPE")), 
@@ -94,7 +94,7 @@ public class UploadAchievementMediaCommandTest {
             largeData
         );
 
-        command = new UploadAchievementMediaCommand("ACHI001", mockFile); // 7 characters
+        command = new UploadAchievementMediaCommand("ACHI001", "USER123", mockFile); // 7 characters
 
         Set<String> errors = command.validate();
         assertTrue(errors.stream().anyMatch(error -> error.contains("EXCEEDS MAXIMUM SIZE")), 

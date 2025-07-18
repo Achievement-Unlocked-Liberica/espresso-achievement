@@ -83,6 +83,20 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
                 return HandlerResponse.error("Achievement not found", ResponseType.NOT_FOUND);
             }
 
+            // Check if the requester is the owner of the achievement
+            User achievementOwner = achievement.getUser();
+
+            if (achievementOwner == null) {
+                return HandlerResponse.error("Achievement owner not found", ResponseType.NOT_FOUND);
+            }
+
+            String ownerEntityKey = achievementOwner.getEntityKey();
+            String requesterEntityKey = cmd.getUserKey();
+            
+            if (!ownerEntityKey.equals(requesterEntityKey)) {
+                return HandlerResponse.error("The requester is not the owner of the achievment", ResponseType.UNAUTHORIZED);
+            }
+
             // Convert MultipartFile to byte array
             byte[] imageData;
             try {

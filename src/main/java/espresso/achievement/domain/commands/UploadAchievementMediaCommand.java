@@ -57,6 +57,10 @@ public class UploadAchievementMediaCommand extends CommonCommand {
     @Size(min = 7, max = 7, message = "LOCALIZE: ENTITY KEY MUST BE EXACTLY 7 CHARACTERS")
     private String achievementKey;
 
+    @NotBlank(message = "LOCALIZE: USER KEY IS REQUIRED")
+    @Size(min = 7, max = 7, message = "LOCALIZE: ENTITY KEY MUST BE EXACTLY 7 CHARACTERS")
+    private String userKey;
+
     private MultipartFile image;
 
     @Override

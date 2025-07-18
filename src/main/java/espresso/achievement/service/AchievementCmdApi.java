@@ -2,6 +2,8 @@ package espresso.achievement.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +21,7 @@ import espresso.achievement.domain.contracts.IAchievementCommandHandler;
 import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonCmdApi;
 import espresso.common.service.operational.ApiLogger;
+import espresso.security.domain.entities.JWTAuthenticationToken;
 
 @RestController("Achievement Cmd Api")
 @RequestMapping("/api/cmd/achievement")
@@ -43,13 +46,23 @@ public class AchievementCmdApi extends CommonCmdApi {
 	@ApiResponse(responseCode = "201:CREATED", description = "Media uploaded successfully.")
 	@ApiResponse(responseCode = "400:BAD_REQUEST", description = "Validation error in the request.")
 	@ApiResponse(responseCode = "404:NOT_FOUND", description = "Achievement not found.")
+	@ApiResponse(responseCode = "401:UNAUTHORIZED", description = "User not authorized to upload media for this achievement.")
 	@ApiResponse(responseCode = "500:INTERNAL_SERVER_ERROR", description = "An internal error occurred.")
 	@ApiLogger("Upload achievement media")
 	public ResponseEntity<ServiceResponse<Object>> uploadAchievementMedia(			
 			@RequestParam("image") MultipartFile image,
 			@PathVariable String key) {
 
-		UploadAchievementMediaCommand command = new UploadAchievementMediaCommand(key, image);
+		// Get authentication from SecurityContext to extract user key from JWT
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String userKey = null;
+		
+		if (authentication instanceof JWTAuthenticationToken) {
+			JWTAuthenticationToken jwtAuth = (JWTAuthenticationToken) authentication;
+			userKey = jwtAuth.getUserKey();
+		}
+
+		UploadAchievementMediaCommand command = new UploadAchievementMediaCommand(key, userKey, image);
 		return executeCommand(command, achivementCommandHandler::handleUploadMedia);
 	}
 }

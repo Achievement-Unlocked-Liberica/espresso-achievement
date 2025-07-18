@@ -55,6 +55,7 @@ public class AchievementCmdApiUnitTest {
     void testUploadAchievementMediaCommandCreation() {
         // Arrange
         String achievementKey = "ACHI001";
+        String userKey = "USER123";
         MockMultipartFile mockFile = new MockMultipartFile(
             "image", 
             "test.jpg", 
@@ -63,10 +64,11 @@ public class AchievementCmdApiUnitTest {
         );
 
         // This test verifies that the command is created correctly with the path variable
-        UploadAchievementMediaCommand command = new UploadAchievementMediaCommand(achievementKey, mockFile);
+        UploadAchievementMediaCommand command = new UploadAchievementMediaCommand(achievementKey, userKey, mockFile);
 
         // Assert
         assertEquals(achievementKey, command.getAchievementKey());
+        assertEquals(userKey, command.getUserKey());
         assertEquals(mockFile, command.getImage());
     }
 }
