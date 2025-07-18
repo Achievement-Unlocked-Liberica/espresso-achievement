@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import espresso.AppConfiguration;
-import espresso.achievement.domain.entities.KeyGenerator;
 import espresso.achievement.domain.readModels.MediaStorageDetailReadModel;
 
 @Component
@@ -22,7 +21,7 @@ public class MediaQryBlobDBProvider {
                 appConfiguration.getCloudConfig().getStorageUrl(),
                 "media-files",
                 "/pre-media/" + key + "/uploaded",
-                KeyGenerator.generateKeyString(24));
+            "");
 
         return entity;
 

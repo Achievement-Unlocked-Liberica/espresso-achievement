@@ -100,7 +100,7 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
             );
 
             // Save the media
-            AchievementMedia savedMedia = achievementMediaRepository.save(media);
+            AchievementMedia savedMedia = achievementMediaRepository.save(achievement, media);
 
             return HandlerResponse.created(savedMedia);
 

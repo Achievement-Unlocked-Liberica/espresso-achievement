@@ -2,6 +2,9 @@ package espresso.user.infrastructure.repositories;
 
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Repository;
+
+import java.io.IOException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import espresso.user.domain.contracts.IUserProfilePictureRepository;
@@ -20,26 +23,20 @@ public class UserProfilePictureRepository implements IUserProfilePictureReposito
     UserProfilePicturePSQLProvider psqlProvider;
 
     @Override
-    public UserProfileImage save(UserProfileImage userProfileImage) {
+    public UserProfileImage save(UserProfileImage userProfileImage) throws IOException {
         // Implementation for saving the user profile image
-        try {
-            String directory = environment.getProperty("user.profilePicture.directory");
+        String directory = environment.getProperty("user.profilePicture.directory");
 
-            String objectStoragePath = s3DataProvider.uploadImage(directory, userProfileImage);
+        String objectStoragePath = s3DataProvider.uploadImage(directory, userProfileImage);
 
-            // Clear the image data to avoid sending large binary data in the response
-            userProfileImage.setImageData(null);
+        // Clear the image data to avoid sending large binary data in the response
+        userProfileImage.setImageData(null);
 
-            userProfileImage.setProfileImageUrl(objectStoragePath);
+        userProfileImage.setProfileImageUrl(objectStoragePath);
 
-            UserProfileImage savedEntity = psqlProvider.save(userProfileImage);
+        UserProfileImage savedEntity = psqlProvider.save(userProfileImage);
 
-            return savedEntity;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return userProfileImage; // Placeholder return
+        return savedEntity;
     }
 
 }

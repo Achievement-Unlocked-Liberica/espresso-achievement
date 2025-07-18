@@ -3,9 +3,6 @@ package espresso.achievement.domain.entities;
 import java.util.Date;
 import java.util.List;
 
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Convert;
@@ -51,9 +48,8 @@ public class Achievement extends DomainEntity {
     private List<String> skills;
 
     @JsonManagedReference
-    @OneToMany(mappedBy = "achievement")
-    @JoinColumn(name = "achievementMediaId", referencedColumnName = "id")
-    private AchievementMedia media;
+    @OneToMany(mappedBy = "achievement", fetch = FetchType.LAZY)
+    private List<AchievementMedia> media;
 
     @Enumerated(EnumType.STRING)
     private AchievementVisibilityStatus achievementVisibility;

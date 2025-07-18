@@ -27,7 +27,7 @@ public class AchievementMediaS3Provider {
 
         try {
             // Build the path for the achievement media
-            String imagePath = basePath + "/" + achievementMedia.getAchievement().getEntityKey() + "/" + achievementMedia.getImageName();
+            String imagePath = basePath + "/" + achievementMedia.getImageName();
 
             ObjectMetadata meta = new ObjectMetadata();
             meta.setContentLength(achievementMedia.getImageData().length);
