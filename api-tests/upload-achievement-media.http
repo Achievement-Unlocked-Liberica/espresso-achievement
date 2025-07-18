@@ -15,7 +15,7 @@ Content-Type: application/json
 
 ###
 
-@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5IjoiQTNSYzJtUSIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiTm9yYSIsImxhc3ROYW1lIjoiSGlsbCIsImlhdCI6MTc1MjgxNzI3NywiZXhwIjoxNzUyOTAzNjc3fQ.P8E6HVifv6QONHNMGrjoamO-jUAoepZsL7d8AXVKX6yXsfcJX5booote28_5mIBg
+@authToken = 
 # Upload media for the achievement (replace ACHI001 with actual key from response above)
 POST https://localhost:8443/api/cmd/achievement/QXols1y/media
 Content-Type: multipart/form-data; boundary=boundary123

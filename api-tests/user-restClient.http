@@ -30,7 +30,7 @@ X-API-Version: 1
 }
 
 ### Get My User
-@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5IjoiOHF1dmtseiIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiT2RpbiIsImxhc3ROYW1lIjoiQm9sZGhhbW1lciIsImlhdCI6MTc1MjI5MDExOSwiZXhwIjoxNzUyMzc2NTE5fQ.1-QKq3KKWHceAvxYzVErxADIM3_J67PNvlAv3sqf2LtNsd20Gv4EB82uiT6kkL_k
+@authToken = 
 GET https://localhost:8443/api/qry/user/me HTTP/1.1
 accept: application/json
 Authorization: Bearer {{authToken}}
