@@ -20,6 +20,7 @@ import espresso.achievement.domain.queries.GetAchievementSummaryByKeyQuery;
 import espresso.achievement.domain.readModels.AchievementDetailReadModel;
 import espresso.achievement.domain.readModels.AchievementSummaryReadModel;
 import espresso.achievement.domain.readModels.MediaStorageDetailReadModel;
+import espresso.common.service.CommonQryApi;
 import espresso.common.service.operational.ApiLogger;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,7 +28,7 @@ import jakarta.validation.Valid;
 
 @RestController("Achievement Qry Api")
 @RequestMapping("/api/qry/v1/achievement")
-public class AchievementQryApi {
+public class AchievementQryApi extends CommonQryApi {
 
 	@Autowired
 	private ApiMessageHelper apiMsgHelper;
@@ -37,21 +38,6 @@ public class AchievementQryApi {
 
 	@Autowired
 	private IAchievementMediaQueryHandler achievementMediaQueryHandler;
-
-
-	@Operation(summary = "Health Check", description = "Checks the health of the API.")
-	@GetMapping("/health")
-	@ApiResponse(responseCode = "200:OK", description = "API is healthy.")
-	@ApiLogger("Achievement API health check")
-	public ResponseEntity<ApiResult<String>> healthCheck() {
-
-		String message = apiMsgHelper.getMessage("achievementQryHealthy", null);
-
-		return ResponseEntity
-				.status(HttpStatus.OK)
-				.body(ApiResult.success(null, message));
-	}
-
 
 
 	@Operation(summary = "Get Achievement by Key", description = "Retrieves an existing Achievemnt by its Key.")
@@ -168,6 +154,8 @@ public class AchievementQryApi {
 							e.toString()));
 		}
 	}
+
+	
 
 
 }
