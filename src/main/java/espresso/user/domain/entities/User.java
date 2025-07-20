@@ -3,14 +3,12 @@ package espresso.user.domain.entities;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 import lombok.*;
-import espresso.achievement.domain.entities.Achievement;
 import espresso.common.domain.models.DomainEntity;
 import espresso.common.domain.support.KeyGenerator;
 import espresso.common.domain.support.NameGenerator;
@@ -23,6 +21,7 @@ import espresso.common.domain.support.PasswordService;
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity(name = "User")
 @Table(name = "Users", indexes = {
         @Index(name = "user_entitykey_idx", columnList = "entitykey", unique = true),
@@ -53,7 +52,7 @@ public class User extends DomainEntity {
     // private String profilePictureUrl;
 
     @JsonManagedReference
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profileImageId", referencedColumnName = "id")
     private UserProfileImage profileImage;
 

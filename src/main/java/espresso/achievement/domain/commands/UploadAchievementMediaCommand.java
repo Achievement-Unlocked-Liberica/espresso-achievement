@@ -61,7 +61,7 @@ public class UploadAchievementMediaCommand extends CommonCommand {
     @Size(min = 7, max = 7, message = "LOCALIZE: ENTITY KEY MUST BE EXACTLY 7 CHARACTERS")
     private String userKey;
 
-    private MultipartFile image;
+    private MultipartFile[] images;
 
     @Override
     public Set<String> validate() {
@@ -70,51 +70,63 @@ public class UploadAchievementMediaCommand extends CommonCommand {
             errors = new HashSet<>();
         }
 
-        // Check if image exists
-        if (image == null || image.isEmpty()) {
-            errors.add("image:" + ERROR_EMPTY_IMAGE);
-            return errors; // Return early as we can't validate further without an image
+        // Check if images array exists and is not empty
+        if (images == null || images.length == 0) {
+            errors.add("images:" + ERROR_EMPTY_IMAGE);
+            return errors; // Return early as we can't validate further without images
         }
 
-        // Validate file size
-        if (image.getSize() > MAX_FILE_SIZE_BYTES) {
-            errors.add("image:" + ERROR_FILE_SIZE);
-        }
-
-        // Validate file content type (MIME type)
-        String contentType = image.getContentType();
-        if (contentType == null || !ALLOWED_CONTENT_TYPES.contains(contentType)) {
-            errors.add("image:" + ERROR_FILE_TYPE);
-        }
-
-        // Validate image dimensions
-        try {
-            BufferedImage bufferedImage = ImageIO.read(image.getInputStream());
-            // Check if it's actually a valid image
-            if (bufferedImage == null) {
-                errors.add("image:" + ERROR_INVALID_IMAGE);
-                return errors; // Return early as we can't check dimensions without a valid image
+        // Validate each image in the array
+        for (int i = 0; i < images.length; i++) {
+            MultipartFile image = images[i];
+            String fieldPrefix = "Image " + (i + 1) + ": "; // 1-based indexing for user-friendly messages
+            
+            // Check if individual image exists
+            if (image == null || image.isEmpty()) {
+                errors.add(fieldPrefix + ERROR_EMPTY_IMAGE);
+                continue;
             }
 
-            // Check dimensions
-            int width = bufferedImage.getWidth();
-            int height = bufferedImage.getHeight();
-
-            if (width < MIN_IMAGE_DIMENSION || height < MIN_IMAGE_DIMENSION) {
-                errors.add("image:" + ERROR_IMAGE_TOO_SMALL);
+            // Validate file size
+            if (image.getSize() > MAX_FILE_SIZE_BYTES) {
+                errors.add(fieldPrefix + ERROR_FILE_SIZE);
             }
 
-            if (width > MAX_IMAGE_DIMENSION || height > MAX_IMAGE_DIMENSION) {
-                errors.add("image:" + ERROR_IMAGE_TOO_LARGE);
+            // Validate file content type (MIME type)
+            String contentType = image.getContentType();
+            if (contentType == null || !ALLOWED_CONTENT_TYPES.contains(contentType)) {
+                errors.add(fieldPrefix + ERROR_FILE_TYPE);
             }
-        } catch (IOException e) {
-            errors.add("image:" + String.format(ERROR_PROCESSING_IMAGE, e.getMessage()));
-        }
 
-        // Validate filename
-        String originalFilename = image.getOriginalFilename();
-        if (originalFilename != null && !originalFilename.matches(FILENAME_REGEX_PATTERN)) {
-            errors.add("filename:" + ERROR_INVALID_FILENAME);
+            // Validate image dimensions
+            try {
+                BufferedImage bufferedImage = ImageIO.read(image.getInputStream());
+                // Check if it's actually a valid image
+                if (bufferedImage == null) {
+                    errors.add(fieldPrefix + ERROR_INVALID_IMAGE);
+                    continue; // Continue to next image
+                }
+
+                // Check dimensions
+                int width = bufferedImage.getWidth();
+                int height = bufferedImage.getHeight();
+
+                if (width < MIN_IMAGE_DIMENSION || height < MIN_IMAGE_DIMENSION) {
+                    errors.add(fieldPrefix + ERROR_IMAGE_TOO_SMALL);
+                }
+
+                if (width > MAX_IMAGE_DIMENSION || height > MAX_IMAGE_DIMENSION) {
+                    errors.add(fieldPrefix + ERROR_IMAGE_TOO_LARGE);
+                }
+            } catch (IOException e) {
+                errors.add(fieldPrefix + String.format(ERROR_PROCESSING_IMAGE, e.getMessage()));
+            }
+
+            // Validate filename
+            String originalFilename = image.getOriginalFilename();
+            if (originalFilename != null && !originalFilename.matches(FILENAME_REGEX_PATTERN)) {
+                errors.add(fieldPrefix + ERROR_INVALID_FILENAME);
+            }
         }
 
         return errors;

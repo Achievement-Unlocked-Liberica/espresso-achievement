@@ -5,7 +5,7 @@ X-API-Version: 1
 
 ### Create a new Achievement
 
-@authToken = 
+@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5IjoiQTNSYzJtUSIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiTm9yYSIsImxhc3ROYW1lIjoiSGlsbCIsImlhdCI6MTc1MjkwMTI5OSwiZXhwIjoxNzUyOTg3Njk5fQ.ECjr0NxmaxGAeaiVZaffsETaHf0dlu4Ukr97KVTuj9oAuX03LIoJhaYaSb9q5bP2
 POST http://localhost:8080/api/cmd/achievement HTTP/1.1
 Content-Type: application/json
 accept: application/json
@@ -14,10 +14,10 @@ Authorization: Bearer {{authToken}}
 
 {
   "userKey": "A3Rc2mQ",
-  "title": "Completed Java Spring Boot Course",
-  "description": "Successfully completed a comprehensive Spring Boot development course covering REST APIs, JPA, and microservices architecture.",
-  "completedDate": "2024-12-15",
-  "skills": ["int", "wis", "con"],
+  "title": "Completed Miilti File Upload",
+  "description": "Sucessfully implemented multi file upload for achievement media.",
+  "completedDate": "2025-07-18",
+  "skills": ["int", "wis", "luc"],
   "isPublic": true
 }
 

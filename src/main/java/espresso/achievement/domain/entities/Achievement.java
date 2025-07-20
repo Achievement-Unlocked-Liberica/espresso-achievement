@@ -3,6 +3,7 @@ package espresso.achievement.domain.entities;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Convert;
@@ -29,6 +30,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity(name = "Achievement")
 @Table(name = "Achievements")
 // @Table(name = "achievements", indexes = {@Index(name = "achievement_idx", columnList = "key", unique = true)})

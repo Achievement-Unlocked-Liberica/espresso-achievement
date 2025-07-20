@@ -128,12 +128,18 @@ public class AchievementApiTest {
 
     @Test
     void shouldUploadAchievementMediaSuccessfully() throws Exception {
-        // Create a mock image file
-        MockMultipartFile mockFile = new MockMultipartFile(
-            "image", 
-            "test-achievement.jpg", 
+        // Create mock image files
+        MockMultipartFile mockFile1 = new MockMultipartFile(
+            "images", 
+            "test-achievement1.jpg", 
             "image/jpeg", 
-            "test image content".getBytes()
+            "test image content 1".getBytes()
+        );
+        MockMultipartFile mockFile2 = new MockMultipartFile(
+            "images", 
+            "test-achievement2.jpg", 
+            "image/jpeg", 
+            "test image content 2".getBytes()
         );
 
         // Mock the handler response
@@ -142,7 +148,8 @@ public class AchievementApiTest {
 
         this.mockMvc
                 .perform(multipart("/api/cmd/achievement/ACHI001/media")
-                        .file(mockFile)
+                        .file(mockFile1)
+                        .file(mockFile2)
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andDo(print())
                 .andExpect(status().isCreated());
@@ -160,7 +167,7 @@ public class AchievementApiTest {
     @Test
     void shouldReturnBadRequestForInvalidAchievementKey() throws Exception {
         MockMultipartFile mockFile = new MockMultipartFile(
-            "image", 
+            "images", 
             "test-achievement.jpg", 
             "image/jpeg", 
             "test image content".getBytes()
@@ -177,7 +184,7 @@ public class AchievementApiTest {
     @Test
     void shouldReturnNotFoundForNonExistentAchievement() throws Exception {
         MockMultipartFile mockFile = new MockMultipartFile(
-            "image", 
+            "images", 
             "test-achievement.jpg", 
             "image/jpeg", 
             "test image content".getBytes()

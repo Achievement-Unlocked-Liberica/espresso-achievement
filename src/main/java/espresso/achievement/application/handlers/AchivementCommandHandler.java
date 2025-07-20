@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import espresso.achievement.domain.contracts.IAchievementCommandHandler;
 import espresso.achievement.domain.commands.CreateAchivementCommand;
@@ -97,26 +98,30 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
                 return HandlerResponse.error("The requester is not the owner of the achievment", ResponseType.UNAUTHORIZED);
             }
 
-            // Convert MultipartFile to byte array
-            byte[] imageData;
-            try {
-                imageData = cmd.getImage().getBytes();
-            } catch (IOException e) {
-                return HandlerResponse.error("Failed to process image: " + e.getMessage(), ResponseType.INTERNAL_ERROR);
+            // Process each image in the array
+            for (MultipartFile image : cmd.getImages()) {
+                // Convert MultipartFile to byte array
+                byte[] imageData;
+                try {
+                    imageData = image.getBytes();
+                } catch (IOException e) {
+                    return HandlerResponse.error("Failed to process image: " + e.getMessage(), ResponseType.INTERNAL_ERROR);
+                }
+
+                // Create AchievementMedia entity
+                AchievementMedia media = AchievementMedia.create(
+                    achievement,
+                    image.getOriginalFilename(),
+                    image.getContentType(),
+                    imageData
+                );
+
+                // Save the media
+                achievementMediaRepository.save(achievement, media);
             }
 
-            // Create AchievementMedia entity
-            AchievementMedia media = AchievementMedia.create(
-                achievement,
-                cmd.getImage().getOriginalFilename(),
-                cmd.getImage().getContentType(),
-                imageData
-            );
-
-            // Save the media
-            AchievementMedia savedMedia = achievementMediaRepository.save(achievement, media);
-
-            return HandlerResponse.created(savedMedia);
+            // Return the achievement instance
+            return HandlerResponse.created(achievement);
 
         } catch (Exception ex) {
             return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);

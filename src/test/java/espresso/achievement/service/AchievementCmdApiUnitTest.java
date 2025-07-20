@@ -31,12 +31,19 @@ public class AchievementCmdApiUnitTest {
     void testUploadAchievementMediaEndpointSignature() {
         // Arrange
         String achievementKey = "ACHI001";
-        MockMultipartFile mockFile = new MockMultipartFile(
-            "image", 
-            "test.jpg", 
+        MockMultipartFile mockFile1 = new MockMultipartFile(
+            "images", 
+            "test1.jpg", 
             "image/jpeg", 
-            "test content".getBytes()
+            "test content 1".getBytes()
         );
+        MockMultipartFile mockFile2 = new MockMultipartFile(
+            "images", 
+            "test2.jpg", 
+            "image/jpeg", 
+            "test content 2".getBytes()
+        );
+        MockMultipartFile[] mockFiles = {mockFile1, mockFile2};
 
         // Mock the handler response
         when(achivementCommandHandler.handleUploadMedia(any(UploadAchievementMediaCommand.class)))
@@ -44,7 +51,7 @@ public class AchievementCmdApiUnitTest {
 
         // Act
         ResponseEntity<ServiceResponse<Object>> response = 
-            achievementCmdApi.uploadAchievementMedia(mockFile, achievementKey);
+            achievementCmdApi.uploadAchievementMedia(mockFiles, achievementKey);
 
         // Assert
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -56,19 +63,26 @@ public class AchievementCmdApiUnitTest {
         // Arrange
         String achievementKey = "ACHI001";
         String userKey = "USER123";
-        MockMultipartFile mockFile = new MockMultipartFile(
-            "image", 
-            "test.jpg", 
+        MockMultipartFile mockFile1 = new MockMultipartFile(
+            "images", 
+            "test1.jpg", 
             "image/jpeg", 
-            "test content".getBytes()
+            "test content 1".getBytes()
         );
+        MockMultipartFile mockFile2 = new MockMultipartFile(
+            "images", 
+            "test2.jpg", 
+            "image/jpeg", 
+            "test content 2".getBytes()
+        );
+        MockMultipartFile[] mockFiles = {mockFile1, mockFile2};
 
         // This test verifies that the command is created correctly with the path variable
-        UploadAchievementMediaCommand command = new UploadAchievementMediaCommand(achievementKey, userKey, mockFile);
+        UploadAchievementMediaCommand command = new UploadAchievementMediaCommand(achievementKey, userKey, mockFiles);
 
         // Assert
         assertEquals(achievementKey, command.getAchievementKey());
         assertEquals(userKey, command.getUserKey());
-        assertEquals(mockFile, command.getImage());
+        assertEquals(mockFiles, command.getImages());
     }
 }

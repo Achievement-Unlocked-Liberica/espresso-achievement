@@ -41,7 +41,7 @@ public class AchievementCmdApi extends CommonCmdApi {
 		return executeCommand(command, achivementCommandHandler::handle);
 	}
 
-	@Operation(summary = "Upload Achievement Media", description = "Uploads media file for an existing Achievement.")
+	@Operation(summary = "Upload Achievement Media", description = "Uploads media files for an existing Achievement.")
 	@PostMapping("/{key}/media")
 	@ApiResponse(responseCode = "201:CREATED", description = "Media uploaded successfully.")
 	@ApiResponse(responseCode = "400:BAD_REQUEST", description = "Validation error in the request.")
@@ -50,7 +50,7 @@ public class AchievementCmdApi extends CommonCmdApi {
 	@ApiResponse(responseCode = "500:INTERNAL_SERVER_ERROR", description = "An internal error occurred.")
 	@ApiLogger("Upload achievement media")
 	public ResponseEntity<ServiceResponse<Object>> uploadAchievementMedia(			
-			@RequestParam("image") MultipartFile image,
+			@RequestParam("images") MultipartFile[] images,
 			@PathVariable String key) {
 
 		// Get authentication from SecurityContext to extract user key from JWT
@@ -62,7 +62,7 @@ public class AchievementCmdApi extends CommonCmdApi {
 			userKey = jwtAuth.getUserKey();
 		}
 
-		UploadAchievementMediaCommand command = new UploadAchievementMediaCommand(key, userKey, image);
+		UploadAchievementMediaCommand command = new UploadAchievementMediaCommand(key, userKey, images);
 		return executeCommand(command, achivementCommandHandler::handleUploadMedia);
 	}
 }

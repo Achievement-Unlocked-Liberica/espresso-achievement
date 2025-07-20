@@ -1,37 +1,34 @@
-### Upload Achievement Media API Test
-
-# First, create an achievement (you need to be authenticated)
-POST https://localhost:8443/api/cmd/achievement
-Content-Type: application/json
-
-{
-    "title": "Test Achievement",
-    "description": "A test achievement for media upload",
-    "completedDate": "2025-01-15T10:30:00",
-    "isPublic": true,
-    "userKey": "USER001",
-    "skills": ["Communication", "Leadership"]
-}
-
 ###
 
-@authToken = 
+@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5IjoiQTNSYzJtUSIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiTm9yYSIsImxhc3ROYW1lIjoiSGlsbCIsImlhdCI6MTc1MjkwMTI5OSwiZXhwIjoxNzUyOTg3Njk5fQ.ECjr0NxmaxGAeaiVZaffsETaHf0dlu4Ukr97KVTuj9oAuX03LIoJhaYaSb9q5bP2
 # Upload media for the achievement (replace ACHI001 with actual key from response above)
-POST https://localhost:8443/api/cmd/achievement/QXols1y/media
+POST https://localhost:8443/api/cmd/achievement/Qs95QJd/media
 Content-Type: multipart/form-data; boundary=boundary123
 X-API-Version: 1
 Authorization: Bearer {{authToken}}
 
 --boundary123
-Content-Disposition: form-data; name="image"; filename="achievement-image.jpg"
+Content-Disposition: form-data; name="images"; filename="achievement-image-1.jpg"
 Content-Type: image/jpeg
 
-< C:\Users\midor\Pictures\pedroMandalorian.jpg
+< D:\Documents\Pictures\dog1.jpg
+--boundary123
+Content-Disposition: form-data; name="images"; filename="achievement-image-2.jpg"
+Content-Type: image/jpeg
+
+< D:\Documents\Pictures\dog2.jpg
+--boundary123
+Content-Disposition: form-data; name="images"; filename="achievement-image-3.jpg"
+Content-Type: image/jpeg
+
+< D:\Documents\Pictures\dog3.jpg
 --boundary123--
 
 ###
 
 # Alternative using curl (for command line testing)
 # curl -X POST https://localhost:8443/api/cmd/achievement/ACHI001/media \
-#   -F "image=@/path/to/your/image.jpg" \
+#   -F "images=@/path/to/your/image1.jpg" \
+#   -F "images=@/path/to/your/image2.jpg" \
+#   -F "images=@/path/to/your/image3.jpg" \
 #   -H "Authorization: Bearer your-jwt-token"

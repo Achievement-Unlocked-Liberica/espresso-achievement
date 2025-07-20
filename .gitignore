@@ -35,5 +35,8 @@ build/
 # Private Files
 private/*
 
+# API Tests
+api-tests/*
+
 # Local configuration files
 src/main/resources/application-local.*
