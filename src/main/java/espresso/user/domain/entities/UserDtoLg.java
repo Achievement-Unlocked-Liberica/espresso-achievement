@@ -23,10 +23,4 @@ public interface UserDtoLg {
     LocalDate getBirthDate();
 
     UserProfileImageDtoLg getProfileImage();
-
-    boolean isEmailVerified();
-
-    boolean isActive();
-
-    OffsetDateTime getRegisteredAt();
 }

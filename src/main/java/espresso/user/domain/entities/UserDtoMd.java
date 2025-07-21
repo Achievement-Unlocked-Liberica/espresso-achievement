@@ -20,4 +20,6 @@ public interface UserDtoMd {
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     LocalDate getBirthDate();
+
+    UserProfileImageDtoMd getProfileImage();
 }

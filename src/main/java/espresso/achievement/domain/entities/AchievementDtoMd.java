@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import espresso.user.domain.entities.UserDtoSm;
 
+// TODO: do not used, this is a palce holder for an undefined DTO we don't have requirements for
 public interface AchievementDtoMd {
     
     String getEntityKey();

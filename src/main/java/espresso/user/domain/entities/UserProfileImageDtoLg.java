@@ -9,5 +9,4 @@ public interface UserProfileImageDtoLg {
     String getImageExtension();
 
     String getProfileImageUrl();
-
 }

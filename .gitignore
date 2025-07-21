@@ -36,7 +36,7 @@ build/
 private/*
 
 # API Tests
-api-tests/*
+api-tests/*.http
 
 # Local configuration files
 src/main/resources/application-local.*

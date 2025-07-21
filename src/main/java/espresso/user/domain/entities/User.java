@@ -24,23 +24,17 @@ import espresso.common.domain.support.PasswordService;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity(name = "User")
 @Table(name = "Users", indexes = {
-        @Index(name = "user_entitykey_idx", columnList = "entitykey", unique = true),
-        @Index(name = "user_username_idx", columnList = "username", unique = true),
-        @Index(name = "user_email_idx", columnList = "email", unique = true)
+        @Index(name = "idx_user_id_pkey", columnList = "id", unique = true),
+        @Index(name = "idx_user_entitykey_ukey", columnList = "entitykey", unique = true),
+        @Index(name = "idx_user_username_ukey", columnList = "username", unique = true),
+        @Index(name = "idx_user_email_ukey", columnList = "email", unique = true)
 })
 public class User extends DomainEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "entitykey", nullable = false, unique = true)
-    private String entityKey;
-
-    @Column(name = "username", nullable = false, unique = true)
+    @Column(name = "username", nullable = false)
     private String username;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email", nullable = false)
     private String email;
 
     @Column(name = "passwordHash", nullable = false)

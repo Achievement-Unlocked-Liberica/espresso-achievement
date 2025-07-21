@@ -26,7 +26,7 @@ public abstract class DomainEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
-    @Column(name = "entityKey", nullable = false, unique = true)
+    @Column(name = "entityKey", nullable = false)
     protected String entityKey;
 
     @Column(name="timeStamp", nullable = false)

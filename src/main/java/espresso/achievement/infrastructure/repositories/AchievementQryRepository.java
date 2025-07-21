@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 import espresso.achievement.domain.contracts.IAchievementQryRepository;
 import espresso.achievement.domain.readModels.AchievementDetailReadModel;
@@ -78,6 +78,29 @@ public class AchievementQryRepository implements IAchievementQryRepository {
         }
 
         return null;
+    }
+
+    @Override
+    public <T> List<T> getLatestAchievements(Class<T> dtoType, Integer limit) {
+        try {
+            if (dtoType == null) {
+                throw new IllegalArgumentException("DTO type cannot be null");
+            }
+            
+            if (limit == null || limit <= 0) {
+                limit = 10; // Default limit
+            }
+
+            // Use the PSQL provider to get achievements with DTO projection
+            return achievementPSQLProvider.findLatestAchievements(dtoType, Limit.of(limit));
+
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ArrayList<>();
     }
 
 }

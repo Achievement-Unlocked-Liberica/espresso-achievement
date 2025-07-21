@@ -1,5 +1,7 @@
 package espresso.achievement.domain.entities;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 
@@ -11,6 +13,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -30,16 +33,22 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 @Entity(name = "Achievement")
-@Table(name = "Achievements")
-// @Table(name = "achievements", indexes = {@Index(name = "achievement_idx", columnList = "key", unique = true)})
+@Table(name = "Achievements", indexes = {
+        @Index(name = "idx_achievement_registered_at_desc", columnList = "registeredAt DESC"),
+        @Index(name = "idx_achievement_id_pkey", columnList = "id", unique = true),
+        @Index(name = "idx_achievement_entitykey_ukey", columnList = "entityKey", unique = true)
+})
+// @Table(name = "achievements", indexes = {@Index(name = "achievement_idx",
+// columnList = "key", unique = true)})
 public class Achievement extends DomainEntity {
 
-    
     private String title;
     private String description;
     private Date completedDate;
+    private OffsetDateTime registeredAt;
+    private boolean active;
 
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.LAZY)
@@ -93,26 +102,28 @@ public class Achievement extends DomainEntity {
 
     private void initializeEntity() {
         this.setEntityKey(espresso.common.domain.support.KeyGenerator.generateKey(7));
+        this.registeredAt = OffsetDateTime.now(ZoneOffset.UTC);
+        this.active = true;
     }
 
     // public void setSkills(List<String> skills) {
-    //     this.skills = skills;
+    // this.skills = skills;
     // }
 
     // public void setMedia(AchievementMedia media) {
-    //     this.media = media;
+    // this.media = media;
     // }
 
     // #region Domain Events
 
     public void raiseNewAchievementCreatedEvent() {
         // this.domainEvents.add(new NewAchievementCreated(
-        //         this.getEntityKey(),
-        //         this.getUserProfile().getEntityKey(),
-        //         this.getCompletedDate(),
-        //         this.getSkills().stream().toArray(String[]::new),
-        //         this.getMedia().stream().map(AchievementMedia::getEntityKey).toArray(String[]::new)
-        //     ));
+        // this.getEntityKey(),
+        // this.getUserProfile().getEntityKey(),
+        // this.getCompletedDate(),
+        // this.getSkills().stream().toArray(String[]::new),
+        // this.getMedia().stream().map(AchievementMedia::getEntityKey).toArray(String[]::new)
+        // ));
     }
 
     // #endregion Domain Events

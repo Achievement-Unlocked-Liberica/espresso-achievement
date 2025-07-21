@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+// TODO: do not used, this is a palce holder for an undefined DTO we don't have requirements for
 public interface AchievementMediaDtoMd {
     
     String getImageKey();
@@ -12,12 +13,5 @@ public interface AchievementMediaDtoMd {
     
     String getOriginalImageName();
     
-    String getContentType();
-    
     String getMediaUrl();
-    
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    LocalDateTime getUploadTimestamp();
-    
-    Long getFileSize();
 }
