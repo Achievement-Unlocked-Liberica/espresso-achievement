@@ -12,6 +12,8 @@ public interface AchievementDtoSm {
     
     String getDescription();
 
+    List<String> getSkills();
+
     UserDtoSm getUser();
 
     List<AchievementMediaDtoSm> getMedia();

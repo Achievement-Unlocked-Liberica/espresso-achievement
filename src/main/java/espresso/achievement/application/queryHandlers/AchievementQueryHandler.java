@@ -18,6 +18,8 @@ import espresso.achievement.domain.queries.GetLatestAchievementsQuery;
 import espresso.achievement.domain.readModels.AchievementDetailReadModel;
 import espresso.achievement.domain.readModels.AchievementSummaryReadModel;
 import espresso.common.domain.queries.QuerySizeType;
+import espresso.common.domain.responses.HandlerResponse;
+import espresso.common.domain.responses.ResponseType;
 import lombok.NoArgsConstructor;
 
 @Service
@@ -62,7 +64,8 @@ public class AchievementQueryHandler implements IAchievementQueryHandler {
             throw new IllegalArgumentException("The query is null");
         }
 
-        List<AchievementSummaryReadModel> entity = achievementRepository.getAchievementSummariesByUserKey(query.getUserKey());
+        List<AchievementSummaryReadModel> entity = achievementRepository
+                .getAchievementSummariesByUserKey(query.getUserKey());
 
         return entity != null
                 ? HandlerResult.success(null, entity)
@@ -70,26 +73,37 @@ public class AchievementQueryHandler implements IAchievementQueryHandler {
     }
 
     @Override
-    public HandlerResult<Object> handle(GetLatestAchievementsQuery query) {
-        // Validate the inputs and throw an exception if the input is invalid
-        if (query == null) {
-            throw new IllegalArgumentException("The query is null");
+    public HandlerResponse<Object> handle(GetLatestAchievementsQuery query) {
+
+        HandlerResponse<Object> response;
+
+        try {
+            // Validate the inputs and throw an exception if the input is invalid
+            if (query == null) {
+                throw new IllegalArgumentException("The query is null");
+            }
+
+            if (query.getSize() == null) {
+                throw new IllegalArgumentException("DTO size must be specified");
+            }
+
+            // Get the achievements from repository
+            List<?> achievementDtos = achievementRepository.getLatestAchievements(getDtoSize(query.getSize()),
+                    query.getLimit());
+
+            response = achievementDtos != null
+                    ? HandlerResponse.success(achievementDtos)
+                    : HandlerResponse.error(null, ResponseType.NOT_FOUND);
+
+            return response;
+        } catch (Exception ex) {
+            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
         }
-
-        if (query.getDtoSize() == null) {
-            throw new IllegalArgumentException("DTO size must be specified");
-        }
-
-        // Get the achievements from repository
-        List<?> achievements = achievementRepository.getLatestAchievements(getDtoSize(query.getDtoSize()), query.getLimit());
-
-        return achievements != null && !achievements.isEmpty()
-                ? HandlerResult.success(null, achievements)
-                : HandlerResult.empty();
     }
 
     /**
      * Maps QuerySizeType to the appropriate Achievement DTO class
+     * 
      * @param querySizeType the size type enum
      * @return the corresponding DTO class
      */

@@ -1,27 +1,22 @@
 ###
 
-@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5IjoiQTNSYzJtUSIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiTm9yYSIsImxhc3ROYW1lIjoiSGlsbCIsImlhdCI6MTc1MjkwMTI5OSwiZXhwIjoxNzUyOTg3Njk5fQ.ECjr0NxmaxGAeaiVZaffsETaHf0dlu4Ukr97KVTuj9oAuX03LIoJhaYaSb9q5bP2
+@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5Ijoibnp4eGIxYiIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiRWR3aW4iLCJsYXN0TmFtZSI6IlZhbmNlIiwiaWF0IjoxNzUzMzI5NDc3LCJleHAiOjE3NTM0MTU4Nzd9.GW-D-kud8I91O24lkUXm1q-psUclnsEO230Oj1nX-HzMqsjCdY7ZquhINbBHSgeK
 # Upload media for the achievement (replace ACHI001 with actual key from response above)
-POST https://localhost:8443/api/cmd/achievement/Qs95QJd/media
+POST https://localhost:8443/api/cmd/achievement/qjJtDpt/media
 Content-Type: multipart/form-data; boundary=boundary123
 X-API-Version: 1
 Authorization: Bearer {{authToken}}
 
---boundary123
-Content-Disposition: form-data; name="images"; filename="achievement-image-1.jpg"
-Content-Type: image/jpeg
-
-< D:\Documents\Pictures\dog1.jpg
 --boundary123
 Content-Disposition: form-data; name="images"; filename="achievement-image-2.jpg"
 Content-Type: image/jpeg
 
 < D:\Documents\Pictures\dog2.jpg
 --boundary123
-Content-Disposition: form-data; name="images"; filename="achievement-image-3.jpg"
+Content-Disposition: form-data; name="images"; filename="achievement-image-7.jpg"
 Content-Type: image/jpeg
 
-< D:\Documents\Pictures\dog3.jpg
+< D:\Documents\Pictures\dog7.jpg
 --boundary123--
 
 ###

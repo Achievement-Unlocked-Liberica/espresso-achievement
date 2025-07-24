@@ -21,7 +21,7 @@ public interface AchievementPSQLProvider extends JpaRepository<Achievement, Long
      * @param limit Maximum number of results to return
      * @return List of achievements projected to the specified DTO type
      */
-    @Query("SELECT a FROM Achievement a ORDER BY a.completedDate DESC")
+    @Query("SELECT a FROM Achievement a ORDER BY a.registeredAt DESC")
     <T> List<T> findLatestAchievements(Class<T> type, Limit limit);
 
     // @Query("{ 'key': ?0 }")

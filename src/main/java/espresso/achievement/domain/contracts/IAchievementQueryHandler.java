@@ -9,6 +9,7 @@ import espresso.achievement.domain.queries.GetAchievementSummaryByKeyQuery;
 import espresso.achievement.domain.queries.GetLatestAchievementsQuery;
 import espresso.achievement.domain.readModels.AchievementDetailReadModel;
 import espresso.achievement.domain.readModels.AchievementSummaryReadModel;
+import espresso.common.domain.responses.HandlerResponse;
 
 public interface IAchievementQueryHandler {
 
@@ -18,6 +19,6 @@ public interface IAchievementQueryHandler {
 
     public HandlerResult<List<AchievementSummaryReadModel>> handle(GetAchievementSummariesByUserQuery query);
 
-    public HandlerResult<Object> handle(GetLatestAchievementsQuery query);
+    public HandlerResponse<Object> handle(GetLatestAchievementsQuery query);
 
 }

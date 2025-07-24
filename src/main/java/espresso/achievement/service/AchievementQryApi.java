@@ -21,6 +21,7 @@ import espresso.achievement.domain.queries.GetLatestAchievementsQuery;
 import espresso.achievement.domain.readModels.AchievementDetailReadModel;
 import espresso.achievement.domain.readModels.AchievementSummaryReadModel;
 import espresso.achievement.domain.readModels.MediaStorageDetailReadModel;
+import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonQryApi;
 import espresso.common.service.operational.ApiLogger;
 import io.swagger.v3.oas.annotations.Operation;
@@ -160,27 +161,9 @@ public class AchievementQryApi extends CommonQryApi {
 	@GetMapping("/latest")
 	@ApiResponse(responseCode = "200:OK", description = "Returns the latest achievements in the specified DTO format.")
 	@ApiLogger("Get latest achievements")
-	public ResponseEntity<ApiResult<Object>> getLatestAchievements(GetLatestAchievementsQuery query) {
+	public ResponseEntity<ServiceResponse<Object>> getLatestAchievements(GetLatestAchievementsQuery qry) {
 
-		try {
-			HandlerResult<Object> result = achievementQueryHandler.handle(query);
-
-			if (result.HasData()) {
-				return ResponseEntity
-						.status(HttpStatus.OK)
-						.body(ApiResult.success(null, result.getData()));
-			} else {
-				return ResponseEntity
-						.status(HttpStatus.NOT_FOUND)
-						.body(ApiResult.error(apiMsgHelper.getMessage("achievementRetrieveLatestNotFound", null), null));
-			}
-
-		} catch (Exception e) {
-			return ResponseEntity
-					.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(ApiResult.error(apiMsgHelper.getMessage("achievementRetrieveLatestFailure", null),
-							e.toString()));
-		}
+		return executeQuery(qry, achievementQueryHandler::handle);
 	}
 
 }
