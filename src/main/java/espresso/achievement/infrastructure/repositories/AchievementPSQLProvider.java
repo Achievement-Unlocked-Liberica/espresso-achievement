@@ -1,5 +1,6 @@
 package espresso.achievement.infrastructure.repositories;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Limit;
@@ -17,12 +18,16 @@ public interface AchievementPSQLProvider extends JpaRepository<Achievement, Long
 
     /**
      * Gets the latest achievements ordered by completion date (newest first)
-     * @param type The DTO class to project to
+     * 
+     * @param type  The DTO class to project to
      * @param limit Maximum number of results to return
      * @return List of achievements projected to the specified DTO type
      */
     @Query("SELECT a FROM Achievement a ORDER BY a.registeredAt DESC")
     <T> List<T> findLatestAchievements(Class<T> type, Limit limit);
+
+    @Query("SELECT a FROM Achievement a WHERE a.registeredAt > :fromDate ORDER BY a.registeredAt DESC")
+    <T> List<T> findLatestAchievements(Class<T> type, Limit limit, OffsetDateTime fromDate);
 
     // @Query("{ 'key': ?0 }")
     // List<AchievementSummaryReadModel> findSummaryByKey(String key);

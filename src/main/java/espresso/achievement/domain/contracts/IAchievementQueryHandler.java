@@ -10,6 +10,7 @@ import espresso.achievement.domain.queries.GetLatestAchievementsQuery;
 import espresso.achievement.domain.readModels.AchievementDetailReadModel;
 import espresso.achievement.domain.readModels.AchievementSummaryReadModel;
 import espresso.common.domain.responses.HandlerResponse;
+import espresso.common.domain.responses.HandlerResponseList;
 
 public interface IAchievementQueryHandler {
 

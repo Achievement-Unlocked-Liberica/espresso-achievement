@@ -11,10 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import espresso.ApiMessageHelper;
 import espresso.achievement.application.response.HandlerResult;
-import espresso.achievement.domain.contracts.IAchievementMediaQueryHandler;
 import espresso.achievement.domain.contracts.IAchievementQueryHandler;
 import espresso.achievement.domain.queries.GetAchievementDetailByKeyQuery;
-import espresso.achievement.domain.queries.GetAchievementMediaStorageQuery;
 import espresso.achievement.domain.queries.GetAchievementSummariesByUserQuery;
 import espresso.achievement.domain.queries.GetAchievementSummaryByKeyQuery;
 import espresso.achievement.domain.queries.GetLatestAchievementsQuery;
@@ -37,9 +35,6 @@ public class AchievementQryApi extends CommonQryApi {
 
 	@Autowired
 	private IAchievementQueryHandler achievementQueryHandler;
-
-	@Autowired
-	private IAchievementMediaQueryHandler achievementMediaQueryHandler;
 
 
 	@Operation(summary = "Get Achievement by Key", description = "Retrieves an existing Achievemnt by its Key.")
@@ -128,35 +123,6 @@ public class AchievementQryApi extends CommonQryApi {
 
 
 
-
-	@Operation(summary = "Get Achievement Media storage endpoints and keys", description = "Retrieves the endpoint and access keys for uploading media files for an achievement.")
-	@GetMapping("/media/storage")
-	@ApiResponse(responseCode = "200:OK", description = "Retrieves the endpoint and access keys for uploading media files for an achievement.")
-	@ApiLogger("Get achievement media storage details")
-	public ResponseEntity<ApiResult<Object>> getAchivementMediaStorage(
-		@Valid GetAchievementMediaStorageQuery query) {
-
-		try {
-			HandlerResult<MediaStorageDetailReadModel> result = achievementMediaQueryHandler.handle(query);
-
-			if (result.HasData()) {
-				return ResponseEntity
-						.status(HttpStatus.OK)
-						.body(ApiResult.success(null, result.getData()));
-			} else {
-				return ResponseEntity
-						.status(HttpStatus.NOT_FOUND)
-						.body(ApiResult.error(apiMsgHelper.getMessage("achievementRetrieveByKeyNotFound", null), null));
-			}
-
-		} catch (Exception e) {
-			return ResponseEntity
-					.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(ApiResult.error(apiMsgHelper.getMessage("achievementRetrieveByKeyFailure", null),
-							e.toString()));
-		}
-	}
-
 	@Operation(summary = "Get Latest Achievements", description = "Retrieves the latest achievements ordered by completion date (newest first).")
 	@GetMapping("/latest")
 	@ApiResponse(responseCode = "200:OK", description = "Returns the latest achievements in the specified DTO format.")
@@ -165,5 +131,6 @@ public class AchievementQryApi extends CommonQryApi {
 
 		return executeQuery(qry, achievementQueryHandler::handle);
 	}
+
 
 }

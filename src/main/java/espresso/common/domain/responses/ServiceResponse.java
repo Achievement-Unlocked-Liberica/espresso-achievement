@@ -12,17 +12,19 @@ import lombok.Data;
 public class ServiceResponse<T> {
 
     private boolean success;
-    // private String message;
+    @Builder.Default
+    private Integer count = null;
     private T data;
     private HttpStatus httpStatus;
 
     public static <T> ServiceResponse<T> empty() {
-        return success(null, null);
+        return success(null, null, null);
     }
 
-    public static <T> ServiceResponse<T> success(HttpStatus httpStatus, T data) {
+    public static <T> ServiceResponse<T> success(HttpStatus httpStatus, T data, Integer count) {
         return ServiceResponse.<T>builder()
             .data(data)
+            .count(count)
             .success(true)
             .httpStatus(httpStatus)
             .build();

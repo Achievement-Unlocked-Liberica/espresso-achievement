@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import espresso.common.domain.responses.HandlerResponse;
-import espresso.common.domain.responses.ResponseType;
 import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.operational.ApiLogger;
 
@@ -29,11 +28,11 @@ public class CommonApi {
 
             switch (result.getResponseType()) {
                 case CREATED:
-                    return ServiceResponse.success(HttpStatus.CREATED, result.getData());
+                    return ServiceResponse.success(HttpStatus.CREATED, result.getData(), result.getCount());
                 case SUCCESS:
-                    return ServiceResponse.success(HttpStatus.OK, result.getData());
+                    return ServiceResponse.success(HttpStatus.OK, result.getData(), result.getCount());
                 default:
-                    return ServiceResponse.success(HttpStatus.OK, result.getData());
+                    return ServiceResponse.success(HttpStatus.OK, result.getData(), result.getCount());
             }
 
         } else {

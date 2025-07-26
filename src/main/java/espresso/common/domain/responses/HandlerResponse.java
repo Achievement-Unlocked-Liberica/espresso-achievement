@@ -10,7 +10,8 @@ import lombok.Data;
 public class HandlerResponse<T> {
 
     private boolean success;
-    // private String message;
+    @Builder.Default
+    private Integer count = null;
     private T data;
     private ResponseType responseType;
 
@@ -23,19 +24,35 @@ public class HandlerResponse<T> {
     }
 
     public static <T> HandlerResponse<T> created(T data) {
+
+        Integer count = null;
+        if (data instanceof java.util.List<?>) {
+            count = ((java.util.List<?>) data).size();
+        }
+
         return HandlerResponse.<T>builder()
                 .data(data)
+                .count(count)
                 .responseType(ResponseType.CREATED)
-                .success(true)
+                .success(true)            
                 .build();
     }
 
     public static <T> HandlerResponse<T> success(T data) {
+
+        Integer count = null;
+        
+        if (data instanceof java.util.List<?>) {
+            count = ((java.util.List<?>) data).size();
+        }
+
         return HandlerResponse.<T>builder()
                 .data(data)
+                .count(count)
                 .responseType(ResponseType.SUCCESS)
                 .success(true)
                 .build();
+
     }
 
     public static <T> HandlerResponse<T> error(T data, ResponseType responseType) {

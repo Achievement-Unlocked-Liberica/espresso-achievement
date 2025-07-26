@@ -1,5 +1,6 @@
 package espresso.achievement.domain.contracts;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import espresso.achievement.domain.readModels.AchievementDetailReadModel;
@@ -19,5 +20,5 @@ public interface IAchievementQryRepository {
      * @param limit Maximum number of results to return
      * @return List of achievements projected to the specified DTO type
      */
-    <T> List<T> getLatestAchievements(Class<T> dtoType, Integer limit);
+    <T> List<T> getLatestAchievements(Class<T> dtoType, Integer limit, OffsetDateTime fromDate);
 }
