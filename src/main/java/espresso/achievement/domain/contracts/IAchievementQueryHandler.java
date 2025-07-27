@@ -1,25 +1,23 @@
 package espresso.achievement.domain.contracts;
 
-import java.util.List;
-
-import espresso.achievement.application.response.HandlerResult;
-import espresso.achievement.domain.queries.GetAchievementDetailByKeyQuery;
-import espresso.achievement.domain.queries.GetAchievementSummariesByUserQuery;
-import espresso.achievement.domain.queries.GetAchievementSummaryByKeyQuery;
+import espresso.achievement.domain.queries.GetAchievementDetailQuery;
 import espresso.achievement.domain.queries.GetLatestAchievementsQuery;
-import espresso.achievement.domain.readModels.AchievementDetailReadModel;
-import espresso.achievement.domain.readModels.AchievementSummaryReadModel;
 import espresso.common.domain.responses.HandlerResponse;
-import espresso.common.domain.responses.HandlerResponseList;
 
 public interface IAchievementQueryHandler {
 
-    public HandlerResult<AchievementDetailReadModel> handle(GetAchievementDetailByKeyQuery query);
+    /**
+     * Handles the query to get detailed information about an achievement
+     * @param qry the query containing the key of the achievement
+     * @return a HandlerResponse containing the achievement detail read model
+     */
+    public HandlerResponse<Object> handle(GetLatestAchievementsQuery qry);
 
-    public HandlerResult<AchievementSummaryReadModel> handle(GetAchievementSummaryByKeyQuery query);
-
-    public HandlerResult<List<AchievementSummaryReadModel>> handle(GetAchievementSummariesByUserQuery query);
-
-    public HandlerResponse<Object> handle(GetLatestAchievementsQuery query);
+    /**
+     * Handles the query to get a summary of an achievement by its key
+     * @param qry the query containing the key of the achievement
+     * @return a HandlerResponse containing the achievement summary read model
+     */
+    public HandlerResponse<Object> handle(GetAchievementDetailQuery qry);
 
 }

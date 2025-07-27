@@ -33,9 +33,4 @@ public class AchievementCmdRepository implements IAchievementCmdRepository {
         }
 
     }
-
-    @Override
-    public <T> T findByKey(String entityKey, Class<T> type) {
-        return this.achievementPSQLProvider.findByKey(entityKey, type);
-    }
 }

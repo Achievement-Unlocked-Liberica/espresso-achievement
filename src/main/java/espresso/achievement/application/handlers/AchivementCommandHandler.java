@@ -12,6 +12,7 @@ import espresso.achievement.domain.commands.CreateAchivementCommand;
 import espresso.achievement.domain.commands.UploadAchievementMediaCommand;
 import espresso.achievement.domain.contracts.IAchievementCmdRepository;
 import espresso.achievement.domain.contracts.IAchievementMediaRepository;
+import espresso.achievement.domain.contracts.IAchievementQryRepository;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
 import espresso.achievement.domain.entities.Achievement;
@@ -23,7 +24,10 @@ import espresso.common.domain.responses.ResponseType;
 public class AchivementCommandHandler implements IAchievementCommandHandler {
 
     @Autowired
-    private IAchievementCmdRepository achievementRepository;
+    private IAchievementCmdRepository achievementCmdRepository;
+
+    @Autowired
+    private IAchievementQryRepository achievementQryRepository;
 
     @Autowired
     private IUserRepository userRepository;
@@ -59,7 +63,7 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
                     user,
                     skills);
 
-            Achievement savedEntity = achievementRepository.save(entity);
+            Achievement savedEntity = achievementCmdRepository.save(entity);
 
             return HandlerResponse.created(savedEntity);
 
@@ -78,8 +82,8 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
             }
 
             // Get the achievement by key
-            Achievement achievement = achievementRepository.findByKey(cmd.getAchievementKey(), Achievement.class);
-            
+            Achievement achievement = achievementQryRepository.getAchievementByKey(Achievement.class, cmd.getAchievementKey());
+
             if (achievement == null) {
                 return HandlerResponse.error("Achievement not found", ResponseType.NOT_FOUND);
             }
@@ -93,9 +97,10 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
 
             String ownerEntityKey = achievementOwner.getEntityKey();
             String requesterEntityKey = cmd.getUserKey();
-            
+
             if (!ownerEntityKey.equals(requesterEntityKey)) {
-                return HandlerResponse.error("The requester is not the owner of the achievment", ResponseType.UNAUTHORIZED);
+                return HandlerResponse.error("The requester is not the owner of the achievment",
+                        ResponseType.UNAUTHORIZED);
             }
 
             // Process each image in the array
@@ -105,16 +110,16 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
                 try {
                     imageData = image.getBytes();
                 } catch (IOException e) {
-                    return HandlerResponse.error("Failed to process image: " + e.getMessage(), ResponseType.INTERNAL_ERROR);
+                    return HandlerResponse.error("Failed to process image: " + e.getMessage(),
+                            ResponseType.INTERNAL_ERROR);
                 }
 
                 // Create AchievementMedia entity
                 AchievementMedia media = AchievementMedia.create(
-                    achievement,
-                    image.getOriginalFilename(),
-                    image.getContentType(),
-                    imageData
-                );
+                        achievement,
+                        image.getOriginalFilename(),
+                        image.getContentType(),
+                        imageData);
 
                 // Save the media
                 achievementMediaRepository.save(achievement, media);

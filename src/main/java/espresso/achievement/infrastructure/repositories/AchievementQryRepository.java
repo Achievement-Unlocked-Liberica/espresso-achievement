@@ -9,8 +9,6 @@ import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Component;
 
 import espresso.achievement.domain.contracts.IAchievementQryRepository;
-import espresso.achievement.domain.readModels.AchievementDetailReadModel;
-import espresso.achievement.domain.readModels.AchievementSummaryReadModel;
 
 @Component
 public class AchievementQryRepository implements IAchievementQryRepository {
@@ -19,90 +17,32 @@ public class AchievementQryRepository implements IAchievementQryRepository {
     AchievementPSQLProvider achievementPSQLProvider;
 
     @Override
-    public AchievementDetailReadModel getAchievementDetailByKey(String key) {
-
-        try {
-            if (key == null) {
-                throw new IllegalArgumentException("The key is null");
-            }
-
-            List<AchievementDetailReadModel> entities = new ArrayList<AchievementDetailReadModel>(); // this.achievementMongoDBProvider.findDetailByKey(key);
-
-            return entities.isEmpty()
-                    ? null
-                    : entities.getFirst();
-
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    @Override
-    public AchievementSummaryReadModel getAchievementSummaryByKey(String key) {
-        try {
-            if (key == null) {
-                throw new IllegalArgumentException("The key is null");
-            }
-
-            List<AchievementSummaryReadModel> entities = new ArrayList<AchievementSummaryReadModel>(); // this.achievementMongoDBProvider.findSummaryByKey(key);
-
-            return entities.isEmpty()
-                    ? null
-                    : entities.getFirst();
-
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    @Override
-    public List<AchievementSummaryReadModel> getAchievementSummariesByUserKey(String userKey) {
-        try {
-            if (userKey == null) {
-                throw new IllegalArgumentException("The key is null");
-            }
-
-            List<AchievementSummaryReadModel> entities = new ArrayList<AchievementSummaryReadModel>(); // this.achievementMongoDBProvider.findSummaryByUserKey(userKey);
-
-            return entities.isEmpty()
-                    ? null
-                    : entities;
-
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    @Override
     public <T> List<T> getLatestAchievements(Class<T> dtoType, Integer limit, OffsetDateTime fromDate) {
-        try {
 
-            if (limit == null || limit <= 0) {
-                limit = 10; // Default limit
-            }
+        List<T> entities;
 
-            if (fromDate == null) {
-                // Use the PSQL provider to get achievements with DTO projection
-                return achievementPSQLProvider.findLatestAchievements(dtoType, Limit.of(limit));
-            } else {
-                // Use the PSQL provider to get achievements with DTO projection and fromDate
-                // filter
-                return achievementPSQLProvider.findLatestAchievements(dtoType, Limit.of(limit), fromDate);
-            }
-
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (limit == null || limit <= 0) {
+            limit = 10; // Default limit
         }
 
-        return new ArrayList<>();
+        // If fromDate is null, get all latest achievements
+        // If fromDate is provided, filter achievements from that date
+        // This allows for pagination and filtering based on date
+        entities = fromDate == null
+                ? achievementPSQLProvider.findLatestAchievements(dtoType, Limit.of(limit))
+                : achievementPSQLProvider.findLatestAchievements(dtoType, Limit.of(limit), fromDate);
+
+        return entities;
+    }
+
+    @Override
+    public <T> T getAchievementByKey(Class<T> dtoType, String entityKey) {
+
+        T entity;
+
+        entity = achievementPSQLProvider.findAchievementByKey(dtoType, entityKey);
+
+        return entity;
     }
 
 }
