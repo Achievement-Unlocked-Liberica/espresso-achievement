@@ -8,6 +8,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -44,9 +45,15 @@ import lombok.NoArgsConstructor;
 // columnList = "key", unique = true)})
 public class Achievement extends DomainEntity {
 
+    @Column(name = "title", nullable = false, length = 200)
     private String title;
+
+    @Column(name = "description", nullable = false, length = 1000)
     private String description;
+    
+    @Column(name = "completeddate", nullable = false)
     private Date completedDate;
+
     private OffsetDateTime registeredAt;
     private boolean active;
 

@@ -8,53 +8,14 @@
 # database or a cache. For examples, see the Awesome Compose repository:
 # https://github.com/docker/awesome-compose
 version: '3.9'
-name: espresso
+name: espresso-achievement
 services:
-  espresso-liberica:
-    # image: ghcr.io/achievement-unlocked-liberica/espresso-achievement:latest
-    container_name: achievement-liberica
+  espresso-achievement:
+    container_name: liberica-espresso-achievement
     build:
       context: .
     ports:
-      - 5050:5050
-    depends_on:
-      - mongo-liberica
-      - azblob-liberica
-
-
-  mongo-liberica:
-    container_name: mongodb-liberica
-    image: bitnami/mongodb:latest
-    restart: always
-    ports:
-      - 27017:27017
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: mongousr
-      MONGO_INITDB_ROOT_PASSWORD: mongopwd
-      MONGO_INITDB_DATABASE: admin
-    volumes:
-      - mongodb_data_container:/data/db
-
-  azblob-liberica:
-    container_name: azblob-liberica
-    image: mcr.microsoft.com/azure-storage/azurite
-    hostname: azblob-liberica
-    restart: always
-    environment:
-      - AZURITE_ACCOUNTS=azblobliberica:4cXiMYiuzHhb-Pw33jLGhbTrVVQ360KaS39Rc4_JhgE:mFFoBcujpJXDRZFvZV_XCnkH0r4P9vDYrglTSm8rNCM
-    volumes:
-      - azblob_data_container:/azblob
-    ports:
-      - 10000:10000
-      - 10001:10001
-      - 10002:10002
-
-
-volumes:
-  mongodb_data_container:
-    driver: local
-  azblob_data_container:
-    driver: local
+      - 8080:8080
 
 # DefaultEndpointsProtocol=http;AccountName=azblobliberica;AccountKey=4cXiMYiuzHhb-Pw33jLGhbTrVVQ360KaS39Rc4_JhgE;BlobEndpoint=http://127.0.0.1:10000/azblobliberica;
 
