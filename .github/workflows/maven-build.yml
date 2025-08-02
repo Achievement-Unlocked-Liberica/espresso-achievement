@@ -112,7 +112,10 @@ jobs:
 
           # This uses the `latest` tag convention.
           [ "$VERSION" == "main" ] && VERSION=latest || VERSION=$RELEASE_VERSION 
-           
+          
+          echo "REPO_CHART_PATH=$REPO_CHART_PATH"
+          echo "VERSION=$VERSION"
+
           helm package $REPO_CHART_PATH --destination ./charts --version $VERSION --app-version $VERSION
 
       - name: Step - Log In to GitHub Container Registry
