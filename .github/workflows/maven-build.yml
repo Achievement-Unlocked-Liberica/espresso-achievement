@@ -106,16 +106,14 @@ jobs:
         run: |        
           # Remove the git ref prefix from the version.
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          
-          echo "VERSION=$VERSION"
 
           # Remove the "v" prefix from the tag name.
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
-          echo "VERSION=$VERSION"
+          echo "GH REF VERSION=$VERSION"
 
           # This uses the `latest` tag convention.
-          [ "$VERSION" == "main" ] && VERSION=latest || VERSION=$RELEASE_VERSION 
+          [ "$VERSION" == "main" ] && VERSION=$RELEASE_VERSION 
           
           echo "REPO_CHART_PATH=$REPO_CHART_PATH"
           echo "VERSION=$VERSION"
