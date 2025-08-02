@@ -39,4 +39,6 @@ private/*
 api-tests/*.http
 
 # Local configuration files
-src/main/resources/application-local.*
+src/main/resources/application-lcl.*
+
+infrastructure/packages/*.*

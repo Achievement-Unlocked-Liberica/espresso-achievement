@@ -116,16 +116,16 @@ echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin
 
 ## Helm Install, Create and Package
 ```
-helm create helm/bernese-core  
+helm create infrastructure/espresso-service 
 ```
 
 ```
-helm package helm/bernese-core -d helm/packages
+helm package infrastructure/espresso-service -d infrastructure/packages
 ```
 
 ```
 //REVIEW THIS LINE
-helm install bernese-core-service helm/packages/bernese-core-service-0.1.0.tgz --set image.tag=latest -n lulo-services --create-namespace
+helm install espresso-service infrastructure/packages/espresso-service-0.1.0.tgz --set image.tag=latest -n liberica-services --create-namespace
 ```
 
 
