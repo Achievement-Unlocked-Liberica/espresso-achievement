@@ -106,9 +106,13 @@ jobs:
         run: |        
           # Remove the git ref prefix from the version.
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          
+          echo "VERSION=$VERSION"
 
           # Remove the "v" prefix from the tag name.
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          echo "VERSION=$VERSION"
 
           # This uses the `latest` tag convention.
           [ "$VERSION" == "main" ] && VERSION=latest || VERSION=$RELEASE_VERSION 
