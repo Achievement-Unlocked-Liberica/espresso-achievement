@@ -29,7 +29,7 @@ env:
   RELEASE_NAME: espresso-service
   RELEASE_VERSION: 1.1.1
   NAMESPACE: liberica-services
-  REPO_CHART_PATH: ./helm/espresso-service
+  REPO_CHART_PATH: ./infrastructure/espresso-service
 #
 jobs:
   # 
