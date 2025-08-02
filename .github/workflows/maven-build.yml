@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Achievement Unlocked - CI/C
+name: Espresso Achievement - CI/CD
 
 on:
   workflow_dispatch:
@@ -23,9 +23,13 @@ on:
   #   branches: [ "main" ]
 
 env:
-  IMAGE_NAME: espresso-achievement
+  IMAGE_NAME: docker-images/espresso-service
   # GHA_PAT_REGISTRY_PUSH: ${{ secrets.GHA_PAT_REGISTRY_PUSH }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  RELEASE_NAME: espresso-service
+  RELEASE_VERSION: 1.1.1
+  NAMESPACE: liberica-services
+  REPO_CHART_PATH: ./helm/espresso-service
 #
 jobs:
   # 
@@ -48,6 +52,7 @@ jobs:
 
   # This pushes the image to GitHub Packages.
   publish-gh-package-container:
+    needs: publish-gh-package-maven
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -75,8 +80,8 @@ jobs:
           # Remove the "v" prefix from the tag name.
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
-          # This uses the Docker `latest` tag convention.
-          [ "$VERSION" == "main" ] && VERSION=latest
+          # This uses the `latest` tag convention.
+          [ "$VERSION" == "main" ] && VERSION=latest || VERSION=$RELEASE_VERSION         
 
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
@@ -86,3 +91,87 @@ jobs:
 
           # Push the image to the GitHub Container Registry
           docker push $IMAGE_ID:$VERSION
+
+  publish-gh-package-helm:
+    needs: publish-gh-package-container
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Step - Build Helm Chart
+        run: |        
+          # Remove the git ref prefix from the version.
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          # Remove the "v" prefix from the tag name.
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          # This uses the `latest` tag convention.
+          [ "$VERSION" == "main" ] && VERSION=latest || VERSION=$RELEASE_VERSION 
+           
+          helm package $REPO_CHART_PATH --destination ./charts --version $VERSION --app-version $VERSION
+
+      - name: Step - Log In to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io --username ${{ github.actor }} --password-stdin
+
+      - name: Step - Publish Helm Chart to GitHub Container Registry
+        run: |
+          echo "Printing contents of ./charts"
+          ls -lh ./charts
+          CHART_PATH=./charts/*.tgz
+          helm push $CHART_PATH oci://ghcr.io/${{ github.repository_owner }}/helm-charts
+
+  publish-gh-package-k8s:
+    needs: publish-gh-package-helm
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check if kubectl is installed
+        run: |
+          if ! command -v kubectl &> /dev/null; then
+            echo "kubectl could not be found"
+            exit 1
+          fi
+          echo "kubectl is installed."
+
+      - name: Create kubeconfig file
+        run: |
+          mkdir ${HOME}/.kube
+          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 --decode > ${HOME}/.kube/config
+          chmod 600 ${HOME}/.kube/config
+          echo "Kubeconfig file created."
+          
+
+      - name: Step - Use kubectl to set the current context
+        run: |
+          kubectl config use-context ${{ secrets.KUBE_CONTEXT }}
+          echo "Printing current context"
+          kubectl config current-context
+
+      - name: Step - Build Helm Chart
+        run: |        
+          # Remove the git ref prefix from the version.
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          # Remove the "v" prefix from the tag name.
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          # This uses the `latest` tag convention.
+          [ "$VERSION" == "main" ] && VERSION=latest || VERSION=$RELEASE_VERSION 
+           
+          helm package $REPO_CHART_PATH --destination ./charts --version $VERSION --app-version $VERSION
+
+      - name: Step - Deploy Helm Chart to Kubernetes
+        run: |
+          echo "Printing contents of ./charts"
+          ls -lh ./charts
+          CHART_PATH=./charts/*.tgz
+          helm upgrade --install $RELEASE_NAME $CHART_PATH --namespace $NAMESPACE --create-namespace --set image.tag=$VERSION
