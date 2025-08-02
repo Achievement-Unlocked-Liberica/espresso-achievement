@@ -128,7 +128,14 @@ jobs:
           echo "Printing contents of ./charts"
           ls -lh ./charts
           CHART_PATH=./charts/*.tgz
-          helm push $CHART_PATH oci://ghcr.io/${{ github.repository_owner }}/helm-charts
+          REPOSITORY_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+
+          echo "REPOSITORY_OWNER=$REPOSITORY_OWNER"
+          echo "CHART_PATH=$CHART_PATH"
+
+          echo "Pushing Helm Chart to ghcr.io/$REPOSITORY_OWNER/helm-charts"
+
+          helm push $CHART_PATH oci://ghcr.io/$REPOSITORY_OWNER/helm-charts
 
   publish-gh-package-k8s:
     needs: publish-gh-package-helm
