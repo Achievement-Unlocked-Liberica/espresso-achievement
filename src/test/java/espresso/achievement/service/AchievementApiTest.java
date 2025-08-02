@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -21,10 +22,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.MessageSource;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
 import espresso.achievement.domain.commands.CreateAchivementCommand;
+import espresso.achievement.domain.commands.UploadAchievementMediaCommand;
 import espresso.achievement.domain.contracts.IAchievementCommandHandler;
+import espresso.common.domain.responses.HandlerResponse;
+import espresso.common.domain.responses.ResponseType;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -118,6 +124,82 @@ public class AchievementApiTest {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(containsString(message)));
+    }
+
+    @Test
+    void shouldUploadAchievementMediaSuccessfully() throws Exception {
+        // Create mock image files
+        MockMultipartFile mockFile1 = new MockMultipartFile(
+            "images", 
+            "test-achievement1.jpg", 
+            "image/jpeg", 
+            "test image content 1".getBytes()
+        );
+        MockMultipartFile mockFile2 = new MockMultipartFile(
+            "images", 
+            "test-achievement2.jpg", 
+            "image/jpeg", 
+            "test image content 2".getBytes()
+        );
+
+        // Mock the handler response
+        when(achivementCommandHandler.handleUploadMedia(any(UploadAchievementMediaCommand.class)))
+            .thenReturn(HandlerResponse.created("Media uploaded successfully"));
+
+        this.mockMvc
+                .perform(multipart("/api/cmd/achievement/ACHI001/media")
+                        .file(mockFile1)
+                        .file(mockFile2)
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andDo(print())
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    void shouldReturnBadRequestForMissingImageFile() throws Exception {
+        this.mockMvc
+                .perform(multipart("/api/cmd/achievement/ACHI001/media")
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnBadRequestForInvalidAchievementKey() throws Exception {
+        MockMultipartFile mockFile = new MockMultipartFile(
+            "images", 
+            "test-achievement.jpg", 
+            "image/jpeg", 
+            "test image content".getBytes()
+        );
+
+        this.mockMvc
+                .perform(multipart("/api/cmd/achievement/INVALID/media")
+                        .file(mockFile)
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldReturnNotFoundForNonExistentAchievement() throws Exception {
+        MockMultipartFile mockFile = new MockMultipartFile(
+            "images", 
+            "test-achievement.jpg", 
+            "image/jpeg", 
+            "test image content".getBytes()
+        );
+
+        // Mock the handler to return not found
+        when(achivementCommandHandler.handleUploadMedia(any(UploadAchievementMediaCommand.class)))
+            .thenReturn(HandlerResponse.error("Achievement not found", ResponseType.NOT_FOUND));
+
+        this.mockMvc
+                .perform(multipart("/api/cmd/achievement/NOTFND1/media")
+                        .file(mockFile)
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andDo(print())
+                .andExpect(status().isNotFound());
     }
 
 }

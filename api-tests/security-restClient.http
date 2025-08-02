@@ -1,0 +1,168 @@
+### Authentication API Testing
+
+# Base URL
+@baseUrl = http://localhost:8080
+
+### Register New User
+# @name register
+POST {{baseUrl}}/api/cmd/security/register
+Content-Type: application/json
+
+{
+  "username": "pedrof",
+  "password": "NewPass123@",
+  "email": "pedrof@example.com"
+}
+
+### Authenticate User - Login (Get JWT Token)
+# @name login
+POST {{baseUrl}}/api/cmd/security/auth
+Content-Type: application/json
+
+{
+  "username": "pedrof",
+  "password": "NewPass123@"
+}
+
+### Extract token from previous request (for VS Code REST Client)
+@authToken = {{login.response.body.data.token}}
+
+### Test Protected Endpoint with JWT Token
+GET {{baseUrl}}/api/cmd/user
+Authorization: Bearer {{authToken}}
+
+### Test Another Protected Endpoint with JWT Token
+GET {{baseUrl}}/api/qry/user/johndoe123
+Authorization: Bearer {{authToken}}
+
+### Test Protected Endpoint without Authorization Header (Should fail)
+GET {{baseUrl}}/api/cmd/user
+
+### Test Protected Endpoint with Invalid Token (Should fail)
+GET {{baseUrl}}/api/cmd/user
+Authorization: Bearer invalid-token-here
+
+### Authenticate User - Sample with Variables
+POST {{baseUrl}}/api/cmd/security/auth
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "TestPass123!"
+}
+
+### Test Invalid Credentials
+POST {{baseUrl}}/api/cmd/security/auth
+Content-Type: application/json
+
+{
+  "username": "invaliduser",
+  "password": "wrongpassword"
+}
+
+### Test Validation Errors - Empty Username
+POST {{baseUrl}}/api/cmd/security/auth
+Content-Type: application/json
+
+{
+  "username": "",
+  "password": "TestPass123!"
+}
+
+### Test Validation Errors - Weak Password
+POST {{baseUrl}}/api/cmd/security/auth
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "weak"
+}
+
+### Test Validation Errors - Password Missing Special Character
+POST {{baseUrl}}/api/cmd/security/auth
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "TestPass123"
+}
+
+### Test Validation Errors - Password Missing Uppercase
+POST {{baseUrl}}/api/cmd/security/auth
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "testpass123!"
+}
+
+### Test Validation Errors - Password Missing Number
+POST {{baseUrl}}/api/cmd/security/auth
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "TestPassword!"
+}
+
+### Register User - Validation Tests
+
+### Test Registration Validation Errors - Empty Username
+POST {{baseUrl}}/api/cmd/security/register
+Content-Type: application/json
+
+{
+  "username": "",
+  "password": "TestPass123@",
+  "email": "test@example.com"
+}
+
+### Test Registration Validation Errors - Short Username
+POST {{baseUrl}}/api/cmd/security/register
+Content-Type: application/json
+
+{
+  "username": "usr",
+  "password": "TestPass123@",
+  "email": "test@example.com"
+}
+
+### Test Registration Validation Errors - Weak Password
+POST {{baseUrl}}/api/cmd/security/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "weak",
+  "email": "test@example.com"
+}
+
+### Test Registration Validation Errors - Invalid Email
+POST {{baseUrl}}/api/cmd/security/register
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "TestPass123@",
+  "email": "invalid-email"
+}
+
+### Test Registration - Duplicate Username (Should fail after first registration)
+POST {{baseUrl}}/api/cmd/security/register
+Content-Type: application/json
+
+{
+  "username": "newuser123",
+  "password": "TestPass123@",
+  "email": "different@example.com"
+}
+
+### Test Registration - Duplicate Email (Should fail after first registration)
+POST {{baseUrl}}/api/cmd/security/register
+Content-Type: application/json
+
+{
+  "username": "differentuser",
+  "password": "TestPass123@",
+  "email": "newuser@example.com"
+}

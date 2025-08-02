@@ -1,0 +1,18 @@
+package espresso.common.domain.responses;
+
+public enum ResponseType {
+    NONE,
+    CREATED,
+    SUCCESS,
+    VALIDATION_ERROR,
+    INTERNAL_ERROR,
+    NOT_FOUND,
+    UNAUTHORIZED,
+    FORBIDDEN,
+    CONFLICT,
+    BAD_REQUEST,
+    UNPROCESSABLE_ENTITY,
+    TOO_MANY_REQUESTS,
+    SERVICE_UNAVAILABLE,
+    GATEWAY_TIMEOUT
+}

@@ -1,66 +1,109 @@
 package espresso.achievement.domain.entities;
 
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.List;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Lob;
 
-import org.springframework.data.mongodb.core.index.Indexed;
-
+import espresso.common.domain.models.ValueEntity;
+import espresso.common.domain.support.KeyGenerator;
+import jakarta.persistence.Column;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+@Data
+@EqualsAndHashCode(callSuper = false)
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class AchievementMedia extends Entity {
+@Entity(name = "AchievementMedia")
+@Table(name = "AchievementMedias")
+public class AchievementMedia extends ValueEntity {
 
-    @Indexed(name = "achievement_media_idx",  unique = false)
-    @Setter
-    private String key;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private boolean isUploaded;
-    private String mediaPath;
-    private String originalName;
-    private String originalHash;
-    private String mimeType;
-    private Integer size;
-    private String encoding;
+    @Column(name = "imageKey")
+    private String imageKey;
 
-    public static AchievementMedia createPreMedia(String originalName, String mimeType, String encoding, Integer size) {
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "achievementId", referencedColumnName = "id")
+    private Achievement achievement;
 
-        AchievementMedia preMedia = new AchievementMedia(
-                null,
-                false,
-                null,
-                originalName,
-                originalName.hashCode() + "",
-                mimeType,
-                size,
-                encoding);
+    @Column(name = "imageName", nullable = false)
+    private String imageName;
 
-        preMedia.setKey(KeyGenerator.generateShortString());
+    @Column(name = "originalImageName", nullable = false)
+    private String originalImageName;
 
-        return preMedia;
+    @Column(name = "contentType")
+    private String contentType;
+
+    // @Lob
+    // @Column(name = "imageData")
+    @Transient
+    private byte[] imageData;
+
+    @Column(name = "mediaUrl")
+    private String mediaUrl;
+
+    @Column(name = "uploadTimestamp", nullable = false)
+    private LocalDateTime uploadTimestamp;
+
+    @Column(name = "fileSize")
+    private Long fileSize;
+
+    /**
+     * Static factory method to create a new AchievementMedia instance
+     * 
+     * @param achievement the achievement to associate with this media
+     * @param imageName   the name of the uploaded image
+     * @param contentType the MIME type of the image
+     * @param imageData   the binary data of the image
+     * @return a new AchievementMedia instance
+     */
+    public static AchievementMedia create(Achievement achievement, String originalImageName, String contentType,
+            byte[] imageData) {
+        AchievementMedia media = new AchievementMedia();
+
+        String imageExtension = null;
+        if (originalImageName != null && originalImageName.contains(".")) {
+            imageExtension = originalImageName.substring(originalImageName.lastIndexOf('.') -1);
+        }
+
+        String nameKey = KeyGenerator.generateKey(7);
+
+        media.setImageKey(achievement.getEntityKey() + "-" + nameKey);
+        media.setAchievement(achievement);
+        media.setImageName(nameKey + imageExtension);
+        media.setOriginalImageName(originalImageName);
+        media.setContentType(contentType);
+        media.setImageData(imageData);
+        media.setUploadTimestamp(LocalDateTime.now());
+
+        if (imageData != null) {
+            media.setFileSize((long) imageData.length);
+        }
+
+        return media;
     }
 
 }
-
-
-/*
-    private String storageUrl;
-    private String containerName;
-    private String mediaPath;
-    private String accessToken;
-
-
-PreMedia preMedia = new PreMedia(
-    appConfiguration.getCloudConfig().getStorageUrl(),
-    "media-files",
-    "/pre-media/" + achievement.getKey() + "/uploaded",
-    KeyGenerator.generateKeyString(24)
-);
-*/

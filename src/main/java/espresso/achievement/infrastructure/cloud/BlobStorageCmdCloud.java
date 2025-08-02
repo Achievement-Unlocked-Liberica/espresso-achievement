@@ -2,18 +2,12 @@ package espresso.achievement.infrastructure.cloud;
 
 import java.time.OffsetDateTime;
 
-import com.azure.storage.blob.BlobContainerClient;
-import com.azure.storage.blob.BlobServiceClient;
-import com.azure.storage.blob.BlobServiceClientBuilder;
-import com.azure.storage.blob.sas.BlobContainerSasPermission;
-import com.azure.storage.blob.sas.BlobServiceSasSignatureValues;
-import com.azure.storage.common.StorageSharedKeyCredential;
 
 public class BlobStorageCmdCloud {
 
     private final String accountName = "<account-name>";
     private final String accountKey = "<account-key>";
-
+/*
     private BlobServiceClient blobServiceClient;
 
     public BlobStorageCmdCloud() {
@@ -42,5 +36,5 @@ public class BlobStorageCmdCloud {
         String sasToken = containerClient.generateSas(sasSignatureValues);
         return sasToken;
     }
-
+*/
 }

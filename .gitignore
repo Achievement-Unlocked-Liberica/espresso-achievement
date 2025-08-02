@@ -32,5 +32,13 @@ build/
 ### VS Code ###
 .vscode/
 
-### Private Secrets, Keys, Values ###
+# Private Files
 private/*
+
+# API Tests
+api-tests/*.http
+
+# Local configuration files
+src/main/resources/application-lcl.*
+
+infrastructure/packages/*.*

@@ -8,35 +8,16 @@
 # database or a cache. For examples, see the Awesome Compose repository:
 # https://github.com/docker/awesome-compose
 version: '3.9'
-name: espresso
+name: espresso-achievement
 services:
-  espresso-liberica:
-    # image: ghcr.io/achievement-unlocked-liberica/espresso-achievement:latest
-    container_name: achievement-liberica
+  espresso-achievement:
+    container_name: liberica-espresso-achievement
     build:
       context: .
     ports:
-      - 5050:5050
-    depends_on:
-      - mongo-liberica
+      - 8080:8080
 
-
-  mongo-liberica:
-    container_name: mongodb-liberica
-    image: bitnami/mongodb:latest
-    restart: always
-    ports:
-      - 27017:27017
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: mongousr
-      MONGO_INITDB_ROOT_PASSWORD: mongopwd
-      MONGO_INITDB_DATABASE: admin
-    volumes:
-          - mongodb_data_container:/data/db
-
-volumes:
-  mongodb_data_container:
-    driver: local
+# DefaultEndpointsProtocol=http;AccountName=azblobliberica;AccountKey=4cXiMYiuzHhb-Pw33jLGhbTrVVQ360KaS39Rc4_JhgE;BlobEndpoint=http://127.0.0.1:10000/azblobliberica;
 
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to

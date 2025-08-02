@@ -1,81 +1,48 @@
 package espresso.achievement.infrastructure.repositories;
 
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Limit;
+import org.springframework.stereotype.Component;
 
 import espresso.achievement.domain.contracts.IAchievementQryRepository;
-import espresso.achievement.domain.readModels.AchievementDetailReadModel;
-import espresso.achievement.domain.readModels.AchievementSummaryReadModel;
 
-@Repository
+@Component
 public class AchievementQryRepository implements IAchievementQryRepository {
 
     @Autowired
-    AchievementQryMongoDBProvider achievementMongoDBProvider;
+    AchievementPSQLProvider achievementPSQLProvider;
 
     @Override
-    public AchievementDetailReadModel getAchievementDetailByKey(String key) {
+    public <T> List<T> getLatestAchievements(Class<T> dtoType, Integer limit, OffsetDateTime fromDate) {
 
-        try {
-            if (key == null) {
-                throw new IllegalArgumentException("The key is null");
-            }
+        List<T> entities;
 
-            List<AchievementDetailReadModel> entities = this.achievementMongoDBProvider.findDetailByKey(key);
-
-            return entities.isEmpty()
-                    ? null
-                    : entities.getFirst();
-
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        if (limit == null || limit <= 0) {
+            limit = 10; // Default limit
         }
 
-        return null;
+        // If fromDate is null, get all latest achievements
+        // If fromDate is provided, filter achievements from that date
+        // This allows for pagination and filtering based on date
+        entities = fromDate == null
+                ? achievementPSQLProvider.findLatestAchievements(dtoType, Limit.of(limit))
+                : achievementPSQLProvider.findLatestAchievements(dtoType, Limit.of(limit), fromDate);
+
+        return entities;
     }
 
-
     @Override
-    public AchievementSummaryReadModel getAchievementSummaryByKey(String key) {
-        try {
-            if (key == null) {
-                throw new IllegalArgumentException("The key is null");
-            }
+    public <T> T getAchievementByKey(Class<T> dtoType, String entityKey) {
 
-            List<AchievementSummaryReadModel> entities = this.achievementMongoDBProvider.findSummaryByKey(key);
+        T entity;
 
-            return entities.isEmpty()
-                    ? null
-                    : entities.getFirst();
+        entity = achievementPSQLProvider.findAchievementByKey(dtoType, entityKey);
 
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-
-    @Override
-    public List<AchievementSummaryReadModel> getAchievementSummariesByUserKey(String userKey) {
-        try {
-            if (userKey == null) {
-                throw new IllegalArgumentException("The key is null");
-            }
-
-            List<AchievementSummaryReadModel> entities = this.achievementMongoDBProvider.findSummaryByUserKey(userKey);
-
-            return entities.isEmpty()
-                    ? null
-                    : entities;
-
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+        return entity;
     }
 
 }
