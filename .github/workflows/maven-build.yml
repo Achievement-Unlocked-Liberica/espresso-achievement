@@ -176,8 +176,13 @@ jobs:
           # Remove the "v" prefix from the tag name.
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
+          echo "GH REF VERSION=$VERSION"
+          
           # This uses the `latest` tag convention.
-          [ "$VERSION" == "main" ] && VERSION=latest || VERSION=$RELEASE_VERSION 
+          [ "$VERSION" == "main" ] && VERSION=$RELEASE_VERSION 
+          
+          echo "REPO_CHART_PATH=$REPO_CHART_PATH"
+          echo "VERSION=$VERSION"
            
           helm package $REPO_CHART_PATH --destination ./charts --version $VERSION --app-version $VERSION
 
