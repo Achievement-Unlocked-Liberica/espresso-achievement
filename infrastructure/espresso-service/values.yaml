@@ -16,9 +16,9 @@ volumeMounts:
     readOnly: true
 
 volumes:
-- name: coffee-service-application-secrets-volume
-  secret:
-    secretName: coffee-service-application-secrets
+  - name: coffee-service-application-secrets-volume
+    secret:
+      secretName: coffee-service-application-secrets
 
 imagePullSecrets:
   - name: github-container-registry

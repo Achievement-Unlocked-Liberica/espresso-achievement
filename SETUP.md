@@ -125,7 +125,7 @@ helm package infrastructure/espresso-service -d infrastructure/packages
 
 ```
 //REVIEW THIS LINE
-helm install espresso-service infrastructure/packages/espresso-service-0.1.0.tgz --set image.tag=latest -n liberica-services --create-namespace
+helm install espresso-service infrastructure/packages/espresso-service-0.1.0.tgz --set image.tag=1.1.1 -n liberica-services --create-namespace
 ```
 
 
