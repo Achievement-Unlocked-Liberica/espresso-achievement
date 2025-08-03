@@ -81,7 +81,7 @@ jobs:
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
 
           # This uses the `latest` tag convention.
-          [ "$VERSION" == "main" ] && VERSION=latest || VERSION=$RELEASE_VERSION         
+          [ "$VERSION" == "main" ] VERSION=$RELEASE_VERSION         
 
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
