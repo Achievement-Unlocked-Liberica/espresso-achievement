@@ -53,8 +53,8 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 8080
-  targetPort: 8080 # Aligned with the port value for consistency
+  port: 8090
+  targetPort: 8090 # Aligned with the port value for consistency
 
 ingress:
   enabled: true

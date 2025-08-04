@@ -15,7 +15,7 @@ services:
     build:
       context: .
     ports:
-      - 8080:8080
+      - 8090:8090
 
 # DefaultEndpointsProtocol=http;AccountName=azblobliberica;AccountKey=4cXiMYiuzHhb-Pw33jLGhbTrVVQ360KaS39Rc4_JhgE;BlobEndpoint=http://127.0.0.1:10000/azblobliberica;
 

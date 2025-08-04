@@ -89,13 +89,13 @@ COPY --from=extract /build/target/extracted/spring-boot-loader/ ./
 COPY --from=extract /build/target/extracted/snapshot-dependencies/ ./
 COPY --from=extract /build/target/extracted/application/ ./
 
-EXPOSE 8080
+EXPOSE 8090
 
 LABEL org.opencontainers.image.source https://github.com/Achievement-Unlocked-Liberica/espresso-achievement
 LABEL org.opencontainers.image.description "Espresso Liberica - Achievement Service"
 LABEL org.opencontainers.image.licenses MIT
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-  CMD curl -f http://localhost:8080/api/cmd/achievement/health || exit 1
+  CMD curl -f http://localhost:8090/api/cmd/achievement/health || exit 1
 
 ENTRYPOINT [ "java", "org.springframework.boot.loader.launch.JarLauncher" ]

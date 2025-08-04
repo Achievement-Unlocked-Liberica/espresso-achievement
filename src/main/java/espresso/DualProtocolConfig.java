@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
  * Enables both HTTP and HTTPS access simultaneously
  * 
  * - HTTPS: 8443 (primary with SSL certificate)
- * - HTTP: 8080 (for mobile testing and development)
+ * - HTTP: 8090 (for mobile testing and development)
  */
 @Configuration
 public class DualProtocolConfig {
@@ -19,27 +19,27 @@ public class DualProtocolConfig {
     /**
      * Configure Tomcat to support both HTTP and HTTPS
      * HTTPS is configured via application.properties (port 8443)
-     * HTTP is configured here (port 8080)
+     * HTTP is configured here (port 8090)
      */
     @Bean
     public ServletWebServerFactory servletContainer() {
         TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
         
-        // Add HTTP connector on port 8080
+        // Add HTTP connector on port 8090
         tomcat.addAdditionalTomcatConnectors(createHttpConnector());
         
         return tomcat;
     }
 
     /**
-     * Create HTTP connector for port 8080
+     * Create HTTP connector for port 8090
      * This allows mobile apps and clients that have issues with self-signed certificates
      * to connect via plain HTTP
      */
     private Connector createHttpConnector() {
         Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
         connector.setScheme("http");
-        connector.setPort(8080);
+        connector.setPort(8090);
         connector.setSecure(false);
         return connector;
     }
