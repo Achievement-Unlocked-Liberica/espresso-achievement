@@ -67,10 +67,10 @@ ingress:
       paths:
         - path: /
           pathType: ImplementationSpecific
-  # tls:
-  #   - hosts:
-  #     - api.aunlocked.com
-  #     secretName: espresso-service-cert-dev-tls
+  tls:
+    - hosts:
+      - api.aunlocked.com
+      secretName: espresso-service-cert-dev-tls
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
