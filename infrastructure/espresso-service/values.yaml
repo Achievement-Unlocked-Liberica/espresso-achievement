@@ -61,7 +61,7 @@ ingress:
   className: "nginx"
   annotations: 
     kubernetes.io/ingress.class: nginx
-    # cert-manager.io/cluster-issuer: espresso-service-cert-dev
+    cert-manager.io/cluster-issuer: espresso-service-cert-dev
   hosts:
     - host: api.aunlocked.com
       paths:
