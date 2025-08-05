@@ -28,7 +28,7 @@ public class OpenApiConfig {
                         .url("https://localhost:8443")
                         .description("Secure HTTPS Server (Production-like)"))
                 .addServersItem(new Server()
-                        .url("http://localhost:8090")
+                        .url("http://localhost:8080")
                         .description("HTTP Server (Mobile testing & Development)"));
     }
 }

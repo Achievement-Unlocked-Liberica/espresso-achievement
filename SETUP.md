@@ -83,7 +83,7 @@ mvnw spring-boot:run
 
 ## Open Swagger API page
 
-http://localhost:8090/swagger-ui/index.html
+http://localhost:8080/swagger-ui/index.html
 
 Port number might be different.  Check your application.properties file
 

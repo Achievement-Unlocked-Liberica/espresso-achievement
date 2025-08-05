@@ -53,24 +53,24 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 8090
-  targetPort: 8090 # Aligned with the port value for consistency
+  port: 8080
+  targetPort: 8080 # Aligned with the port value for consistency
 
 ingress:
   enabled: true
   className: "nginx"
   annotations: 
     kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: espresso-service-cert-dev
+    # cert-manager.io/cluster-issuer: espresso-service-cert-dev
   hosts:
     - host: api.aunlocked.com
       paths:
         - path: /
           pathType: ImplementationSpecific
-  tls:
-    - hosts:
-      - api.aunlocked.com
-      secretName: espresso-service-cert-dev-tls
+  # tls:
+  #   - hosts:
+  #     - api.aunlocked.com
+  #     secretName: espresso-service-cert-dev-tls
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

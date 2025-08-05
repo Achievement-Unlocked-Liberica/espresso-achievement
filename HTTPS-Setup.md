@@ -12,7 +12,7 @@ The application includes a custom OpenAPI configuration that:
 ### 5. Browser Security Warning (HTTPS Only)## Overview
 This application has been configured to run with **dual protocol support** - both HTTP and HTTPS simultaneously:
 - **HTTPS (Port 8443)**: Secure connections with SSL/TLS encryption
-- **HTTP (Port 8090)**: Plain HTTP for mobile testing and development
+- **HTTP (Port 8080)**: Plain HTTP for mobile testing and development
 
 This setup is perfect for scenarios where you need secure HTTPS for production-like testing while also providing HTTP access for mobile apps that have issues with self-signed certificates.
 
@@ -28,7 +28,7 @@ This setup is perfect for scenarios where you need secure HTTPS for production-l
 
 ### Server Configuration
 - **HTTPS Port**: 8443 (Primary with SSL certificate)
-- **HTTP Port**: 8090 (Secondary for mobile testing)
+- **HTTP Port**: 8080 (Secondary for mobile testing)
 - **Certificate Subject**: CN=localhost, OU=Development, O=Espresso, L=Local, ST=Development, C=US
 
 ## How to Use
@@ -47,16 +47,16 @@ mvnw.cmd spring-boot:run
 - **API Docs**: `https://localhost:8443/api-docs`
 - **Health Check**: `https://localhost:8443/actuator/health`
 
-#### HTTP Access (Mobile-friendly - Port 8090)
-- **Base URL**: `http://localhost:8090`
-- **API Endpoints**: `http://localhost:8090/api/...`
-- **Swagger UI**: `http://localhost:8090/swagger-ui.html`
-- **API Docs**: `http://localhost:8090/api-docs`
-- **Health Check**: `http://localhost:8090/actuator/health`
+#### HTTP Access (Mobile-friendly - Port 8080)
+- **Base URL**: `http://localhost:8080`
+- **API Endpoints**: `http://localhost:8080/api/...`
+- **Swagger UI**: `http://localhost:8080/swagger-ui.html`
+- **API Docs**: `http://localhost:8080/api-docs`
+- **Health Check**: `http://localhost:8080/actuator/health`
 
 ### 3. Mobile App Testing
 For mobile applications that have issues with self-signed certificates:
-- Use the **HTTP endpoints** on port 8090
+- Use the **HTTP endpoints** on port 8080
 - No SSL certificate warnings or errors
 - Full API functionality available
 - Use `userRestClient-HTTP.http` for testing HTTP endpoints
