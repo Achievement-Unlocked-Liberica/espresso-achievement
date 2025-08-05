@@ -11,12 +11,12 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component
+// @Component
 public class PropertiesLogger{
 
     private static final Logger log = LoggerFactory.getLogger(PropertiesLogger.class);
 
-    @EventListener
+    // @EventListener
     public void handleContextRefreshed(ContextRefreshedEvent  event) {
         ConfigurableEnvironment environment = (ConfigurableEnvironment) event.getApplicationContext().getEnvironment();
         System.out.println("--- Application Properties ---");
