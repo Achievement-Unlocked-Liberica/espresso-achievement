@@ -38,18 +38,18 @@ spec:
               containerPort: {{ .Values.service.targetPort }}
               protocol: TCP
           livenessProbe:
-            enabled: false
+            # enabled: false
             httpGet:
-              path: /health
+              path: /actuator/health
               port: http
             initialDelaySeconds: 10
             periodSeconds: 10
             timeoutSeconds: 1
             failureThreshold: 3
           readinessProbe:
-            enabled: false
+            # enabled: false
             httpGet:
-              path: /health
+              path: /actuator/health
               port: http
             initialDelaySeconds: 5
             periodSeconds: 10
