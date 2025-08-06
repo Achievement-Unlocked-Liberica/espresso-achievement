@@ -13,7 +13,7 @@ import io.swagger.v3.oas.models.info.Info;
 
 @Configuration
 @EnableWebMvc
-public class EspressoConfig implements WebMvcConfigurer {
+public class EspressoWebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {

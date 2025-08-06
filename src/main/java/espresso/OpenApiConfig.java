@@ -4,6 +4,8 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.servers.Server;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,6 +15,9 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class OpenApiConfig {
+
+    @Autowired
+    private EspressoPropertiesConfig espressoPropertiesConfig;
 
     @Bean
     public OpenAPI customOpenAPI() {
@@ -24,11 +29,8 @@ public class OpenApiConfig {
                         .contact(new Contact()
                                 .name("Espresso Development Team")
                                 .email("dev@espresso.local")))
-                // .addServersItem(new Server()
-                //         .url("https://localhost:8443")
-                //         .description("Secure HTTPS Server (Production-like)"))
                 .addServersItem(new Server()
-                        .url("http://localhost:8080")
+                        .url(this.espressoPropertiesConfig.getBaseUrl())
                         .description("HTTP Server (Mobile testing & Development)"));
     }
 }
