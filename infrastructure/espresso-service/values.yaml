@@ -20,6 +20,9 @@ volumes:
     secret:
       secretName: coffee-service-application-secrets
 
+secrets:
+  environmentSecretName: coffee-service-application-secrets
+
 imagePullSecrets:
   - name: github-container-registry
 

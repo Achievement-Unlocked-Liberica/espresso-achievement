@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
  * - HTTPS: 8443 (primary with SSL certificate)
  * - HTTP: 8080 (for mobile testing and development)
  */
-@Configuration
+// @Configuration
 public class DualProtocolConfig {
 
     /**
@@ -21,7 +21,7 @@ public class DualProtocolConfig {
      * HTTPS is configured via application.properties (port 8443)
      * HTTP is configured here (port 8080)
      */
-    @Bean
+    // @Bean
     public ServletWebServerFactory servletContainer() {
         TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory();
         

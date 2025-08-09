@@ -40,7 +40,7 @@ spec:
           livenessProbe:
             # enabled: false
             httpGet:
-              path: /health
+              path: /actuator/health
               port: http
             initialDelaySeconds: 10
             periodSeconds: 10
@@ -49,7 +49,7 @@ spec:
           readinessProbe:
             # enabled: false
             httpGet:
-              path: /health
+              path: /actuator/health
               port: http
             initialDelaySeconds: 5
             periodSeconds: 10
@@ -57,14 +57,9 @@ spec:
             failureThreshold: 3              
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
-            {{- with .Values.volumeMounts }}
-              {{- toYaml . | nindent 12 }}
-            {{- end }}
-      volumes:
-        {{- with .Values.volumes }}
-          {{- toYaml . | nindent 8 }}
-        {{- end }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.secrets.environmentSecretName }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
