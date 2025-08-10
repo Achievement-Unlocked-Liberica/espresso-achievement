@@ -8,11 +8,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import espresso.achievement.domain.contracts.IAchievementCommandHandler;
+import espresso.achievement.domain.contracts.IAchievementCommentRepository;
+import espresso.achievement.domain.commands.AddAchievementCommentCommand;
 import espresso.achievement.domain.commands.CreateAchivementCommand;
 import espresso.achievement.domain.commands.UploadAchievementMediaCommand;
 import espresso.achievement.domain.contracts.IAchievementCmdRepository;
 import espresso.achievement.domain.contracts.IAchievementMediaRepository;
 import espresso.achievement.domain.contracts.IAchievementQryRepository;
+import espresso.achievement.domain.entities.AchievementComment;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
 import espresso.achievement.domain.entities.Achievement;
@@ -34,6 +37,9 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
 
     @Autowired
     private IAchievementMediaRepository achievementMediaRepository;
+
+    @Autowired
+    private IAchievementCommentRepository achievementCommentRepository;
 
     public HandlerResponse<Object> handle(CreateAchivementCommand command) {
 
@@ -127,6 +133,57 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
 
             // Return the achievement instance
             return HandlerResponse.created(achievement);
+
+        } catch (Exception ex) {
+            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+        }
+    }
+
+    /**
+     * Handles the command to add a new comment to an achievement.
+     * Delegates to the dedicated comment command handler for processing.
+     * 
+     * @param command The command containing comment data
+     * @return HandlerResponse with the created comment or error details
+     */
+    public HandlerResponse<Object> handleAddComment(AddAchievementCommentCommand command) {
+        try {
+            // Validate the command
+            var validationErrors = command.validate();
+
+            if (!validationErrors.isEmpty()) {
+                return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
+            }
+
+            // Verify the achievement exists
+            Achievement achievement = achievementQryRepository.getAchievementByKey(
+                Achievement.class, 
+                command.getAchievementKey()
+            );
+
+            if (achievement == null) {
+                return HandlerResponse.error("Achievement not found", ResponseType.NOT_FOUND);
+            }
+
+            // Verify the user exists
+            User user = userRepository.findByKey(command.getUserKey(), User.class);
+
+            if (user == null) {
+                return HandlerResponse.error("User not found", ResponseType.NOT_FOUND);
+            }
+
+            // Create a new achievement comment using the domain model's create operation
+            AchievementComment comment = AchievementComment.create(
+                command.getCommentText(),
+                achievement,
+                user
+            );
+
+            // Save the comment through the repository
+            AchievementComment savedComment = achievementCommentRepository.save(comment);
+
+            // Return success response with the created comment
+            return HandlerResponse.created(savedComment);
 
         } catch (Exception ex) {
             return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
