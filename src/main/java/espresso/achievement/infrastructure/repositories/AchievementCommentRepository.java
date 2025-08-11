@@ -24,22 +24,16 @@ public class AchievementCommentRepository implements IAchievementCommentReposito
      * @param achievementComment The comment entity to save
      * @return The saved AchievementComment entity with populated ID
      * @throws IllegalArgumentException if the comment is null
-     * @throws RuntimeException if there's an error during persistence
+     * @throws RuntimeException         if there's an error during persistence
      */
     @Override
     public AchievementComment save(AchievementComment achievementComment) {
-        try {
-            if (achievementComment == null) {
-                throw new IllegalArgumentException("The achievement comment is null");
-            }
-
-            AchievementComment savedEntity = this.achievementCommentPSQLProvider.save(achievementComment);
-
-            return savedEntity;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
+        if (achievementComment == null) {
+            throw new IllegalArgumentException("The achievement comment is null");
         }
+
+        AchievementComment savedEntity = this.achievementCommentPSQLProvider.save(achievementComment);
+
+        return savedEntity;
     }
 }

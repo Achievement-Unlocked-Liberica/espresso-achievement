@@ -46,7 +46,7 @@ public class AchievementCmdApiUnitTest {
         MockMultipartFile[] mockFiles = {mockFile1, mockFile2};
 
         // Mock the handler response
-        when(achivementCommandHandler.handleUploadMedia(any(UploadAchievementMediaCommand.class)))
+        when(achivementCommandHandler.handle(any(UploadAchievementMediaCommand.class)))
             .thenReturn(HandlerResponse.created("Media uploaded successfully"));
 
         // Act

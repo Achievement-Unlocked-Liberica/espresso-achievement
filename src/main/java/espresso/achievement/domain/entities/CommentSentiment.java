@@ -20,19 +20,19 @@ public class CommentSentiment {
      * Probability score for positive sentiment (0.0 to 1.0)
      */
     @Column(name = "sentimentPositive", nullable = false)
-    private float positive;
+    private double positive;
 
     /**
      * Probability score for neutral sentiment (0.0 to 1.0)
      */
     @Column(name = "sentimentNeutral", nullable = false)
-    private float neutral;
+    private double neutral;
 
     /**
      * Probability score for negative sentiment (0.0 to 1.0)
      */
     @Column(name = "sentimentNegative", nullable = false)
-    private float negative;
+    private double negative;
 
     /**
      * Creates a default sentiment with neutral values.
@@ -52,7 +52,7 @@ public class CommentSentiment {
      * @param negative Negative sentiment score (0.0 to 1.0)
      * @return CommentSentiment instance
      */
-    public static CommentSentiment create(float positive, float neutral, float negative) {
+    public static CommentSentiment create(double positive, double neutral, double negative) {
         return new CommentSentiment(positive, neutral, negative);
     }
 }

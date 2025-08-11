@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import espresso.achievement.domain.commands.AddAchievementCommentCommand;
 import espresso.achievement.domain.commands.CreateAchivementCommand;
 import espresso.achievement.domain.commands.UploadAchievementMediaCommand;
 import espresso.achievement.domain.contracts.IAchievementCommandHandler;
@@ -29,7 +30,8 @@ import espresso.security.domain.entities.JWTAuthenticationToken;
 public class AchievementCmdApi extends CommonCmdApi {
 
 	@Autowired
-	private IAchievementCommandHandler achivementCommandHandler;
+	private IAchievementCommandHandler achievementCommandHandler;
+
 
 	@Operation(summary = "Create New Achivement", description = "Creates a new Achievement from the provided command.")
 	@PostMapping("")
@@ -38,7 +40,7 @@ public class AchievementCmdApi extends CommonCmdApi {
 	@ApiResponse(responseCode = "500:INTERNAL_SERVER_ERROR", description = "An internal error occurred.")
 	@ApiLogger("Create new achievement")
 	public ResponseEntity<ServiceResponse<Object>> createAchievement(@RequestBody CreateAchivementCommand command) {
-		return executeCommand(command, achivementCommandHandler::handle);
+		return executeCommand(command, achievementCommandHandler::handle);
 	}
 
 	@Operation(summary = "Upload Achievement Media", description = "Uploads media files for an existing Achievement.")
@@ -63,6 +65,39 @@ public class AchievementCmdApi extends CommonCmdApi {
 		}
 
 		UploadAchievementMediaCommand command = new UploadAchievementMediaCommand(key, userKey, images);
-		return executeCommand(command, achivementCommandHandler::handleUploadMedia);
+		return executeCommand(command, achievementCommandHandler::handle);
 	}
+
+
+    /**
+     * Creates a new comment on an existing achievement.
+     * The userKey is automatically extracted from the JWT authentication token.
+     * 
+     * @param command The command containing achievement key and comment text
+     * @return ResponseEntity with the created comment or error response
+     */
+    @Operation(summary = "Add Comment to Achievement", description = "Creates a new comment on an existing achievement.")
+    @PostMapping("/comments")
+    @ApiResponse(responseCode = "201:CREATED", description = "Comment created successfully.")
+    @ApiResponse(responseCode = "400:BAD_REQUEST", description = "Validation error in the request.")
+    @ApiResponse(responseCode = "401:UNAUTHORIZED", description = "Unauthorized access - invalid or missing JWT token.")
+    @ApiResponse(responseCode = "404:NOT_FOUND", description = "Achievement or user not found.")
+    @ApiResponse(responseCode = "500:INTERNAL_SERVER_ERROR", description = "An internal error occurred.")
+    @ApiLogger("Add achievement comment")
+    public ResponseEntity<ServiceResponse<Object>> addComment(@RequestBody AddAchievementCommentCommand command) {
+        
+        // Get authentication from SecurityContext to extract user key from JWT
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userKey = null;
+        
+        if (authentication instanceof JWTAuthenticationToken) {
+            JWTAuthenticationToken jwtAuth = (JWTAuthenticationToken) authentication;
+            userKey = jwtAuth.getUserKey();
+        }
+
+        // Set the user key from the authenticated JWT token
+        command.setUserKey(userKey);
+        
+        return executeCommand(command, achievementCommandHandler::handle);
+    }
 }
