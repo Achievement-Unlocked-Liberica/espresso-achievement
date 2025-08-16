@@ -143,7 +143,7 @@ public class AchievementApiTest {
         );
 
         // Mock the handler response
-        when(achivementCommandHandler.handleUploadMedia(any(UploadAchievementMediaCommand.class)))
+        when(achivementCommandHandler.handle(any(UploadAchievementMediaCommand.class)))
             .thenReturn(HandlerResponse.created("Media uploaded successfully"));
 
         this.mockMvc
@@ -191,7 +191,7 @@ public class AchievementApiTest {
         );
 
         // Mock the handler to return not found
-        when(achivementCommandHandler.handleUploadMedia(any(UploadAchievementMediaCommand.class)))
+        when(achivementCommandHandler.handle(any(UploadAchievementMediaCommand.class)))
             .thenReturn(HandlerResponse.error("Achievement not found", ResponseType.NOT_FOUND));
 
         this.mockMvc

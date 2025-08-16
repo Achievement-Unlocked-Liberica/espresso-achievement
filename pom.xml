@@ -61,7 +61,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		
+
 
 		<dependency>
 			<groupId>com.amazonaws</groupId>
@@ -126,6 +126,12 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.azure</groupId>
+			<artifactId>azure-ai-textanalytics</artifactId>
+			<version>5.5.4</version>			<!-- Use the latest stable version -->
 		</dependency>
 	</dependencies>
 

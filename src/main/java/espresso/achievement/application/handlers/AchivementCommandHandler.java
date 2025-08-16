@@ -8,17 +8,46 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import espresso.achievement.domain.contracts.IAchievementCommandHandler;
+import espresso.achievement.domain.contracts.IAchievementCommentRepository;
+import espresso.achievement.domain.commands.AddAchievementCommentCommand;
 import espresso.achievement.domain.commands.CreateAchivementCommand;
 import espresso.achievement.domain.commands.UploadAchievementMediaCommand;
 import espresso.achievement.domain.contracts.IAchievementCmdRepository;
 import espresso.achievement.domain.contracts.IAchievementMediaRepository;
 import espresso.achievement.domain.contracts.IAchievementQryRepository;
+import espresso.achievement.domain.entities.AchievementComment;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
 import espresso.achievement.domain.entities.Achievement;
 import espresso.achievement.domain.entities.AchievementMedia;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+
+/**
+ * Handles the creation of a new achievement.
+ * 
+ * This method validates the provided {@link CreateAchivementCommand}, retrieves
+ * the user
+ * associated with the command, and creates a new achievement entity. The
+ * created achievement
+ * is then saved to the repository.
+ * 
+ * @param command The {@link CreateAchivementCommand} containing the details of
+ *                the achievement to be created.
+ * @return A {@link HandlerResponse} containing the created achievement or error
+ *         details in case of failure.
+ *         Possible response types:
+ *         <ul>
+ *         <li>{@link ResponseType#VALIDATION_ERROR} - If the command contains
+ *         validation errors.</li>
+ *         <li>{@link ResponseType#NOT_FOUND} - If the user associated with the
+ *         command is not found.</li>
+ *         <li>{@link ResponseType#INTERNAL_ERROR} - If an unexpected error
+ *         occurs during processing.</li>
+ *         <li>{@link ResponseType#CREATED} - If the achievement is successfully
+ *         created.</li>
+ *         </ul>
+ */
 
 @Service
 public class AchivementCommandHandler implements IAchievementCommandHandler {
@@ -34,6 +63,9 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
 
     @Autowired
     private IAchievementMediaRepository achievementMediaRepository;
+
+    @Autowired
+    private IAchievementCommentRepository achievementCommentRepository;
 
     public HandlerResponse<Object> handle(CreateAchivementCommand command) {
 
@@ -72,7 +104,8 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
         }
     }
 
-    public HandlerResponse<Object> handleUploadMedia(UploadAchievementMediaCommand cmd) {
+
+    public HandlerResponse<Object> handle(UploadAchievementMediaCommand cmd) {
         try {
             // Validate the command
             var validationErrors = cmd.validate();
@@ -82,7 +115,8 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
             }
 
             // Get the achievement by key
-            Achievement achievement = achievementQryRepository.getAchievementByKey(Achievement.class, cmd.getAchievementKey());
+            Achievement achievement = achievementQryRepository.getAchievementByKey(Achievement.class,
+                    cmd.getAchievementKey());
 
             if (achievement == null) {
                 return HandlerResponse.error("Achievement not found", ResponseType.NOT_FOUND);
@@ -127,6 +161,55 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
 
             // Return the achievement instance
             return HandlerResponse.created(achievement);
+
+        } catch (Exception ex) {
+            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+        }
+    }
+
+    /**
+     * Handles the command to add a new comment to an achievement.
+     * Delegates to the dedicated comment command handler for processing.
+     * 
+     * @param cmd The command containing comment data
+     * @return HandlerResponse with the created comment or error details
+     */
+    public HandlerResponse<Object> handle(AddAchievementCommentCommand cmd) {
+        try {
+            // Validate the command
+            var validationErrors = cmd.validate();
+
+            if (!validationErrors.isEmpty()) {
+                return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
+            }
+
+            // Verify the achievement exists
+            Achievement achievement = achievementQryRepository.getAchievementByKey(
+                    Achievement.class,
+                    cmd.getAchievementKey());
+
+            if (achievement == null) {
+                return HandlerResponse.error("Achievement not found", ResponseType.NOT_FOUND);
+            }
+
+            // Verify the user exists
+            User user = userRepository.findByKey(cmd.getUserKey(), User.class);
+
+            if (user == null) {
+                return HandlerResponse.error("User not found", ResponseType.NOT_FOUND);
+            }
+
+            // Create a new achievement comment using the domain model's create operation
+            AchievementComment comment = AchievementComment.create(
+                    cmd.getCommentText(),
+                    achievement,
+                    user);
+
+            // Save the comment through the repository
+            AchievementComment savedComment = achievementCommentRepository.save(comment);
+
+            // Return success response with the created comment
+            return HandlerResponse.created(savedComment);
 
         } catch (Exception ex) {
             return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);

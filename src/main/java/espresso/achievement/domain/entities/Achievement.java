@@ -69,6 +69,10 @@ public class Achievement extends DomainEntity {
     @OneToMany(mappedBy = "achievement", fetch = FetchType.LAZY)
     private List<AchievementMedia> media;
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "achievement", fetch = FetchType.LAZY)
+    private List<AchievementComment> comments;
+
     @Enumerated(EnumType.STRING)
     private AchievementVisibilityStatus achievementVisibility;
 
