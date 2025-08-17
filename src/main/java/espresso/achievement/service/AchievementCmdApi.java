@@ -73,19 +73,17 @@ public class AchievementCmdApi extends CommonCmdApi {
 	 * @return ResponseEntity with the created comment or error response
 	 */
 	@Operation(summary = "Add Comment to Achievement", description = "Creates a new comment on an existing achievement.")
-	@PostMapping("/comments")
+	@PostMapping("/{key}/comments")
 	@ApiResponse(responseCode = "201:CREATED", description = "Comment created successfully.")
 	@ApiResponse(responseCode = "400:BAD_REQUEST", description = "Validation error in the request.")
 	@ApiResponse(responseCode = "401:UNAUTHORIZED", description = "Unauthorized access - invalid or missing JWT token.")
 	@ApiResponse(responseCode = "404:NOT_FOUND", description = "Achievement or user not found.")
 	@ApiResponse(responseCode = "500:INTERNAL_SERVER_ERROR", description = "An internal error occurred.")
 	@ApiLogger("Add achievement comment")
-	public ResponseEntity<ServiceResponse<Object>> addComment(@RequestBody AddAchievementCommentCommand command) {
-
+	public ResponseEntity<ServiceResponse<Object>> addComment(@PathVariable String key, @RequestBody AddAchievementCommentCommand command) {
 		String userKey = getAuthenticatedUserKey();
-
 		command.setUserKey(userKey);
-
+		command.setAchievementKey(key);
 		return executeCommand(command, achievementCommandHandler::handle);
 	}
 
@@ -98,19 +96,17 @@ public class AchievementCmdApi extends CommonCmdApi {
 	 * @return ResponseEntity with the updated achievement or error response
 	 */
 	@Operation(summary = "Update Achievement", description = "Updates an existing achievement with new details.")
-	@PutMapping("")
+	@PutMapping("/{key}")
 	@ApiResponse(responseCode = "200:OK", description = "Achievement updated successfully.")
 	@ApiResponse(responseCode = "400:BAD_REQUEST", description = "Validation error in the request.")
 	@ApiResponse(responseCode = "401:UNAUTHORIZED", description = "Unauthorized access - invalid or missing JWT token or user not authorized to update this achievement.")
 	@ApiResponse(responseCode = "404:NOT_FOUND", description = "Achievement or user not found.")
 	@ApiResponse(responseCode = "500:INTERNAL_SERVER_ERROR", description = "An internal error occurred.")
 	@ApiLogger("Update achievement")
-	public ResponseEntity<ServiceResponse<Object>> updateAchievement(@RequestBody UpdateAchievementCommand command) {
-
+	public ResponseEntity<ServiceResponse<Object>> updateAchievement(@PathVariable String key, @RequestBody UpdateAchievementCommand command) {
 		String userKey = getAuthenticatedUserKey();
-
 		command.setUserKey(userKey);
-
+		command.setAchievementKey(key);
 		return executeCommand(command, achievementCommandHandler::handle);
 	}
 }

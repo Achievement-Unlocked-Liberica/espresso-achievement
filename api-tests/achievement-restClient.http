@@ -5,7 +5,7 @@ X-API-Version: 1
 
 ### Create a new Achievement
 
-@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5Ijoibnp4eGIxYiIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiRWR3aW4iLCJsYXN0TmFtZSI6IlZhbmNlIiwiaWF0IjoxNzU0ODkyMzY2LCJleHAiOjE3NTQ5Nzg3NjZ9.F2PNqkXB09VYpLBYhwnerIwe2AZV-wHHaHaFAT8ClooqoNYE6wriH3EwEwHab_UY
+@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5Ijoibnp4eGIxYiIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiRWR3aW4iLCJsYXN0TmFtZSI6IlZhbmNlIiwiaWF0IjoxNzU1NDE1NzExLCJleHAiOjE3NTU1MDIxMTF9.RuNWVxOIM87Gs3yjwPjfogl5lDZxYft0TAP2xHksszuRQjWPdcABALMZblYe7ZpL
 
 POST http://localhost:8080/api/cmd/achievement HTTP/1.1
 Content-Type: application/json
@@ -44,7 +44,7 @@ Authorization: Bearer {{authToken}}
 }
 
 ### Update an existing Achievement
-PUT http://localhost:8080/api/cmd/achievement HTTP/1.1
+PUT http://localhost:8080/api/cmd/achievement/PFBB8UQ HTTP/1.1
 Content-Type: application/json
 accept: application/json
 X-API-Version: 1
@@ -53,8 +53,8 @@ Authorization: Bearer {{authToken}}
 {
   "achievementKey": "PFBB8UQ",
   "userKey": "nzxxb1b",
-  "title": "Updated Achievement Title",
-  "description": "This achievement has been updated with new information and improved description.",
+  "title": "A new updated title",
+  "description": "A new updated description",
   "skills": ["str", "dex", "int"],
   "isPublic": false
 }
