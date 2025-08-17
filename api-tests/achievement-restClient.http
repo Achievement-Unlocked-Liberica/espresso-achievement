@@ -42,3 +42,19 @@ Authorization: Bearer {{authToken}}
 "userKey": "nzxxb1b",
 "commentText": "This is a test comment for the achievement."
 }
+
+### Update an existing Achievement
+PUT http://localhost:8080/api/cmd/achievement HTTP/1.1
+Content-Type: application/json
+accept: application/json
+X-API-Version: 1
+Authorization: Bearer {{authToken}}
+
+{
+  "achievementKey": "PFBB8UQ",
+  "userKey": "nzxxb1b",
+  "title": "Updated Achievement Title",
+  "description": "This achievement has been updated with new information and improved description.",
+  "skills": ["str", "dex", "int"],
+  "isPublic": false
+}

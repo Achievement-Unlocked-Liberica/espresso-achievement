@@ -11,6 +11,7 @@ import espresso.achievement.domain.contracts.IAchievementCommandHandler;
 import espresso.achievement.domain.contracts.IAchievementCommentRepository;
 import espresso.achievement.domain.commands.AddAchievementCommentCommand;
 import espresso.achievement.domain.commands.CreateAchivementCommand;
+import espresso.achievement.domain.commands.UpdateAchievementCommand;
 import espresso.achievement.domain.commands.UploadAchievementMediaCommand;
 import espresso.achievement.domain.contracts.IAchievementCmdRepository;
 import espresso.achievement.domain.contracts.IAchievementMediaRepository;
@@ -213,6 +214,65 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
 
         } catch (Exception ex) {
             return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+        }
+    }
+
+    /**
+     * Handles the command to update an existing achievement.
+     * Validates the command, verifies user and achievement exist, updates the achievement,
+     * and persists the changes to the repository.
+     * 
+     * @param cmd The command containing updated achievement data
+     * @return HandlerResponse with the updated achievement or error details
+     */
+    public HandlerResponse<Object> handle(UpdateAchievementCommand cmd) {
+        try {
+            // Validate the command
+            var validationErrors = cmd.validate();
+
+            if (!validationErrors.isEmpty()) {
+            return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
+            }
+
+            // Retrieve user by userKey - throw not found error if missing
+            User user = userRepository.findByKey(cmd.getUserKey(), User.class);
+            if (user == null) {
+            return HandlerResponse.error("LOCALIZE: USER NOT FOUND", ResponseType.NOT_FOUND);
+            }
+
+            // Retrieve achievement by achievementKey - throw not found error if missing
+            Achievement achievement = achievementQryRepository.getAchievementByKey(
+            Achievement.class, 
+            cmd.getAchievementKey()
+            );
+
+            if (achievement == null) {
+            return HandlerResponse.error("LOCALIZE: ACHIEVEMENT NOT FOUND", ResponseType.NOT_FOUND);
+            }
+
+            // Verify that the user owns the achievement
+            if (!achievement.getUser().getEntityKey().equals(cmd.getUserKey())) {
+            return HandlerResponse.error("LOCALIZE: USER IS NOT AUTHORIZED TO UPDATE THIS ACHIEVEMENT", ResponseType.UNAUTHORIZED);
+            }
+
+            // Convert skills array to list for the update method
+            List<String> skillsList = Arrays.asList(cmd.getSkills());
+
+            // Call update method on achievement with command properties
+            achievement.update(
+            cmd.getTitle(), 
+            cmd.getDescription(), 
+            skillsList, 
+            cmd.getIsPublic()
+            );
+
+            // Save updated achievement via AchievementCmdRepository.update
+            Achievement updatedAchievement = achievementCmdRepository.update(achievement);
+
+            return HandlerResponse.success(updatedAchievement);
+
+        } catch (Exception ex) {
+            return HandlerResponse.error("LOCALIZE: " + ex.getMessage().toUpperCase(), ResponseType.INTERNAL_ERROR);
         }
     }
 }

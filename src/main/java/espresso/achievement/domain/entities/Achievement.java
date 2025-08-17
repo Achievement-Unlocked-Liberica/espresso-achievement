@@ -125,6 +125,24 @@ public class Achievement extends DomainEntity {
     // this.media = media;
     // }
 
+    /**
+     * Updates the achievement with new values for title, description, skills, and visibility.
+     * This method allows updating the main properties of an achievement after it has been created.
+     * 
+     * @param title The new title for the achievement
+     * @param description The new description for the achievement  
+     * @param skills List of skill abbreviations associated with the achievement
+     * @param isPublic Whether the achievement should be publicly visible
+     */
+    public void update(String title, String description, List<String> skills, boolean isPublic) {
+        this.title = title;
+        this.description = description;
+        this.skills = skills;
+        this.achievementVisibility = isPublic 
+                ? AchievementVisibilityStatus.EVERYONE 
+                : AchievementVisibilityStatus.PRIVATE;
+    }
+
     // #region Domain Events
 
     public void raiseNewAchievementCreatedEvent() {

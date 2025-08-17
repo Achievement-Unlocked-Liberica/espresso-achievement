@@ -33,4 +33,21 @@ public class AchievementCmdRepository implements IAchievementCmdRepository {
         }
 
     }
+
+    /**
+     * Updates an existing achievement in the database.
+     * Validates the achievement entity and forwards the update to the PostgreSQL provider.
+     * 
+     * @param achievement The achievement entity to update
+     * @return The updated Achievement entity
+     * @throws IllegalArgumentException if the achievement is null
+     * @throws RuntimeException if there's an error during the update operation
+     */
+    @Override
+    public Achievement update(Achievement achievement) {
+            // Use the PSQL provider's update method (leverages JPA save for updates)
+            Achievement updatedEntity = this.achievementPSQLProvider.updateAchievement(achievement);
+
+            return updatedEntity;
+    }
 }
