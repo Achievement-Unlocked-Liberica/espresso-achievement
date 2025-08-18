@@ -4,6 +4,7 @@ public enum ResponseType {
     NONE,
     CREATED,
     SUCCESS,
+    NO_CONTENT,
     VALIDATION_ERROR,
     INTERNAL_ERROR,
     NOT_FOUND,

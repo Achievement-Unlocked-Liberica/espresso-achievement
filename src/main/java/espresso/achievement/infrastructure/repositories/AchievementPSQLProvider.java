@@ -20,7 +20,7 @@ public interface AchievementPSQLProvider extends JpaRepository<Achievement, Long
      * @param entityKey The key of the achievement to retrieve
      * @return A single achievement projected to the specified DTO type
      */
-    @Query("SELECT a FROM Achievement a WHERE a.entityKey = :entityKey")
+    @Query("SELECT a FROM Achievement a WHERE a.entityKey = :entityKey AND a.enabled = true")
     <T> T findAchievementByKey(Class<T> type, String entityKey);
 
     /**
@@ -30,7 +30,7 @@ public interface AchievementPSQLProvider extends JpaRepository<Achievement, Long
      * @param limit Maximum number of results to return
      * @return List of achievements projected to the specified DTO type
      */
-    @Query("SELECT a FROM Achievement a ORDER BY a.registeredAt DESC")
+    @Query("SELECT a FROM Achievement a WHERE a.enabled = true ORDER BY a.registeredAt DESC")
     <T> List<T> findLatestAchievements(Class<T> type, Limit limit);
 
     /**
@@ -41,7 +41,7 @@ public interface AchievementPSQLProvider extends JpaRepository<Achievement, Long
      * @param fromDate The date from which to retrieve achievements
      * @return List of achievements projected to the specified DTO type
      */
-    @Query("SELECT a FROM Achievement a WHERE a.registeredAt > :fromDate ORDER BY a.registeredAt DESC")
+    @Query("SELECT a FROM Achievement a WHERE a.enabled = true AND a.registeredAt > :fromDate ORDER BY a.registeredAt DESC")
     <T> List<T> findLatestAchievements(Class<T> type, Limit limit, OffsetDateTime fromDate);
 
     /**

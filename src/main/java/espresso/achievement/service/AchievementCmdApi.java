@@ -2,6 +2,7 @@ package espresso.achievement.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import espresso.achievement.domain.commands.AddAchievementCommentCommand;
 import espresso.achievement.domain.commands.CreateAchivementCommand;
+import espresso.achievement.domain.commands.DisableAchievementCommand;
 import espresso.achievement.domain.commands.UpdateAchievementCommand;
 import espresso.achievement.domain.commands.UploadAchievementMediaCommand;
 import espresso.achievement.domain.contracts.IAchievementCommandHandler;
@@ -107,6 +109,31 @@ public class AchievementCmdApi extends CommonCmdApi {
 		String userKey = getAuthenticatedUserKey();
 		command.setUserKey(userKey);
 		command.setAchievementKey(key);
+		return executeCommand(command, achievementCommandHandler::handle);
+	}
+
+	/**
+	 * Disables an existing achievement by setting its enabled property to false.
+	 * This removes the achievement from all filters, searches, and visibility without deleting it from the database.
+	 * The userKey is automatically extracted from the JWT authentication token.
+	 * 
+	 * @param key The 7-character alphanumeric key of the achievement to disable
+	 * @return ResponseEntity with the disabled achievement or error response
+	 */
+	@Operation(summary = "Disable Achievement", description = "Disables an achievement by setting its enabled property to false.")
+	@PatchMapping("/{key}/disable")
+	@ApiResponse(responseCode = "200:OK", description = "Achievement disabled successfully.")
+	@ApiResponse(responseCode = "204:NO_CONTENT", description = "No action taken becasue the achievement was already disabled.")
+	@ApiResponse(responseCode = "400:BAD_REQUEST", description = "Validation error in the request.")
+	@ApiResponse(responseCode = "401:UNAUTHORIZED", description = "Unauthorized access - invalid or missing JWT token or user not authorized to disable this achievement.")
+	@ApiResponse(responseCode = "404:NOT_FOUND", description = "Achievement or user not found.")
+	@ApiResponse(responseCode = "500:INTERNAL_SERVER_ERROR", description = "An internal error occurred.")
+	@ApiLogger("Disable achievement")
+	public ResponseEntity<ServiceResponse<Object>> disableAchievement(@PathVariable String key) {
+		String userKey = getAuthenticatedUserKey();
+
+		DisableAchievementCommand command = new DisableAchievementCommand(key, userKey);
+
 		return executeCommand(command, achievementCommandHandler::handle);
 	}
 }

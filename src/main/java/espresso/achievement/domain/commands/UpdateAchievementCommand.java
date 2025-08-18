@@ -2,6 +2,7 @@ package espresso.achievement.domain.commands;
 
 import espresso.achievement.domain.constants.AchievementConstants;
 import espresso.common.domain.commands.CommonCommand;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import java.util.HashSet;
@@ -15,6 +16,7 @@ import jakarta.validation.constraints.*;
  */
 @Getter
 @Setter
+@Schema(description = "command for updating an achievement")
 public class UpdateAchievementCommand extends CommonCommand {
 
     /**
