@@ -37,4 +37,17 @@ public class CommonCmdApi extends CommonApi {
                 .status(apiResponse.getHttpStatus())
                 .body(apiResponse);
     }
+    
+        /**
+         * Helper method to extract the authenticated user key from the security context.
+         * @return the user key from the JWT token, or null if not authenticated
+         */
+        protected String getAuthenticatedUserKey() {
+            org.springframework.security.core.Authentication authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+            if (authentication instanceof espresso.security.domain.entities.JWTAuthenticationToken) {
+                espresso.security.domain.entities.JWTAuthenticationToken jwtAuth = (espresso.security.domain.entities.JWTAuthenticationToken) authentication;
+                return jwtAuth.getUserKey();
+            }
+            return null;
+        }
 }

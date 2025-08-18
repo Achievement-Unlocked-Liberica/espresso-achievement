@@ -1,41 +1,66 @@
 package espresso.achievement.domain.commands;
 
-import org.springframework.format.annotation.DateTimeFormat;
-
 import espresso.achievement.domain.constants.AchievementConstants;
 import espresso.common.domain.commands.CommonCommand;
 import lombok.Getter;
 import lombok.Setter;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.validation.constraints.*;
 
+/**
+ * Command for updating an existing achievement.
+ * Contains the necessary data for updating achievement title, description, skills, and visibility.
+ */
 @Getter
 @Setter
-public class CreateAchivementCommand extends CommonCommand {
+public class UpdateAchievementCommand extends CommonCommand {
 
-    @NotBlank(message = "LOCALIZE:  A USER KEY MUST BE PROVIDED")
+    /**
+     * The 7-character alphanumeric key of the achievement to update
+     */
+    @NotBlank(message = "LOCALIZE: ACHIEVEMENT KEY MUST BE PROVIDED")
+    @Size(min = 7, max = 7, message = "LOCALIZE: ACHIEVEMENT KEY MUST BE EXACTLY 7 CHARACTERS")
+    private String achievementKey;
+
+    /**
+     * The 7-character alphanumeric key of the user who owns the achievement
+     */
+    @NotBlank(message = "LOCALIZE: A USER KEY MUST BE PROVIDED")
     @Size(min = 7, max = 7, message = "LOCALIZE: ENTITY KEY MUST BE EXACTLY 7 CHARACTERS")
     private String userKey;
 
+    /**
+     * The updated title of the achievement
+     */
     @NotBlank(message = "LOCALIZE: A TITLE MUST BE PROVIDED")
     @Size(max = 200, message = "LOCALIZE: TITLE MUST NOT BE GREATER THAN 200 CHARACTERS")
     private String title;
 
+    /**
+     * The updated description of the achievement
+     */
     @NotBlank(message = "LOCALIZE: A DESCRIPTION MUST BE PROVIDED")
-    @Size(max = 1000, message = "LOCALIZE: TITLE MUST NOT BE GREATER THAN 1000 CHARACTERS")
+    @Size(max = 1000, message = "LOCALIZE: DESCRIPTION MUST NOT BE GREATER THAN 1000 CHARACTERS")
     private String description;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @PastOrPresent(message = "LOCALIZE: THE COMPLETED DATE CANNOT BE AFTER TODAY")
-    private Date completedDate;
+    /**
+     * Array of skill abbreviations associated with the achievement
+     */
     @Size(min = 1, max = 7, message = "LOCALIZE: AT LEAST ONE SKILL MUST BE PROVIDED")
     private String[] skills;
 
+    /**
+     * Whether the achievement is publicly visible
+     */
     private Boolean isPublic = true;
 
+    /**
+     * Validates the command data including parent validation and custom skill validation.
+     * 
+     * @return Set of validation error messages, empty if valid
+     */
     @Override
     public Set<String> validate() {
         // Call parent validation first to get standard JSR-303 validation errors
@@ -62,5 +87,4 @@ public class CreateAchivementCommand extends CommonCommand {
 
         return errors;
     }
-
 }

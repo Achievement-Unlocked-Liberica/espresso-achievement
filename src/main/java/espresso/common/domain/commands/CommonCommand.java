@@ -8,7 +8,12 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
+import lombok.Getter;
+import lombok.Setter;
 
+
+@Getter
+@Setter
 public abstract class CommonCommand {
 
     //TODO: figure out a way to creeate the validator at runtime and then inject it into the command handler

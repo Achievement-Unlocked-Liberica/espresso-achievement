@@ -44,4 +44,15 @@ public interface AchievementPSQLProvider extends JpaRepository<Achievement, Long
     @Query("SELECT a FROM Achievement a WHERE a.registeredAt > :fromDate ORDER BY a.registeredAt DESC")
     <T> List<T> findLatestAchievements(Class<T> type, Limit limit, OffsetDateTime fromDate);
 
+    /**
+     * Updates an achievement in the database matching the id, achievementKey, and userKey.
+     * This method leverages JPA's built-in save method which performs an update if the entity has an ID.
+     * 
+     * @param achievement The achievement entity to update
+     * @return The updated achievement entity
+     */
+    default Achievement updateAchievement(Achievement achievement) {
+        return save(achievement);
+    }
+
 }
