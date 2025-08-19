@@ -58,3 +58,17 @@ Authorization: Bearer {{authToken}}
   "skills": ["str", "dex", "int"],
   "isPublic": false
 }
+
+### Disable an existing Achievement
+PATCH http://localhost:8080/api/cmd/achievement/PFBB8UQ/disable HTTP/1.1
+Content-Type: application/json
+accept: application/json
+X-API-Version: 1
+Authorization: Bearer {{authToken}}
+
+### Delete an existing Achievement
+DELETE http://localhost:8080/api/cmd/achievement/PFBB8UQ HTTP/1.1
+Content-Type: application/json
+accept: application/json
+X-API-Version: 1
+Authorization: Bearer {{authToken}}

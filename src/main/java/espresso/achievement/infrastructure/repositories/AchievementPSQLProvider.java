@@ -5,8 +5,10 @@ import java.util.List;
 
 import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import espresso.achievement.domain.entities.Achievement;
 
@@ -20,7 +22,7 @@ public interface AchievementPSQLProvider extends JpaRepository<Achievement, Long
      * @param entityKey The key of the achievement to retrieve
      * @return A single achievement projected to the specified DTO type
      */
-    @Query("SELECT a FROM Achievement a WHERE a.entityKey = :entityKey")
+    @Query("SELECT a FROM Achievement a WHERE a.entityKey = :entityKey AND a.enabled = true")
     <T> T findAchievementByKey(Class<T> type, String entityKey);
 
     /**
@@ -30,7 +32,7 @@ public interface AchievementPSQLProvider extends JpaRepository<Achievement, Long
      * @param limit Maximum number of results to return
      * @return List of achievements projected to the specified DTO type
      */
-    @Query("SELECT a FROM Achievement a ORDER BY a.registeredAt DESC")
+    @Query("SELECT a FROM Achievement a WHERE a.enabled = true ORDER BY a.registeredAt DESC")
     <T> List<T> findLatestAchievements(Class<T> type, Limit limit);
 
     /**
@@ -41,7 +43,7 @@ public interface AchievementPSQLProvider extends JpaRepository<Achievement, Long
      * @param fromDate The date from which to retrieve achievements
      * @return List of achievements projected to the specified DTO type
      */
-    @Query("SELECT a FROM Achievement a WHERE a.registeredAt > :fromDate ORDER BY a.registeredAt DESC")
+    @Query("SELECT a FROM Achievement a WHERE a.enabled = true AND a.registeredAt > :fromDate ORDER BY a.registeredAt DESC")
     <T> List<T> findLatestAchievements(Class<T> type, Limit limit, OffsetDateTime fromDate);
 
     /**
@@ -53,6 +55,45 @@ public interface AchievementPSQLProvider extends JpaRepository<Achievement, Long
      */
     default Achievement updateAchievement(Achievement achievement) {
         return save(achievement);
+    }
+
+    /**
+     * Deletes an achievement and all its associated dependencies in the correct order to maintain referential integrity.
+     * The deletion order is:
+     * 1. Delete all comments associated with the achievement
+     * 2. Delete all media files associated with the achievement
+     * 3. Delete the achievement record itself
+     * 
+     * Uses database transactions to ensure atomicity of the entire deletion process.
+     * Handles foreign key constraints properly to avoid constraint violations.
+     * 
+     * @param achievement The achievement entity to delete along with its dependencies
+     * @throws RuntimeException if there's an error during any deletion step
+     */
+    @Modifying
+    @Query(value = "DELETE FROM achievement_comments WHERE achievement_id = :#{#achievement.id}", nativeQuery = true)
+    void deleteAchievementComments(Achievement achievement);
+
+    @Modifying
+    @Query(value = "DELETE FROM achievement_media WHERE achievement_id = :#{#achievement.id}", nativeQuery = true)
+    void deleteAchievementMedia(Achievement achievement);
+
+    /**
+     * Orchestrates the cascading deletion of an achievement and all its dependencies.
+     * This method ensures proper deletion order and transaction management.
+     * 
+     * @param achievement The achievement entity to delete
+     */
+    @Transactional
+    default void deleteAchievementWithDependencies(Achievement achievement) {
+        // Step 1: Delete all comments associated with the achievement
+        deleteAchievementComments(achievement);
+        
+        // Step 2: Delete all media files associated with the achievement
+        deleteAchievementMedia(achievement);
+        
+        // Step 3: Delete the achievement record itself
+        delete(achievement);
     }
 
 }

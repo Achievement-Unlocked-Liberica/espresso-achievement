@@ -31,6 +31,8 @@ public class CommonApi {
                     return ServiceResponse.success(HttpStatus.CREATED, result.getData(), result.getCount());
                 case SUCCESS:
                     return ServiceResponse.success(HttpStatus.OK, result.getData(), result.getCount());
+                case NO_CONTENT:
+                    return ServiceResponse.success(HttpStatus.NO_CONTENT, result.getData(), result.getCount());
                 default:
                     return ServiceResponse.success(HttpStatus.OK, result.getData(), result.getCount());
             }

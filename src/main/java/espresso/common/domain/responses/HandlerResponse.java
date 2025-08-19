@@ -23,6 +23,14 @@ public class HandlerResponse<T> {
                 .build();
     }
 
+    public static <T> HandlerResponse<T> noContent() {
+        return HandlerResponse.<T>builder()
+                .data(null)
+                .responseType(ResponseType.NO_CONTENT)
+                .success(true)
+                .build();
+    }
+
     public static <T> HandlerResponse<T> created(T data) {
 
         Integer count = null;
@@ -34,14 +42,14 @@ public class HandlerResponse<T> {
                 .data(data)
                 .count(count)
                 .responseType(ResponseType.CREATED)
-                .success(true)            
+                .success(true)
                 .build();
     }
 
     public static <T> HandlerResponse<T> success(T data) {
 
         Integer count = null;
-        
+
         if (data instanceof java.util.List<?>) {
             count = ((java.util.List<?>) data).size();
         }

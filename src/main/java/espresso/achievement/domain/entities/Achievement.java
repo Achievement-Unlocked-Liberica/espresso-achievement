@@ -56,6 +56,9 @@ public class Achievement extends DomainEntity {
 
     private OffsetDateTime registeredAt;
     private boolean active;
+    
+    @Column(name = "enabled", nullable = false, columnDefinition = "boolean default true")
+    private boolean enabled = true;
 
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.LAZY)
@@ -115,6 +118,7 @@ public class Achievement extends DomainEntity {
         this.setEntityKey(espresso.common.domain.support.KeyGenerator.generateKey(7));
         this.registeredAt = OffsetDateTime.now(ZoneOffset.UTC);
         this.active = true;
+        this.enabled = true;
     }
 
     // public void setSkills(List<String> skills) {
@@ -141,6 +145,14 @@ public class Achievement extends DomainEntity {
         this.achievementVisibility = isPublic 
                 ? AchievementVisibilityStatus.EVERYONE 
                 : AchievementVisibilityStatus.PRIVATE;
+    }
+
+    /**
+     * Disables the achievement by setting the enabled property to false.
+     * This removes the achievement from all filters, searches, and visibility without deleting it from the database.
+     */
+    public void disable() {
+        this.enabled = false;
     }
 
     // #region Domain Events
