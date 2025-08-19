@@ -50,4 +50,29 @@ public class AchievementCmdRepository implements IAchievementCmdRepository {
 
             return updatedEntity;
     }
+
+    /**
+     * Deletes an achievement and all its associated dependencies in the proper order.
+     * The deletion order is: comments first, then media files, then the achievement record itself.
+     * Uses database transactions to ensure atomicity of the entire deletion process.
+     * 
+     * @param achievement The achievement entity to delete along with its dependencies
+     * @throws IllegalArgumentException if the achievement is null
+     * @throws RuntimeException if there's an error during the deletion process
+     */
+    @Override
+    public void deleteWithDependencies(Achievement achievement) {
+        try {
+            if (achievement == null) {
+                throw new IllegalArgumentException("The achievement is null");
+            }
+
+            // Forward to PSQL provider to delete the achievement and all associated data in proper dependency order
+            this.achievementPSQLProvider.deleteAchievementWithDependencies(achievement);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
 }

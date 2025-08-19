@@ -3,6 +3,7 @@ package espresso.achievement.domain.contracts;
 import espresso.achievement.application.response.HandlerResult;
 import espresso.achievement.domain.commands.AddAchievementCommentCommand;
 import espresso.achievement.domain.commands.CreateAchivementCommand;
+import espresso.achievement.domain.commands.DeleteAchievementCommand;
 import espresso.achievement.domain.commands.DisableAchievementCommand;
 import espresso.achievement.domain.commands.UpdateAchievementCommand;
 import espresso.achievement.domain.commands.UploadAchievementMediaCommand;
@@ -15,4 +16,5 @@ public interface IAchievementCommandHandler {
     HandlerResponse<Object> handle(AddAchievementCommentCommand command);
     HandlerResponse<Object> handle(UpdateAchievementCommand command);
     HandlerResponse<Object> handle(DisableAchievementCommand command);
+    HandlerResponse<Object> handle(DeleteAchievementCommand command);
 }
