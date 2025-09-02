@@ -2,6 +2,7 @@ package espresso.achievement.domain.entities;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -19,6 +20,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
+import espresso.achievement.domain.events.AchievementCelebrationAddedEvent;
+import espresso.common.domain.models.DomainAggregate;
 import espresso.common.domain.models.DomainEntity;
 import espresso.common.domain.support.StringListConverter;
 import espresso.user.domain.entities.User;
@@ -75,6 +79,12 @@ public class Achievement extends DomainEntity {
     @JsonManagedReference
     @OneToMany(mappedBy = "achievement", fetch = FetchType.LAZY)
     private List<AchievementComment> comments;
+
+    /**
+     * List of celebrations given to this achievement by other users
+     */
+    @Transient
+    private List<AchievementCelebration> celebrations = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private AchievementVisibilityStatus achievementVisibility;
@@ -153,6 +163,20 @@ public class Achievement extends DomainEntity {
      */
     public void disable() {
         this.enabled = false;
+    }
+
+    /**
+     * Adds a celebration to this achievement from another user.
+     * This method adds the celebration to the internal list.
+     * 
+     * @param celebration The celebration being added to this achievement
+     */
+    public void addCelebration(AchievementCelebration celebration) {
+        if (this.celebrations == null) {
+            this.celebrations = new ArrayList<>();
+        }
+        
+        this.celebrations.add(celebration);
     }
 
     // #region Domain Events

@@ -1,6 +1,7 @@
 package espresso.achievement.domain.contracts;
 
 import espresso.achievement.application.response.HandlerResult;
+import espresso.achievement.domain.commands.AddAchievementCelebrationCommand;
 import espresso.achievement.domain.commands.AddAchievementCommentCommand;
 import espresso.achievement.domain.commands.CreateAchivementCommand;
 import espresso.achievement.domain.commands.DeleteAchievementCommand;
@@ -14,6 +15,7 @@ public interface IAchievementCommandHandler {
     HandlerResponse<Object> handle(CreateAchivementCommand command);
     HandlerResponse<Object> handle(UploadAchievementMediaCommand command);
     HandlerResponse<Object> handle(AddAchievementCommentCommand command);
+    HandlerResponse<Object> handle(AddAchievementCelebrationCommand command);
     HandlerResponse<Object> handle(UpdateAchievementCommand command);
     HandlerResponse<Object> handle(DisableAchievementCommand command);
     HandlerResponse<Object> handle(DeleteAchievementCommand command);

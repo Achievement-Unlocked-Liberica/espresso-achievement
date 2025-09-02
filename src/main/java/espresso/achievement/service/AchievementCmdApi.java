@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import espresso.achievement.domain.commands.AddAchievementCelebrationCommand;
 import espresso.achievement.domain.commands.AddAchievementCommentCommand;
 import espresso.achievement.domain.commands.CreateAchivementCommand;
 import espresso.achievement.domain.commands.DeleteAchievementCommand;
@@ -85,6 +86,21 @@ public class AchievementCmdApi extends CommonCmdApi {
 	@ApiResponse(responseCode = "500:INTERNAL_SERVER_ERROR", description = "An internal error occurred.")
 	@ApiLogger("Add achievement comment")
 	public ResponseEntity<ServiceResponse<Object>> addComment(@PathVariable String key, @RequestBody AddAchievementCommentCommand command) {
+		String userKey = getAuthenticatedUserKey();
+		command.setUserKey(userKey);
+		command.setAchievementKey(key);
+		return executeCommand(command, achievementCommandHandler::handle);
+	}
+
+	@Operation(summary = "Add Achievement Celebration", description = "Adds a celebration to an existing achievement from the authenticated user.")
+	@PostMapping("/{key}/celebration")
+	@ApiResponse(responseCode = "201:CREATED", description = "Celebration added successfully.")
+	@ApiResponse(responseCode = "400:BAD_REQUEST", description = "Validation error in the request.")
+	@ApiResponse(responseCode = "401:UNAUTHORIZED", description = "Unauthorized access - invalid or missing JWT token.")
+	@ApiResponse(responseCode = "404:NOT_FOUND", description = "Achievement or user not found.")
+	@ApiResponse(responseCode = "500:INTERNAL_SERVER_ERROR", description = "An internal error occurred.")
+	@ApiLogger("Add achievement celebration")
+	public ResponseEntity<ServiceResponse<Object>> addAchievementCelebration(@PathVariable String key, @RequestBody AddAchievementCelebrationCommand command) {
 		String userKey = getAuthenticatedUserKey();
 		command.setUserKey(userKey);
 		command.setAchievementKey(key);

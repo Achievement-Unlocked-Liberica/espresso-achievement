@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 
 @EqualsAndHashCode(callSuper = true)
 @MappedSuperclass
-public class DomainAggregate extends DomainEntity {
+public abstract class DomainAggregate extends DomainEntity {
 
     @Transient    
     protected final List<Object> domainEvents = new ArrayList<>();
