@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Primary;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 /**
  * Jackson configuration to handle Hibernate proxy serialization issues.
@@ -37,6 +38,9 @@ public class JacksonConfig {
         hibernate5Module.disable(Hibernate5Module.Feature.FORCE_LAZY_LOADING);
         
         mapper.registerModule(hibernate5Module);
+        
+        // Register JavaTimeModule to handle Java 8 date/time types
+        mapper.registerModule(new JavaTimeModule());
         
         return mapper;
     }

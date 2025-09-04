@@ -113,7 +113,6 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
         }
     }
 
-
     public HandlerResponse<Object> handle(UploadAchievementMediaCommand cmd) {
         try {
             // Validate the command
@@ -227,7 +226,8 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
 
     /**
      * Handles the command to add a celebration to an existing achievement.
-     * Validates the command, verifies dependent entities exist, creates the celebration,
+     * Validates the command, verifies dependent entities exist, creates the
+     * celebration,
      * adds it to the achievement, saves to repository, and emits to message queue.
      * 
      * @param cmd The command containing celebration data
@@ -243,7 +243,8 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
             }
 
             // Verify achievement exists
-            Achievement achievement = achievementQryRepository.getAchievementByKey(Achievement.class, cmd.getAchievementKey());
+            Achievement achievement = achievementQryRepository.getAchievementByKey(Achievement.class,
+                    cmd.getAchievementKey());
             if (achievement == null) {
                 return HandlerResponse.error("Achievement not found", ResponseType.NOT_FOUND);
             }
@@ -256,22 +257,21 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
 
             // Create the celebration
             AchievementCelebration celebration = AchievementCelebration.create(
-                cmd.getCount(), 
-                achievement, 
-                user
-            );
+                    cmd.getCount(),
+                    achievement,
+                    user);
 
             // Add celebration to achievement (this will raise domain events)
             achievement.addCelebration(celebration);
 
             // Save the celebration
-            var savedCelebration = achievementCelebrationRepository.save(celebration);
+            // var savedCelebration = achievementCelebrationRepository.save(celebration);
 
             // Emit to message queue for downstream processing
-            achievementCelebrationRepository.emit(savedCelebration);
+            achievementCelebrationRepository.emit(celebration);
 
             // Return success response
-            return HandlerResponse.created(savedCelebration);
+            return HandlerResponse.created(celebration);
 
         } catch (Exception ex) {
             return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
@@ -280,7 +280,8 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
 
     /**
      * Handles the command to update an existing achievement.
-     * Validates the command, verifies user and achievement exist, updates the achievement,
+     * Validates the command, verifies user and achievement exist, updates the
+     * achievement,
      * and persists the changes to the repository.
      * 
      * @param cmd The command containing updated achievement data
@@ -292,28 +293,28 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
             var validationErrors = cmd.validate();
 
             if (!validationErrors.isEmpty()) {
-            return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
+                return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
             }
 
             // Retrieve user by userKey - throw not found error if missing
             User user = userRepository.findByKey(cmd.getUserKey(), User.class);
             if (user == null) {
-            return HandlerResponse.error("LOCALIZE: USER NOT FOUND", ResponseType.NOT_FOUND);
+                return HandlerResponse.error("LOCALIZE: USER NOT FOUND", ResponseType.NOT_FOUND);
             }
 
             // Retrieve achievement by achievementKey - throw not found error if missing
             Achievement achievement = achievementQryRepository.getAchievementByKey(
-            Achievement.class, 
-            cmd.getAchievementKey()
-            );
+                    Achievement.class,
+                    cmd.getAchievementKey());
 
             if (achievement == null) {
-            return HandlerResponse.error("LOCALIZE: ACHIEVEMENT NOT FOUND", ResponseType.NOT_FOUND);
+                return HandlerResponse.error("LOCALIZE: ACHIEVEMENT NOT FOUND", ResponseType.NOT_FOUND);
             }
 
             // Verify that the user owns the achievement
             if (!achievement.getUser().getEntityKey().equals(cmd.getUserKey())) {
-            return HandlerResponse.error("LOCALIZE: USER IS NOT AUTHORIZED TO UPDATE THIS ACHIEVEMENT", ResponseType.UNAUTHORIZED);
+                return HandlerResponse.error("LOCALIZE: USER IS NOT AUTHORIZED TO UPDATE THIS ACHIEVEMENT",
+                        ResponseType.UNAUTHORIZED);
             }
 
             // Convert skills array to list for the update method
@@ -321,11 +322,10 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
 
             // Call update method on achievement with command properties
             achievement.update(
-            cmd.getTitle(), 
-            cmd.getDescription(), 
-            skillsList, 
-            cmd.getIsPublic()
-            );
+                    cmd.getTitle(),
+                    cmd.getDescription(),
+                    skillsList,
+                    cmd.getIsPublic());
 
             // Save updated achievement via AchievementCmdRepository.update
             Achievement updatedAchievement = achievementCmdRepository.update(achievement);
@@ -339,7 +339,8 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
 
     /**
      * Handles the command to disable an existing achievement.
-     * Validates the command, verifies user and achievement exist, disables the achievement,
+     * Validates the command, verifies user and achievement exist, disables the
+     * achievement,
      * and persists the changes to the repository.
      * 
      * @param cmd The command containing the achievement key and user key
@@ -362,9 +363,8 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
 
             // Retrieve achievement by achievementKey - throw not found error if missing
             Achievement achievement = achievementQryRepository.getAchievementByKey(
-                Achievement.class, 
-                cmd.getAchievementKey()
-            );
+                    Achievement.class,
+                    cmd.getAchievementKey());
 
             if (achievement == null) {
                 return HandlerResponse.error("LOCALIZE: ACHIEVEMENT NOT FOUND", ResponseType.NOT_FOUND);
@@ -372,7 +372,8 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
 
             // Verify that the user owns the achievement
             if (!achievement.getUser().getEntityKey().equals(cmd.getUserKey())) {
-                return HandlerResponse.error("LOCALIZE: USER IS NOT AUTHORIZED TO DISABLE THIS ACHIEVEMENT", ResponseType.UNAUTHORIZED);
+                return HandlerResponse.error("LOCALIZE: USER IS NOT AUTHORIZED TO DISABLE THIS ACHIEVEMENT",
+                        ResponseType.UNAUTHORIZED);
             }
 
             // Check if achievement is already disabled
@@ -383,7 +384,8 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
             // Call disable method on achievement to update the entity
             achievement.disable();
 
-            // Save updated achievement via AchievementCmdRepository.update (since we modified the entity)
+            // Save updated achievement via AchievementCmdRepository.update (since we
+            // modified the entity)
             Achievement disabledAchievement = achievementCmdRepository.update(achievement);
 
             return HandlerResponse.success(disabledAchievement);
@@ -395,7 +397,8 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
 
     /**
      * Handles the command to delete an existing achievement.
-     * Validates the command, verifies user and achievement exist, checks authorization,
+     * Validates the command, verifies user and achievement exist, checks
+     * authorization,
      * and permanently deletes the achievement and all its dependencies.
      * 
      * @param cmd The command containing the achievement key and user key
@@ -416,19 +419,21 @@ public class AchivementCommandHandler implements IAchievementCommandHandler {
                 return HandlerResponse.error("LOCALIZE: USER NOT FOUND", ResponseType.NOT_FOUND);
             }
 
-            // Retrieve achievement by achievementKey - return No Content if missing (per prompt requirement)
+            // Retrieve achievement by achievementKey - return No Content if missing (per
+            // prompt requirement)
             Achievement achievement = achievementQryRepository.getAchievementByKey(
-                Achievement.class, 
-                cmd.getAchievementKey()
-            );
+                    Achievement.class,
+                    cmd.getAchievementKey());
 
             if (achievement == null) {
                 return HandlerResponse.noContent();
             }
 
-            // Verify that the user is authorized to delete this achievement (user must own the achievement)
+            // Verify that the user is authorized to delete this achievement (user must own
+            // the achievement)
             if (!achievement.getUser().getEntityKey().equals(cmd.getUserKey())) {
-                return HandlerResponse.error("LOCALIZE: USER IS NOT AUTHORIZED TO DELETE THIS ACHIEVEMENT", ResponseType.UNAUTHORIZED);
+                return HandlerResponse.error("LOCALIZE: USER IS NOT AUTHORIZED TO DELETE THIS ACHIEVEMENT",
+                        ResponseType.UNAUTHORIZED);
             }
 
             // Delete the achievement and all its dependencies in proper order
