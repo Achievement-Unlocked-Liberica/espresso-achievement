@@ -47,20 +47,20 @@ import lombok.NoArgsConstructor;
 })
 // @Table(name = "achievements", indexes = {@Index(name = "achievement_idx",
 // columnList = "key", unique = true)})
-public class Achievement extends DomainEntity {
+public class Achievement extends DomainAggregate {
 
     @Column(name = "title", nullable = false, length = 200)
     private String title;
 
     @Column(name = "description", nullable = false, length = 1000)
     private String description;
-    
+
     @Column(name = "completeddate", nullable = false)
     private Date completedDate;
 
     private OffsetDateTime registeredAt;
     private boolean active;
-    
+
     @Column(name = "enabled", nullable = false, columnDefinition = "boolean default true")
     private boolean enabled = true;
 
@@ -140,26 +140,30 @@ public class Achievement extends DomainEntity {
     // }
 
     /**
-     * Updates the achievement with new values for title, description, skills, and visibility.
-     * This method allows updating the main properties of an achievement after it has been created.
+     * Updates the achievement with new values for title, description, skills, and
+     * visibility.
+     * This method allows updating the main properties of an achievement after it
+     * has been created.
      * 
-     * @param title The new title for the achievement
-     * @param description The new description for the achievement  
-     * @param skills List of skill abbreviations associated with the achievement
-     * @param isPublic Whether the achievement should be publicly visible
+     * @param title       The new title for the achievement
+     * @param description The new description for the achievement
+     * @param skills      List of skill abbreviations associated with the
+     *                    achievement
+     * @param isPublic    Whether the achievement should be publicly visible
      */
     public void update(String title, String description, List<String> skills, boolean isPublic) {
         this.title = title;
         this.description = description;
         this.skills = skills;
-        this.achievementVisibility = isPublic 
-                ? AchievementVisibilityStatus.EVERYONE 
+        this.achievementVisibility = isPublic
+                ? AchievementVisibilityStatus.EVERYONE
                 : AchievementVisibilityStatus.PRIVATE;
     }
 
     /**
      * Disables the achievement by setting the enabled property to false.
-     * This removes the achievement from all filters, searches, and visibility without deleting it from the database.
+     * This removes the achievement from all filters, searches, and visibility
+     * without deleting it from the database.
      */
     public void disable() {
         this.enabled = false;
@@ -175,11 +179,25 @@ public class Achievement extends DomainEntity {
         if (this.celebrations == null) {
             this.celebrations = new ArrayList<>();
         }
-        
+
         this.celebrations.add(celebration);
+
+        this.raiseAchievementCelebrationAddedEvent(celebration);
     }
 
     // #region Domain Events
+
+    public void raiseAchievementCelebrationAddedEvent(AchievementCelebration celebration) {
+
+        this.domainEvents.add(
+                AchievementCelebrationAddedEvent.builder()
+                        .source("Espresso.Achievement")
+                        .eventType(AchievementCelebrationAddedEvent.class.getSimpleName())
+                        .achievementKey(this.getEntityKey())
+                        .userKey(celebration.getUser().getEntityKey())
+                        .count(celebration.getCount())
+                        .build());
+    }
 
     public void raiseNewAchievementCreatedEvent() {
         // this.domainEvents.add(new NewAchievementCreated(

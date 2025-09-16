@@ -1,7 +1,6 @@
 package espresso.achievement.infrastructure.repositories;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import espresso.achievement.domain.entities.AchievementCelebration;
 
@@ -19,7 +18,6 @@ public class AchievementCelebrationPSQLProvider {
      * @param celebration The celebration to save
      * @return The celebration instance (unchanged)
      */
-    @Transactional
     public AchievementCelebration save(AchievementCelebration celebration) {
         // As per requirements, this method does not save to DB, just returns
         return celebration;

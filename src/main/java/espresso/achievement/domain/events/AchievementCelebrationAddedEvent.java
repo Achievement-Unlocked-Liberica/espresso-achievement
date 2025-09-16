@@ -4,6 +4,8 @@ import espresso.common.domain.events.CommonEvent;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 
 /**
  * Domain event raised when a celebration is added to an achievement.
@@ -11,7 +13,8 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@Builder
+@SuperBuilder
+@ToString
 public class AchievementCelebrationAddedEvent extends CommonEvent {
     
     /**

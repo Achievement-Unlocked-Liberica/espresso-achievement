@@ -13,20 +13,22 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@EqualsAndHashCode(callSuper = true)
-@MappedSuperclass
+
+//@Data
+//@MappedSuperclass
+//@EqualsAndHashCode(callSuper = true)
 public abstract class DomainAggregate extends DomainEntity {
 
     @Transient    
     protected final List<Object> domainEvents = new ArrayList<>();
 
     @DomainEvents
-    protected List<Object> getDomainEvents() {
+    public List<Object> getDomainEvents() {
         return domainEvents;
     }
 
-    @AfterDomainEventPublication
-    protected void clearDomainEvents() {
+    // @AfterDomainEventPublication
+    public void clearDomainEvents() {
         domainEvents.clear();
     }
 
