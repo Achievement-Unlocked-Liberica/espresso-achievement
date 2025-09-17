@@ -27,13 +27,4 @@ public class CommonEvent {
 
     // Timestamp when the event occurred (in milliseconds since epoch).
     private OffsetDateTime timestamp;
-
-    public CommonEvent() {
-        this.initializeEvent();
-    }
-
-    private void initializeEvent() {
-        this.eventId = KeyGenerator.generateKey(7);
-        this.timestamp = OffsetDateTime.now();
-    }
 }

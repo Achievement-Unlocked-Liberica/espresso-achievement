@@ -11,20 +11,22 @@ import espresso.achievement.domain.contracts.IAchievementRepository;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
 import espresso.achievement.domain.entities.Achievement;
+import espresso.common.application.handlers.CommonCommandHandler;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
 
 /**
  * Handles the creation of a new achievement.
  * 
- * This handler validates the provided {@link CreateAchivementCommand}, retrieves
+ * This handler validates the provided {@link CreateAchivementCommand},
+ * retrieves
  * the user
  * associated with the command, and creates a new achievement entity. The
  * created achievement
  * is then saved to the repository.
  */
 @Service
-public class CreateAchivementCommandHandler implements ICreateAchivementCommandHandler {
+public class CreateAchivementCommandHandler extends CommonCommandHandler implements ICreateAchivementCommandHandler {
 
     @Autowired
     private IAchievementRepository achievementRepository;
@@ -61,6 +63,8 @@ public class CreateAchivementCommandHandler implements ICreateAchivementCommandH
                     skills);
 
             Achievement savedEntity = achievementRepository.save(entity);
+
+            this.publishDomainEvents(savedEntity);
 
             return HandlerResponse.created(savedEntity);
 

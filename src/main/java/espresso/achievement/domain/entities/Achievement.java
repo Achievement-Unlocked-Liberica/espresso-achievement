@@ -21,9 +21,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import espresso.achievement.domain.events.AchievementCelebrationAddedEvent;
+import espresso.achievement.domain.events.AchievementCelebrationEvent;
+import espresso.achievement.domain.events.AchievementEvent;
+import espresso.common.domain.events.EventActionTypes;
 import espresso.common.domain.models.DomainAggregate;
-import espresso.common.domain.models.DomainEntity;
 import espresso.common.domain.support.StringListConverter;
 import espresso.user.domain.entities.User;
 import lombok.AllArgsConstructor;
@@ -187,26 +188,27 @@ public class Achievement extends DomainAggregate {
 
     // #region Domain Events
 
-    public void raiseAchievementCelebrationAddedEvent(AchievementCelebration celebration) {
+    protected void raiseAchievementCelebrationAddedEvent(AchievementCelebration celebration) {
 
         this.domainEvents.add(
-                AchievementCelebrationAddedEvent.builder()
-                        .source("Espresso.Achievement")
-                        .eventType(AchievementCelebrationAddedEvent.class.getSimpleName())
-                        .achievementKey(this.getEntityKey())
-                        .userKey(celebration.getUser().getEntityKey())
-                        .count(celebration.getCount())
-                        .build());
+                AchievementCelebrationEvent.create(
+                        EventActionTypes.CREATED,
+                        celebration.getAchievementKey(),
+                        celebration.getUserKey(),
+                        celebration.getCount()));
     }
 
-    public void raiseNewAchievementCreatedEvent() {
-        // this.domainEvents.add(new NewAchievementCreated(
-        // this.getEntityKey(),
-        // this.getUserProfile().getEntityKey(),
-        // this.getCompletedDate(),
-        // this.getSkills().stream().toArray(String[]::new),
-        // this.getMedia().stream().map(AchievementMedia::getEntityKey).toArray(String[]::new)
-        // ));
+    protected void raiseNewAchievementCreatedEvent() {
+        this.domainEvents.add(
+                AchievementEvent.create(
+                        EventActionTypes.CREATED,
+                        entityKey,
+                        user.getEntityKey(),
+                        title,
+                        description,
+                        completedDate,
+                        registeredAt,
+                        skills.toArray(new String[0])));
     }
 
     // #endregion Domain Events

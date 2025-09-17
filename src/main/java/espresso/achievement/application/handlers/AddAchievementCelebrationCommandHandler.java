@@ -63,24 +63,21 @@ public class AddAchievementCelebrationCommandHandler extends CommonCommandHandle
             }
 
             // Create the celebration
-            AchievementCelebration celebration = AchievementCelebration.create(
+            AchievementCelebration entity = AchievementCelebration.create(
                     cmd.getCount(),
                     achievement,
                     user);
 
             // Add celebration to achievement (this will raise domain events)
-            achievement.addCelebration(celebration);
+            achievement.addCelebration(entity);
 
             // Save the celebration, only trigger JPA to cause the event to be emitted
             //achievementCelebrationRepository.save(celebration);
 
-            // Emit to message queue for downstream processing
-            //achievementCelebrationRepository.emit(celebration);
-
             this.publishDomainEvents(achievement);
 
             // Return success response
-            return HandlerResponse.created(celebration);
+            return HandlerResponse.created(entity);
 
         } catch (Exception ex) {
             return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);

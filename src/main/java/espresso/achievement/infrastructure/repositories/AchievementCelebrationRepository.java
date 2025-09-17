@@ -16,9 +16,6 @@ public class AchievementCelebrationRepository implements IAchievementCelebration
     @Autowired
     private AchievementCelebrationPSQLProvider psqlProvider;
 
-    @Autowired
-    private AchievementCelebrationRMQProvider rmqProvider;
-
     /**
      * Saves an achievement celebration record using the PostgreSQL provider.
      * 
@@ -28,15 +25,5 @@ public class AchievementCelebrationRepository implements IAchievementCelebration
     @Override
     public AchievementCelebration save(AchievementCelebration celebration) {
         return psqlProvider.save(celebration);
-    }
-
-    /**
-     * Emits an achievement celebration to the message queue using the RabbitMQ provider.
-     * 
-     * @param celebration The celebration to emit to the queue
-     */
-    @Override
-    public void emit(AchievementCelebration celebration) {
-        rmqProvider.emit(celebration);
     }
 }

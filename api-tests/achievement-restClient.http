@@ -5,7 +5,7 @@ X-API-Version: 1
 
 ### Create a new Achievement
 
-@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5IjoiOGhTV2VNaSIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiT2xnYSIsImxhc3ROYW1lIjoiTW91bnRhaW5oYXJ0IiwiaWF0IjoxNzU4MDAyODI1LCJleHAiOjE3NTgwODkyMjV9.I7LsC0HQHviJvktjDnr2BSIt5Rf31yyBrCm-5ztmNQOiCdofEvdYdRtj5mDw3Bce
+@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5IjoiOGhTV2VNaSIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiT2xnYSIsImxhc3ROYW1lIjoiTW91bnRhaW5oYXJ0IiwiaWF0IjoxNzU4MTM4MTUyLCJleHAiOjE3NTgyMjQ1NTJ9.-B6IoRDUWNiB7np8nz4nostZ6hEr8HDTDVvrUKPyPfGoK7THB2fE1Dj5keGBz0K2
 
 POST http://localhost:8080/api/cmd/achievement HTTP/1.1
 Content-Type: application/json
@@ -15,10 +15,10 @@ Authorization: Bearer {{authToken}}
 
 {
   "userKey": "8hSWeMi",
-  "title": "Completed Miilti File Upload",
-  "description": "Sucessfully implemented multi file upload for achievement media.",
+  "title": "Bench Pressed My Own Body Weight",
+  "description": "Successfully bench-pressed my own body weight for the first time.",
   "completedDate": "2025-07-18",
-  "skills": ["int", "wis", "luc"],
+  "skills": ["str", "con", "luc"],
   "isPublic": true
 }
 
@@ -82,5 +82,5 @@ X-API-Version: 1
 Authorization: Bearer {{authToken}}
 
 {
-  "count":5
+  "count":9
 }

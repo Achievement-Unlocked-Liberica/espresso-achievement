@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -17,7 +19,10 @@ import lombok.Setter;
 public abstract class CommonCommand {
 
     //TODO: figure out a way to creeate the validator at runtime and then inject it into the command handler
+    @JsonIgnore
     protected final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+
+    @JsonIgnore
     protected final Validator validator = factory.getValidator();
 
     /*
