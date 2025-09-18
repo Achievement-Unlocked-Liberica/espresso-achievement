@@ -14,6 +14,7 @@ import espresso.achievement.domain.entities.Achievement;
 import espresso.common.application.handlers.CommonCommandHandler;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+// Validation centralized in CommonCommandHandler
 
 /**
  * Handles the creation of a new achievement.
@@ -34,15 +35,13 @@ public class CreateAchivementCommandHandler extends CommonCommandHandler impleme
     @Autowired
     private IUserRepository userRepository;
 
+    // Validator logic centralized in CommonCommandHandler
+
     public HandlerResponse<Object> handle(CreateAchivementCommand command) {
 
         try {
-            // Validate the command
-            var validationErrors = command.validate();
-
-            if (!validationErrors.isEmpty()) {
-                return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
-            }
+            var invalid = validateCommand(command);
+            if (invalid != null) return invalid;
 
             // Get the profile of the user that is creating the achievemnet
             User user = userRepository.findByKey(command.getUserKey(), User.class);
@@ -64,7 +63,8 @@ public class CreateAchivementCommandHandler extends CommonCommandHandler impleme
 
             Achievement savedEntity = achievementRepository.save(entity);
 
-            this.publishDomainEvents(savedEntity);
+            // We don't need to call 'publish events' explicitly, 
+            // the JPA call to save the entity will take care of the event publishing
 
             return HandlerResponse.created(savedEntity);
 

@@ -11,14 +11,16 @@ import espresso.achievement.domain.entities.AchievementComment;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
 import espresso.achievement.domain.entities.Achievement;
+import espresso.common.application.handlers.CommonCommandHandler;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+// Validation centralized in CommonCommandHandler
 
 /**
  * Handles the command to add a new comment to an achievement.
  */
 @Service
-public class AddAchievementCommentCommandHandler implements IAddAchievementCommentCommandHandler {
+public class AddAchievementCommentCommandHandler extends CommonCommandHandler implements IAddAchievementCommentCommandHandler {
 
     @Autowired
     private IAchievementRepository achievementRepository;
@@ -29,6 +31,8 @@ public class AddAchievementCommentCommandHandler implements IAddAchievementComme
     @Autowired
     private IAchievementCommentRepository achievementCommentRepository;
 
+    // validator provided by base class
+
     /**
      * Handles the command to add a new comment to an achievement.
      * Delegates to the dedicated comment command handler for processing.
@@ -38,12 +42,9 @@ public class AddAchievementCommentCommandHandler implements IAddAchievementComme
      */
     public HandlerResponse<Object> handle(AddAchievementCommentCommand cmd) {
         try {
-            // Validate the command
-            var validationErrors = cmd.validate();
-
-            if (!validationErrors.isEmpty()) {
-                return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
-            }
+            // Validate the command using shared Validator and command-specific checks
+            var invalid = validateCommand(cmd);
+            if (invalid != null) return invalid;
 
             // Verify the achievement exists
             Achievement achievement = achievementRepository.getAchievementByKey(

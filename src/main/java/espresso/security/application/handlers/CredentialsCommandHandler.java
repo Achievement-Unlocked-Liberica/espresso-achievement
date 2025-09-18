@@ -1,13 +1,12 @@
 package espresso.security.application.handlers;
 
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import espresso.common.application.handlers.CommonCommandHandler;
+// Validation centralized in CommonCommandHandler
 
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
-import espresso.security.application.handlers.RegisterUserCommandHandler;
 import espresso.security.domain.commands.AuthCredentialsCommand;
 import espresso.security.domain.commands.RegisterUserCommand;
 import espresso.security.domain.contracts.ISecurityCommandHandler;
@@ -17,10 +16,12 @@ import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
 
 @Service
-public class CredentialsCommandHandler implements ISecurityCommandHandler {
+public class CredentialsCommandHandler extends CommonCommandHandler implements ISecurityCommandHandler {
 
     @Autowired
     private IUserRepository userRepository;
+
+    // validator provided by base class
 
     @Autowired
     private JWTAuthToken jwtAuthToken;
@@ -30,11 +31,9 @@ public class CredentialsCommandHandler implements ISecurityCommandHandler {
 
     @Override
     public HandlerResponse<Object> handle(AuthCredentialsCommand command) {
-        // Validate the command
-        Set<String> validationErrors = command.validate();
-        if (!validationErrors.isEmpty()) {
-            return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
-        }
+        // Validate the command using shared Validator and any custom checks
+    var invalid = validateCommand(command);
+        if (invalid != null) return invalid;
 
         try {
             // Find user by username

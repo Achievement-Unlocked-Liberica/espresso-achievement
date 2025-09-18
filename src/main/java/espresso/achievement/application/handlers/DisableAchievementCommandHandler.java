@@ -9,20 +9,24 @@ import espresso.achievement.domain.contracts.IAchievementRepository;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
 import espresso.achievement.domain.entities.Achievement;
+import espresso.common.application.handlers.CommonCommandHandler;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+// Validation centralized in CommonCommandHandler
 
 /**
  * Handles the command to disable an existing achievement.
  */
 @Service
-public class DisableAchievementCommandHandler implements IDisableAchievementCommandHandler {
+public class DisableAchievementCommandHandler extends CommonCommandHandler implements IDisableAchievementCommandHandler {
 
     @Autowired
     private IAchievementRepository achievementRepository;
 
     @Autowired
     private IUserRepository userRepository;
+
+    // validator provided by base class
 
     /**
      * Handles the command to disable an existing achievement.
@@ -35,12 +39,9 @@ public class DisableAchievementCommandHandler implements IDisableAchievementComm
      */
     public HandlerResponse<Object> handle(DisableAchievementCommand cmd) {
         try {
-            // Validate the command
-            var validationErrors = cmd.validate();
-
-            if (!validationErrors.isEmpty()) {
-                return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
-            }
+            // Validate the command using shared Validator and command-specific checks
+            var invalid = validateCommand(cmd);
+            if (invalid != null) return invalid;
 
             // Retrieve user by userKey - throw not found error if missing
             User user = userRepository.findByKey(cmd.getUserKey(), User.class);

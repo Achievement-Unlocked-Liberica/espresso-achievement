@@ -52,19 +52,9 @@ public class AddAchievementCelebrationCommand extends CommonCommand {
      * @return Set of validation error messages, empty if valid
      */
     @Override
-    public Set<String> validate() {
-        // Call parent validation first to get standard JSR-303 validation errors
-        Set<String> parentErrors = super.validate();
-
-        // Create a new mutable set to avoid UnsupportedOperationException
-        Set<String> errors = new HashSet<>();
-        if (parentErrors != null) {
-            errors.addAll(parentErrors);
-        }
-
-        // Additional custom validation could be added here if needed
-        // For now, JSR-303 annotations handle all validation requirements
-
-        return errors;
+    public Set<String> validateCustom() {
+        // This command uses only JSR-303 annotations for validation.
+        // Any additional domain-specific checks may be implemented here in the future.
+        return new HashSet<>();
     }
 }

@@ -42,3 +42,6 @@ api-tests/*.http
 src/main/resources/application-lcl.*
 
 infrastructure/packages/*.*
+
+# Temporary backup of removed tests during refactors
+_deleted_tests_backup/

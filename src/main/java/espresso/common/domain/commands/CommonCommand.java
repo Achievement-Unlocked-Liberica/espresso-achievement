@@ -4,12 +4,8 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,30 +13,30 @@ import lombok.Setter;
 @Getter
 @Setter
 public abstract class CommonCommand {
+    // NOTE: Validator lifecycle is now managed by Spring and should be injected into command handlers.
+    // Commands remain as simple DTOs. Handlers will run bean validation using the shared Validator
+    // and then call the command's custom validation hook if any.
 
-    //TODO: figure out a way to creeate the validator at runtime and then inject it into the command handler
-    @JsonIgnore
-    protected final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-
-    @JsonIgnore
-    protected final Validator validator = factory.getValidator();
-
-    /*
-     * Validates the given object and returns a set of error messages if any.
+    /**
+     * Converts a set of constraint violations into a set of human-readable messages.
+     * Handlers should use this to map the Validator results into error strings.
      */
-    public Set<String> validate() {
-
-        // Validate the object
-        Set<ConstraintViolation<CommonCommand>> violations = validator.validate(this);
-
-        // If there are violations, return a set of error messages
-        if (!violations.isEmpty()) {
-            return violations
-                    .stream()
-                    .map(error -> "%s:%s".formatted(error.getPropertyPath(), error.getMessage()))
-                    .collect(Collectors.toSet());
+    public static Set<String> toMessages(Set<? extends ConstraintViolation<?>> violations) {
+        if (violations == null || violations.isEmpty()) {
+            return Collections.emptySet();
         }
 
+        return violations.stream()
+                .map(error -> "%s:%s".formatted(error.getPropertyPath(), error.getMessage()))
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Hook for command-specific validation logic that cannot be expressed with annotations.
+     * Default implementation returns an empty set. Command implementations can override this
+     * and provide additional domain-specific checks.
+     */
+    public Set<String> validateCustom() {
         return Collections.emptySet();
     }
 }

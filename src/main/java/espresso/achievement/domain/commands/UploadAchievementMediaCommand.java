@@ -64,11 +64,8 @@ public class UploadAchievementMediaCommand extends CommonCommand {
     private MultipartFile[] images;
 
     @Override
-    public Set<String> validate() {
-        Set<String> errors = super.validate();
-        if (errors == null || errors.isEmpty()) {
-            errors = new HashSet<>();
-        }
+    public Set<String> validateCustom() {
+        Set<String> errors = new HashSet<>();
 
         // Check if images array exists and is not empty
         if (images == null || images.length == 0) {

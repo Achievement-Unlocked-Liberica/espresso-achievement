@@ -1,30 +1,29 @@
 package espresso.security.application.handlers;
 
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
-import espresso.common.domain.support.NameGenerator;
 import espresso.security.domain.commands.RegisterUserCommand;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
+import espresso.common.application.handlers.CommonCommandHandler;
+// Validation centralized in CommonCommandHandler
 
 @Service
-public class RegisterUserCommandHandler {
+public class RegisterUserCommandHandler extends CommonCommandHandler {
 
     @Autowired
     private IUserRepository userRepository;
 
+    // validator provided by base class
+
     public HandlerResponse<Object> handle(RegisterUserCommand command) {
         try {
-            // Validate the command
-            Set<String> validationErrors = command.validate();
-            if (!validationErrors.isEmpty()) {
-                return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
-            }
+            // Validate the command using shared Validator and any custom checks on the command
+            var invalid = validateCommand(command);
+            if (invalid != null) return invalid;
 
             // Check if username already exists
             User existingUserByUsername = userRepository.findByUsername(command.getUsername());

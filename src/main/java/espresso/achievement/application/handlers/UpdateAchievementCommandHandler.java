@@ -11,20 +11,24 @@ import espresso.achievement.domain.contracts.IAchievementRepository;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
 import espresso.achievement.domain.entities.Achievement;
+import espresso.common.application.handlers.CommonCommandHandler;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+// Validation now handled by CommonCommandHandler
 
 /**
  * Handles the command to update an existing achievement.
  */
 @Service
-public class UpdateAchievementCommandHandler implements IUpdateAchievementCommandHandler {
+public class UpdateAchievementCommandHandler extends CommonCommandHandler implements IUpdateAchievementCommandHandler {
 
     @Autowired
     private IAchievementRepository achievementRepository;
 
     @Autowired
     private IUserRepository userRepository;
+
+    // validator provided by base class
 
     /**
      * Handles the command to update an existing achievement.
@@ -37,12 +41,9 @@ public class UpdateAchievementCommandHandler implements IUpdateAchievementComman
      */
     public HandlerResponse<Object> handle(UpdateAchievementCommand cmd) {
         try {
-            // Validate the command
-            var validationErrors = cmd.validate();
-
-            if (!validationErrors.isEmpty()) {
-                return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
-            }
+            // Validate the command using shared Validator and command-specific checks
+            var invalid = validateCommand(cmd);
+            if (invalid != null) return invalid;
 
             // Retrieve user by userKey - throw not found error if missing
             User user = userRepository.findByKey(cmd.getUserKey(), User.class);

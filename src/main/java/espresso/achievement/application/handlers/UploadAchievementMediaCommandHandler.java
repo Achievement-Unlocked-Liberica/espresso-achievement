@@ -12,14 +12,16 @@ import espresso.achievement.domain.contracts.IAchievementMediaRepository;
 import espresso.user.domain.entities.User;
 import espresso.achievement.domain.entities.Achievement;
 import espresso.achievement.domain.entities.AchievementMedia;
+import espresso.common.application.handlers.CommonCommandHandler;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+// Validation centralized in CommonCommandHandler
 
 /**
  * Handles the upload of media files for an achievement.
  */
 @Service
-public class UploadAchievementMediaCommandHandler implements IUploadAchievementMediaCommandHandler {
+public class UploadAchievementMediaCommandHandler extends CommonCommandHandler implements IUploadAchievementMediaCommandHandler {
 
     @Autowired
     private IAchievementRepository achievementRepository;
@@ -27,14 +29,13 @@ public class UploadAchievementMediaCommandHandler implements IUploadAchievementM
     @Autowired
     private IAchievementMediaRepository achievementMediaRepository;
 
+    // validator provided by base class
+
     public HandlerResponse<Object> handle(UploadAchievementMediaCommand cmd) {
         try {
-            // Validate the command
-            var validationErrors = cmd.validate();
-
-            if (!validationErrors.isEmpty()) {
-                return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
-            }
+            // Validate the command using shared Validator and command-specific checks
+            var invalid = validateCommand(cmd);
+            if (invalid != null) return invalid;
 
             // Get the achievement by key
             Achievement achievement = achievementRepository.getAchievementByKey(Achievement.class,

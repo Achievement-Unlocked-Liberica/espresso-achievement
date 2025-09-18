@@ -27,7 +27,7 @@ public abstract class DomainAggregate extends DomainEntity {
         return domainEvents;
     }
 
-    // @AfterDomainEventPublication
+    @AfterDomainEventPublication
     public void clearDomainEvents() {
         domainEvents.clear();
     }
