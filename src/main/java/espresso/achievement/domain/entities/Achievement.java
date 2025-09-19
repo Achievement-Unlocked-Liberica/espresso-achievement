@@ -9,6 +9,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -22,6 +23,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import espresso.achievement.domain.events.AchievementCelebrationEvent;
+import espresso.achievement.domain.events.AchievementCommentEvent;
 import espresso.achievement.domain.events.AchievementEvent;
 import espresso.common.domain.events.EventActionTypes;
 import espresso.common.domain.models.DomainAggregate;
@@ -59,12 +61,6 @@ public class Achievement extends DomainAggregate {
     @Column(name = "completeddate", nullable = false)
     private Date completedDate;
 
-    private OffsetDateTime registeredAt;
-    private boolean active;
-
-    @Column(name = "enabled", nullable = false, columnDefinition = "boolean default true")
-    private boolean enabled = true;
-
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", referencedColumnName = "id")
@@ -81,10 +77,8 @@ public class Achievement extends DomainAggregate {
     @OneToMany(mappedBy = "achievement", fetch = FetchType.LAZY)
     private List<AchievementComment> comments;
 
-    /**
-     * List of celebrations given to this achievement by other users
-     */
-    @Transient
+    @JsonManagedReference
+    @OneToMany(mappedBy = "achievement", fetch = FetchType.LAZY)
     private List<AchievementCelebration> celebrations = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
@@ -120,16 +114,13 @@ public class Achievement extends DomainAggregate {
         entity.setUser(user);
         entity.setSkills(skills);
 
-        entity.raiseNewAchievementCreatedEvent();
+        entity.raiseAchievementCreated();
 
         return entity;
     }
 
     private void initializeEntity() {
         this.setEntityKey(espresso.common.domain.support.KeyGenerator.generateKey(7));
-        this.registeredAt = OffsetDateTime.now(ZoneOffset.UTC);
-        this.active = true;
-        this.enabled = true;
     }
 
     // public void setSkills(List<String> skills) {
@@ -167,7 +158,26 @@ public class Achievement extends DomainAggregate {
      * without deleting it from the database.
      */
     public void disable() {
-        this.enabled = false;
+        this.setEnabled(false);
+    }
+
+    /**
+     * Adds a comment to this achievement.
+     * This method adds the comment to the internal list and raises a comment added
+     * event.
+     * 
+     * @param comment The comment being added to this achievement
+     */
+    public void addComment(AchievementComment comment) {
+        if (this.comments == null) {
+            this.comments = new ArrayList<>();
+        }
+
+        this.comments.add(comment);
+
+        this.updateEntity();
+
+        this.raiseCommentAdded(comment);
     }
 
     /**
@@ -183,12 +193,23 @@ public class Achievement extends DomainAggregate {
 
         this.celebrations.add(celebration);
 
-        this.raiseAchievementCelebrationAddedEvent(celebration);
+        this.updateEntity();
+
+        this.raiseCelebrationAdded(celebration);
     }
 
     // #region Domain Events
 
-    protected void raiseAchievementCelebrationAddedEvent(AchievementCelebration celebration) {
+    private void raiseCommentAdded(AchievementComment comment) {
+        this.domainEvents.add(
+                AchievementCommentEvent.create(
+                        EventActionTypes.CREATED,
+                        comment.getAchievement().getEntityKey(),
+                        comment.getUser().getEntityKey(),
+                        comment.getText()));
+    }
+
+    private void raiseCelebrationAdded(AchievementCelebration celebration) {
 
         this.domainEvents.add(
                 AchievementCelebrationEvent.create(
@@ -198,7 +219,7 @@ public class Achievement extends DomainAggregate {
                         celebration.getCount()));
     }
 
-    protected void raiseNewAchievementCreatedEvent() {
+    private void raiseAchievementCreated() {
         this.domainEvents.add(
                 AchievementEvent.create(
                         EventActionTypes.CREATED,
@@ -207,7 +228,6 @@ public class Achievement extends DomainAggregate {
                         title,
                         description,
                         completedDate,
-                        registeredAt,
                         skills.toArray(new String[0])));
     }
 

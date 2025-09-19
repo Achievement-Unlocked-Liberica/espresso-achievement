@@ -20,7 +20,8 @@ import espresso.common.domain.responses.ResponseType;
  * Handles the command to add a new comment to an achievement.
  */
 @Service
-public class AddAchievementCommentCommandHandler extends CommonCommandHandler implements IAddAchievementCommentCommandHandler {
+public class AddAchievementCommentCommandHandler extends CommonCommandHandler
+        implements IAddAchievementCommentCommandHandler {
 
     @Autowired
     private IAchievementRepository achievementRepository;
@@ -44,7 +45,8 @@ public class AddAchievementCommentCommandHandler extends CommonCommandHandler im
         try {
             // Validate the command using shared Validator and command-specific checks
             var invalid = validateCommand(cmd);
-            if (invalid != null) return invalid;
+            if (invalid != null)
+                return invalid;
 
             // Verify the achievement exists
             Achievement achievement = achievementRepository.getAchievementByKey(
@@ -68,8 +70,12 @@ public class AddAchievementCommentCommandHandler extends CommonCommandHandler im
                     achievement,
                     user);
 
+            achievement.addComment(comment);
+
             // Save the comment through the repository
             AchievementComment savedComment = achievementCommentRepository.save(comment);
+
+            this.publishDomainEvents(achievement);
 
             // Return success response with the created comment
             return HandlerResponse.created(savedComment);

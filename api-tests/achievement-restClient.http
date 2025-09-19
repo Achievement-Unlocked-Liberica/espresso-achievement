@@ -5,7 +5,7 @@ X-API-Version: 1
 
 ### Create a new Achievement
 
-@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5IjoiOGhTV2VNaSIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiT2xnYSIsImxhc3ROYW1lIjoiTW91bnRhaW5oYXJ0IiwiaWF0IjoxNzU4MTcyODA0LCJleHAiOjE3NTgyNTkyMDR9.oPsyKDZ7In4JROiwp6kMAnnwBZjJEMIa-H_4SSsDZYiDjdMOod2YALr5dXMbAnYR
+@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5IjoiOWhmV3IxWiIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiVG9iaW4iLCJsYXN0TmFtZSI6IlVuZGVyaGlsbCIsImlhdCI6MTc1ODI1OTY4NiwiZXhwIjoxNzU4MzQ2MDg2fQ.cRnXhsrX6IqX5DKBMmYuYb3q-vDdCiSupf7SNutneXAgOltXQBUEOsqOh8jO37gH
 
 POST http://localhost:8080/api/cmd/achievement HTTP/1.1
 Content-Type: application/json
@@ -14,7 +14,7 @@ X-API-Version: 1
 Authorization: Bearer {{authToken}}
 
 {
-  "userKey": "8hSWeMi",
+  "userKey": "9hfWr1Z",
   "title": "Launched Personal Portfolio Website",
   "description": "Designed, built, and deployed a personal portfolio website showcasing projects and a blog.",
   "completedDate": "2025-09-15",
@@ -31,16 +31,16 @@ X-API-Version: 1
 Authorization: Bearer {{authToken}}
 
 ### Add a Comment to the Achievement
-POST http://localhost:8080/api/cmd/achievement/comments HTTP/1.1
+POST http://localhost:8080/api/cmd/achievement/JP5HVXl/comments HTTP/1.1
 Content-Type: application/json
 accept: application/json
 X-API-Version: 1
 Authorization: Bearer {{authToken}}
 
 {
-"achievementKey": "z6V28fW",
-"userKey": "nzxxb1b",
-"commentText": "This is a test comment for the achievement."
+"achievementKey": "JP5HVXl",
+"userKey": "9hfWr1Z",
+"commentText": "Best achievmeent I've ever achieved"
 }
 
 ### Update an existing Achievement
@@ -75,7 +75,7 @@ Authorization: Bearer {{authToken}}
 
 
 ### Add a Celebration to the Achievement
-POST http://localhost:8080/api/cmd/achievement/vLIPLEH/celebration HTTP/1.1
+POST http://localhost:8080/api/cmd/achievement/JP5HVXl/celebration HTTP/1.1
 Content-Type: application/json
 accept: application/json
 X-API-Version: 1

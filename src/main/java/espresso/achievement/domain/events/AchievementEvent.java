@@ -17,12 +17,11 @@ public class AchievementEvent extends CommonEvent {
     private final String title;
     private final String description;
     private final Date completedDate;
-    private final OffsetDateTime registeredAt;
 
     private final String[] skillKeys;
 
     public static AchievementEvent create(EventActionTypes eventType, String key, String userKey, String title,
-            String description, Date completedDate, OffsetDateTime registeredAt, String[] skillKeys) {
+            String description, Date completedDate, String[] skillKeys) {
         return AchievementEvent.builder()
                 .eventId(KeyGenerator.generateKey(7))
                 .timestamp(OffsetDateTime.now())
@@ -33,7 +32,6 @@ public class AchievementEvent extends CommonEvent {
                 .title(title)
                 .description(description)
                 .completedDate(completedDate)
-                .registeredAt(registeredAt)
                 .skillKeys(skillKeys)
                 .build();
     }

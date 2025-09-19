@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import espresso.achievement.domain.contracts.IAddAchievementCelebrationCommandHandler;
 import espresso.achievement.domain.commands.AddAchievementCelebrationCommand;
+import espresso.achievement.domain.contracts.IAchievementCelebrationRepository;
 import espresso.achievement.domain.contracts.IAchievementRepository;
 import espresso.achievement.domain.entities.AchievementCelebration;
 import espresso.user.domain.contracts.IUserRepository;
@@ -19,7 +20,8 @@ import espresso.common.domain.responses.ResponseType;
  * Handles the command to add a celebration to an existing achievement.
  */
 @Service
-public class AddAchievementCelebrationCommandHandler extends CommonCommandHandler implements IAddAchievementCelebrationCommandHandler {
+public class AddAchievementCelebrationCommandHandler extends CommonCommandHandler
+        implements IAddAchievementCelebrationCommandHandler {
 
     @Autowired
     private IAchievementRepository achievementRepository;
@@ -27,9 +29,8 @@ public class AddAchievementCelebrationCommandHandler extends CommonCommandHandle
     @Autowired
     private IUserRepository userRepository;
 
-    // Removed unused achievementCelebrationRepository (not needed after refactor)
-
-    // validator provided by base class
+    @Autowired
+    private IAchievementCelebrationRepository celebrationRepository;
 
     /**
      * Handles the command to add a celebration to an existing achievement.
@@ -43,12 +44,15 @@ public class AddAchievementCelebrationCommandHandler extends CommonCommandHandle
     public HandlerResponse<Object> handle(AddAchievementCelebrationCommand cmd) {
         try {
             // Validate the command using shared Validator and command-specific checks
-            var invalid = validateCommand(cmd);
-            if (invalid != null) return invalid;
+            var validationResult = validateCommand(cmd);
+
+            if (validationResult != null)
+                return validationResult;
 
             // Verify achievement exists
             Achievement achievement = achievementRepository.getAchievementByKey(Achievement.class,
                     cmd.getAchievementKey());
+
             if (achievement == null) {
                 return HandlerResponse.error("Achievement not found", ResponseType.NOT_FOUND);
             }
@@ -60,23 +64,20 @@ public class AddAchievementCelebrationCommandHandler extends CommonCommandHandle
             }
 
             // Create the celebration
-            AchievementCelebration entity = AchievementCelebration.create(
+            AchievementCelebration celebration = AchievementCelebration.create(
                     cmd.getCount(),
                     achievement,
                     user);
 
             // Add celebration to achievement (this will raise domain events)
-            achievement.addCelebration(entity);
+            achievement.addCelebration(celebration);
 
-            // Save the celebration, only trigger JPA to cause the event to be emitted
-            //achievementCelebrationRepository.save(celebration);
+            AchievementCelebration savedCelebration = celebrationRepository.save(celebration);
 
-            // We do need to call 'publish events' explicitly, 
-            // there is no 'save' operation as part of this handler, the celebration will be saved by the aggregator
             this.publishDomainEvents(achievement);
 
             // Return success response
-            return HandlerResponse.created(entity);
+            return HandlerResponse.success(savedCelebration);
 
         } catch (Exception ex) {
             return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
