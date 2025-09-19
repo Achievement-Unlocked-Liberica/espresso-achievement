@@ -79,8 +79,13 @@ public class UploadAchievementMediaCommandHandler extends CommonCommandHandler i
                         imageData);
 
                 // Save the media
-                achievementMediaRepository.save(achievement, media);
+                AchievementMedia savedMedia = achievementMediaRepository.save(achievement, media);
+
+                // Add media to achievement (this will raise domain events)
+                achievement.addMedia(savedMedia);
             }
+
+            this.publishDomainEvents(achievement);
 
             // Return the achievement instance
             return HandlerResponse.created(achievement);

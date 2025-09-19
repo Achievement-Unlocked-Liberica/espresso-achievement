@@ -66,6 +66,9 @@ public class DeleteAchievementCommandHandler extends CommonCommandHandler implem
                         ResponseType.UNAUTHORIZED);
             }
 
+            // Call delete method on achievement to raise domain events before deletion
+            achievement.delete();
+
             // Delete the achievement and all its dependencies in proper order
             achievementRepository.deleteWithDependencies(achievement);
 

@@ -8,6 +8,7 @@ import espresso.achievement.domain.contracts.IAchievementEventHandler;
 import espresso.achievement.domain.events.AchievementCelebrationEvent;
 import espresso.achievement.domain.events.AchievementCommentEvent;
 import espresso.achievement.domain.events.AchievementEvent;
+import espresso.achievement.domain.events.AchievementMediaEvent;
 import espresso.achievement.infrastructure.integrations.AchievementEventPublisher;
 
 @Component
@@ -35,6 +36,14 @@ public class AchievementEventHandler implements IAchievementEventHandler {
     @Override
     @EventListener
     public void handleEvent(AchievementCommentEvent event) {
+        System.out.println("EVENT HANDLED: " + event.toString());
+
+        this.achievementEventPublisher.publishEvent(event);
+    }
+
+    @Override
+    @EventListener
+    public void handleEvent(AchievementMediaEvent event) {
         System.out.println("EVENT HANDLED: " + event.toString());
 
         this.achievementEventPublisher.publishEvent(event);

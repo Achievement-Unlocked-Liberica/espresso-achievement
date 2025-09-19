@@ -5,6 +5,7 @@ import org.springframework.context.event.EventListener;
 import espresso.achievement.domain.events.AchievementCelebrationEvent;
 import espresso.achievement.domain.events.AchievementCommentEvent;
 import espresso.achievement.domain.events.AchievementEvent;
+import espresso.achievement.domain.events.AchievementMediaEvent;
 
 public interface IAchievementEventHandler {
 
@@ -13,5 +14,7 @@ public interface IAchievementEventHandler {
     void handleEvent(AchievementCelebrationEvent event);
 
     void handleEvent(AchievementCommentEvent event);
+
+    void handleEvent(AchievementMediaEvent event);
 
 }

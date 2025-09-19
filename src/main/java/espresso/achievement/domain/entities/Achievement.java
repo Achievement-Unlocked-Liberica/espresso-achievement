@@ -1,7 +1,5 @@
 package espresso.achievement.domain.entities;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -9,7 +7,6 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -21,10 +18,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import espresso.achievement.domain.events.AchievementCelebrationEvent;
 import espresso.achievement.domain.events.AchievementCommentEvent;
 import espresso.achievement.domain.events.AchievementEvent;
+import espresso.achievement.domain.events.AchievementMediaEvent;
 import espresso.common.domain.events.EventActionTypes;
 import espresso.common.domain.models.DomainAggregate;
 import espresso.common.domain.support.StringListConverter;
@@ -150,6 +147,10 @@ public class Achievement extends DomainAggregate {
         this.achievementVisibility = isPublic
                 ? AchievementVisibilityStatus.EVERYONE
                 : AchievementVisibilityStatus.PRIVATE;
+
+        this.updateEntity();
+
+        this.raiseAchievementUpdated();
     }
 
     /**
@@ -159,6 +160,20 @@ public class Achievement extends DomainAggregate {
      */
     public void disable() {
         this.setEnabled(false);
+
+        this.updateEntity();
+
+        this.raiseAchievementDisabled();
+    }
+
+    /**
+     * Marks the achievement for deletion and raises a delete event.
+     * This method should be called before the actual database deletion occurs.
+     */
+    public void delete() {
+        this.updateEntity();
+
+        this.raiseAchievementDeleted();
     }
 
     /**
@@ -198,6 +213,24 @@ public class Achievement extends DomainAggregate {
         this.raiseCelebrationAdded(celebration);
     }
 
+    /**
+     * Adds media to this achievement.
+     * This method adds the media to the internal list and raises a media added event.
+     * 
+     * @param media The media being added to this achievement
+     */
+    public void addMedia(AchievementMedia media) {
+        if (this.media == null) {
+            this.media = new ArrayList<>();
+        }
+
+        this.media.add(media);
+
+        this.updateEntity();
+
+        this.raiseMediaAdded(media);
+    }
+
     // #region Domain Events
 
     private void raiseCommentAdded(AchievementComment comment) {
@@ -219,10 +252,58 @@ public class Achievement extends DomainAggregate {
                         celebration.getCount()));
     }
 
+    private void raiseMediaAdded(AchievementMedia media) {
+        this.domainEvents.add(
+                AchievementMediaEvent.create(
+                        EventActionTypes.CREATED,
+                        media.getAchievement().getEntityKey(),
+                        media.getAchievement().getUser().getEntityKey(),
+                        media.getImageKey(),
+                        media.getOriginalImageName(),
+                        media.getContentType(),
+                        media.getFileSize()));
+    }
+
     private void raiseAchievementCreated() {
         this.domainEvents.add(
                 AchievementEvent.create(
                         EventActionTypes.CREATED,
+                        entityKey,
+                        user.getEntityKey(),
+                        title,
+                        description,
+                        completedDate,
+                        skills.toArray(new String[0])));
+    }
+
+    private void raiseAchievementUpdated() {
+        this.domainEvents.add(
+                AchievementEvent.create(
+                        EventActionTypes.UPDATED,
+                        entityKey,
+                        user.getEntityKey(),
+                        title,
+                        description,
+                        completedDate,
+                        skills.toArray(new String[0])));
+    }
+
+    private void raiseAchievementDisabled() {
+        this.domainEvents.add(
+                AchievementEvent.create(
+                        EventActionTypes.DISABLED,
+                        entityKey,
+                        user.getEntityKey(),
+                        title,
+                        description,
+                        completedDate,
+                        skills.toArray(new String[0])));
+    }
+
+    private void raiseAchievementDeleted() {
+        this.domainEvents.add(
+                AchievementEvent.create(
+                        EventActionTypes.DELETED,
                         entityKey,
                         user.getEntityKey(),
                         title,
