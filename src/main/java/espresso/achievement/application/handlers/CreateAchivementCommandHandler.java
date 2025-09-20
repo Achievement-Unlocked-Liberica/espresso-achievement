@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import espresso.achievement.domain.contracts.ICreateAchivementCommandHandler;
 import espresso.achievement.domain.commands.CreateAchivementCommand;
 import espresso.achievement.domain.contracts.IAchievementRepository;
+import espresso.achievement.domain.contracts.IContentSafetyAIService;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
 import espresso.achievement.domain.entities.Achievement;
@@ -35,13 +36,21 @@ public class CreateAchivementCommandHandler extends CommonCommandHandler impleme
     @Autowired
     private IUserRepository userRepository;
 
+    @Autowired
+    private IContentSafetyAIService contentSafetyAIService;
+
     // Validator logic centralized in CommonCommandHandler
 
     public HandlerResponse<Object> handle(CreateAchivementCommand command) {
 
         try {
-            var invalid = validateCommand(command);
-            if (invalid != null) return invalid;
+            var validationResult = validateCommand(command);
+            if (validationResult != null)
+                return validationResult;
+
+            // Verify content safety for title and description
+            String contentToVerify = command.getTitle() + "|" + command.getDescription();
+            contentSafetyAIService.verifyTextContent(contentToVerify);
 
             // Get the profile of the user that is creating the achievemnet
             User user = userRepository.findByKey(command.getUserKey(), User.class);
@@ -63,7 +72,7 @@ public class CreateAchivementCommandHandler extends CommonCommandHandler impleme
 
             Achievement savedEntity = achievementRepository.save(entity);
 
-            // We don't need to call 'publish events' explicitly, 
+            // We don't need to call 'publish events' explicitly,
             // the JPA call to save the entity will take care of the event publishing
 
             return HandlerResponse.created(savedEntity);

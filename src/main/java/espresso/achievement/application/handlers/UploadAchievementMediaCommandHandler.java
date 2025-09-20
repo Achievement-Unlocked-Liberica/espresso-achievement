@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import espresso.achievement.domain.contracts.IUploadAchievementMediaCommandHandler;
 import espresso.achievement.domain.commands.UploadAchievementMediaCommand;
 import espresso.achievement.domain.contracts.IAchievementRepository;
+import espresso.achievement.domain.contracts.IContentSafetyAIService;
 import espresso.achievement.domain.contracts.IAchievementMediaRepository;
 import espresso.user.domain.entities.User;
 import espresso.achievement.domain.entities.Achievement;
@@ -21,7 +22,8 @@ import espresso.common.domain.responses.ResponseType;
  * Handles the upload of media files for an achievement.
  */
 @Service
-public class UploadAchievementMediaCommandHandler extends CommonCommandHandler implements IUploadAchievementMediaCommandHandler {
+public class UploadAchievementMediaCommandHandler extends CommonCommandHandler
+        implements IUploadAchievementMediaCommandHandler {
 
     @Autowired
     private IAchievementRepository achievementRepository;
@@ -29,13 +31,15 @@ public class UploadAchievementMediaCommandHandler extends CommonCommandHandler i
     @Autowired
     private IAchievementMediaRepository achievementMediaRepository;
 
-    // validator provided by base class
+    @Autowired
+    private IContentSafetyAIService contentSafetyAIService;
 
     public HandlerResponse<Object> handle(UploadAchievementMediaCommand cmd) {
         try {
             // Validate the command using shared Validator and command-specific checks
-            var invalid = validateCommand(cmd);
-            if (invalid != null) return invalid;
+            var validationResult = validateCommand(cmd);
+            if (validationResult != null)
+                return validationResult;
 
             // Get the achievement by key
             Achievement achievement = achievementRepository.getAchievementByKey(Achievement.class,
@@ -62,21 +66,17 @@ public class UploadAchievementMediaCommandHandler extends CommonCommandHandler i
 
             // Process each image in the array
             for (MultipartFile image : cmd.getImages()) {
-                // Convert MultipartFile to byte array
-                byte[] imageData;
-                try {
-                    imageData = image.getBytes();
-                } catch (IOException e) {
-                    return HandlerResponse.error("Failed to process image: " + e.getMessage(),
-                            ResponseType.INTERNAL_ERROR);
-                }
+
+                // Validate the image content safety
+                byte[] contentToVerify = image.getBytes();
+                contentSafetyAIService.verifyImageContent(contentToVerify);
 
                 // Create AchievementMedia entity
                 AchievementMedia media = AchievementMedia.create(
                         achievement,
                         image.getOriginalFilename(),
                         image.getContentType(),
-                        imageData);
+                        image.getBytes());
 
                 // Save the media
                 AchievementMedia savedMedia = achievementMediaRepository.save(achievement, media);
@@ -88,7 +88,7 @@ public class UploadAchievementMediaCommandHandler extends CommonCommandHandler i
             this.publishDomainEvents(achievement);
 
             // Return the achievement instance
-            return HandlerResponse.created(achievement);
+            return HandlerResponse.created(achievement.getMedia());
 
         } catch (Exception ex) {
             return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);

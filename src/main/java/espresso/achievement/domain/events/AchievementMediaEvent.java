@@ -19,6 +19,7 @@ public class AchievementMediaEvent extends CommonEvent {
     private String achievementKey;
     private String userKey;
     private String mediaKey;
+    private String mediaUrl;
     private String originalImageName;
     private String contentType;
     private Long fileSize;
@@ -37,7 +38,7 @@ public class AchievementMediaEvent extends CommonEvent {
      * @return A new AchievementMediaEvent instance
      */
     public static AchievementMediaEvent create(EventActionTypes eventType, String achievementKey, String userKey, 
-            String mediaKey, String originalImageName, String contentType, Long fileSize) {
+            String mediaKey, String mediaUrl, String originalImageName, String contentType, Long fileSize) {
         return AchievementMediaEvent.builder()
                 .eventId(KeyGenerator.generateKey(7))
                 .timestamp(OffsetDateTime.now())
@@ -46,6 +47,7 @@ public class AchievementMediaEvent extends CommonEvent {
                 .achievementKey(achievementKey)
                 .userKey(userKey)
                 .mediaKey(mediaKey)
+                .mediaUrl(mediaUrl)
                 .originalImageName(originalImageName)
                 .contentType(contentType)
                 .fileSize(fileSize)

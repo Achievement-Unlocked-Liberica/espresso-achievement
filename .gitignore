@@ -36,7 +36,7 @@ build/
 private/*
 
 # API Tests
-api-tests/*.http
+api-tests/*.*
 
 # Local configuration files
 src/main/resources/application-lcl.*

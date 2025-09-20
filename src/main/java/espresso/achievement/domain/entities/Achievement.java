@@ -259,6 +259,7 @@ public class Achievement extends DomainAggregate {
                         media.getAchievement().getEntityKey(),
                         media.getAchievement().getUser().getEntityKey(),
                         media.getImageKey(),
+                        media.getMediaUrl(),
                         media.getOriginalImageName(),
                         media.getContentType(),
                         media.getFileSize()));

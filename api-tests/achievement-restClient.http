@@ -5,7 +5,7 @@ X-API-Version: 1
 
 ### Create a new Achievement
 
-@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5IjoiOWhmV3IxWiIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiVG9iaW4iLCJsYXN0TmFtZSI6IlVuZGVyaGlsbCIsImlhdCI6MTc1ODI1OTY4NiwiZXhwIjoxNzU4MzQ2MDg2fQ.cRnXhsrX6IqX5DKBMmYuYb3q-vDdCiSupf7SNutneXAgOltXQBUEOsqOh8jO37gH
+@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5IjoiOWhmV3IxWiIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiVG9iaW4iLCJsYXN0TmFtZSI6IlVuZGVyaGlsbCIsImlhdCI6MTc1ODMwOTgzNSwiZXhwIjoxNzU4Mzk2MjM1fQ.FP1GObo8mP0q9YYafsPhsgKAW316mSVXI2CXfMS5N_RplBCn011qSt4pcNdWsFfs
 
 POST http://localhost:8080/api/cmd/achievement HTTP/1.1
 Content-Type: application/json
@@ -15,8 +15,8 @@ Authorization: Bearer {{authToken}}
 
 {
   "userKey": "9hfWr1Z",
-  "title": "Launched Personal Portfolio Website",
-  "description": "Designed, built, and deployed a personal portfolio website showcasing projects and a blog.",
+  "title": "A title for an achievement",
+  "description": "This is a test for the text analyzer, now continue",
   "completedDate": "2025-09-15",
   "skills": ["int", "cha", "luc"],
   "isPublic": true
@@ -24,7 +24,7 @@ Authorization: Bearer {{authToken}}
 
 ### Get achievement details by entityKey
 
-GET http://localhost:8080/api/qry/achievement/detail?size=lg&entityKey=z6V28fW HTTP/1.1
+GET http://localhost:8080/api/qry/achievement/detail?size=lg&entityKey=JP5HVXl HTTP/1.1
 Content-Type: application/json
 accept: application/json
 X-API-Version: 1
