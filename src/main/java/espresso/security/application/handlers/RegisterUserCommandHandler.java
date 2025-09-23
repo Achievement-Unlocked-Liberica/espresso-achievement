@@ -11,14 +11,32 @@ import espresso.user.domain.entities.User;
 import espresso.common.application.handlers.CommonCommandHandler;
 // Validation centralized in CommonCommandHandler
 
+/**
+ * Command handler for user registration operations in the security domain.
+ * Processes user registration commands to create new user accounts with validation
+ * for unique usernames and email addresses. Extends CommonCommandHandler to inherit
+ * standard validation and error handling capabilities.
+ */
 @Service
 public class RegisterUserCommandHandler extends CommonCommandHandler {
 
+    /**
+     * Repository for user data access and persistence operations.
+     * Used to check for existing users and save new user registrations.
+     */
     @Autowired
     private IUserRepository userRepository;
 
     // validator provided by base class
 
+    /**
+     * Handles user registration commands to create new user accounts.
+     * Validates command data, checks for username and email uniqueness,
+     * creates a new user entity, and persists it to the repository.
+     *
+     * @param command The registration command containing new user details
+     * @return HandlerResponse containing the created user on success or error details on failure
+     */
     public HandlerResponse<Object> handle(RegisterUserCommand command) {
         try {
             // Validate the command using shared Validator and any custom checks on the command

@@ -15,6 +15,12 @@ import espresso.common.service.operational.ApiLogger;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
+/**
+ * REST API controller for handling achievement query operations.
+ * Provides endpoints for retrieving achievement data including latest achievements
+ * and detailed achievement information. All endpoints support size-based DTOs
+ * for optimized data transfer.
+ */
 @RestController("Achievement Qry Api")
 @RequestMapping("/api/qry/achievement")
 public class AchievementQryApi extends CommonQryApi {
@@ -29,6 +35,9 @@ public class AchievementQryApi extends CommonQryApi {
 	 * "achievementRetrieveByKeyNotFound", null), null));
 	 */
 
+	/**
+	 * Handler for processing achievement query operations.
+	 */
 	@Autowired
 	private IAchievementQueryHandler achievementQueryHandler;
 

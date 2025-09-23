@@ -1,13 +1,10 @@
 package espresso.achievement.application.queryHandlers;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import espresso.achievement.application.response.HandlerResult;
 import espresso.achievement.domain.contracts.IAchievementRepository;
 import espresso.achievement.domain.contracts.IAchievementQueryHandler;
 import espresso.achievement.domain.entities.AchievementDtoLg;
@@ -18,59 +15,15 @@ import espresso.achievement.domain.queries.GetAchievementDetailQuery;
 import espresso.achievement.domain.queries.GetAchievementSummariesByUserQuery;
 import espresso.achievement.domain.queries.GetAchievementSummaryByKeyQuery;
 import espresso.achievement.domain.queries.GetLatestAchievementsQuery;
-import espresso.achievement.domain.readModels.AchievementDetailReadModel;
-import espresso.achievement.domain.readModels.AchievementSummaryReadModel;
 import espresso.common.domain.queries.QuerySizeType;
 import espresso.common.domain.responses.HandlerResponse;
-import espresso.common.domain.responses.HandlerResponseList;
 import espresso.common.domain.responses.ResponseType;
+import espresso.common.application.handlers.CommonQueryHandler;
 import lombok.NoArgsConstructor;
 
-/**
- * Service class responsible for handling achievement-related queries.
- * Implements the {@link IAchievementQueryHandler} interface to process various
- * achievement queries
- * and return the corresponding read models or handler responses.
- * <p>
- * This handler interacts with the {@link IAchievementRepository} to fetch
- * achievement details,
- * summaries, and the latest achievements based on the provided queries.
- * </p>
- * 
- * <p>
- * Supported queries:
- * <ul>
- * <li>{@link GetAchievementDetailByKeyQuery} - Retrieves detailed information
- * about a specific achievement.</li>
- * <li>{@link GetAchievementSummaryByKeyQuery} - Retrieves a summary of a
- * specific achievement.</li>
- * <li>{@link GetAchievementSummariesByUserQuery} - Retrieves summaries of
- * achievements for a specific user.</li>
- * <li>{@link GetLatestAchievementsQuery} - Retrieves the latest achievements
- * with configurable DTO size and limit.</li>
- * </ul>
- * </p>
- * 
- * <p>
- * Input validation is performed for each query, and appropriate exceptions are
- * thrown for invalid inputs.
- * The handler returns either a successful result or an empty/error response
- * depending on the repository outcome.
- * </p>
- * 
- * <p>
- * The {@code getDtoSize} method maps {@link QuerySizeType} to the corresponding
- * DTO class for flexible response sizing.
- * </p>
- * 
- * <p>
- * This class is annotated with {@link Service} for Spring component scanning
- * and uses constructor injection.
- * </p>
- */
 @Service
 @NoArgsConstructor
-public class AchievementQueryHandler implements IAchievementQueryHandler {
+public class AchievementQueryHandler extends CommonQueryHandler implements IAchievementQueryHandler {
 
     @Autowired
     IAchievementRepository achievementRepository;
@@ -82,17 +35,9 @@ public class AchievementQueryHandler implements IAchievementQueryHandler {
 
         try {
             // Validate the query
-            var validationErrors = qry.validate();
-
-            if (!validationErrors.isEmpty()) {
-                return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
-            }
-
-            // Verify that fromDate is not null and is not after now (UTC)
-            if (qry.getFromDate() != null && qry.getFromDate().isAfter(OffsetDateTime.now(ZoneOffset.UTC))) {
-                return HandlerResponse.error(
-                        new String[] { "fromDate must not be in the future" }, ResponseType.VALIDATION_ERROR);
-            }
+            var validationResult = validateQuery(qry);
+            if (validationResult != null)
+                return validationResult;
 
             // Get the achievements from repository
             List<?> achievementDtos = achievementRepository.getLatestAchievements(getDtoSize(qry.getSize()),
@@ -115,11 +60,9 @@ public class AchievementQueryHandler implements IAchievementQueryHandler {
 
         try {
             // Validate the query
-            var validationErrors = qry.validate();
-
-            if (!validationErrors.isEmpty()) {
-                return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
-            }
+            var validationResult = validateQuery(qry);
+            if (validationResult != null)
+                return validationResult;
 
             Object achievementDto = achievementRepository.getAchievementByKey(getDtoSize(qry.getSize()), qry.getEntityKey());
 

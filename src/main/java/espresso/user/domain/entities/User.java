@@ -18,6 +18,12 @@ import espresso.common.domain.support.PasswordService;
 //TODO: Add the birthDate to the vertical feature
 //TODO: Add the profilePictureUrl to the vertical feature
 
+/**
+ * Represents a user entity in the achievement system.
+ * Contains user authentication information, profile data, and verification status.
+ * Users can create achievements, comment on achievements, and celebrate others' accomplishments.
+ * Supports secure password hashing and various verification workflows.
+ */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
@@ -32,29 +38,82 @@ import espresso.common.domain.support.PasswordService;
 })
 public class User extends DomainEntity {
 
+    /**
+     * Unique username for the user account.
+     * Used for authentication and public identification.
+     */
     @Column(name = "username", nullable = false)
     private String username;
 
+    /**
+     * User's email address for authentication and notifications.
+     * Must be unique across the system.
+     */
     @Column(name = "email", nullable = false)
     private String email;
 
+    /**
+     * Hashed password for secure authentication.
+     * Never store or transmit plain text passwords.
+     */
     @Column(name = "passwordHash", nullable = false)
     private String passwordHash;
 
+    /**
+     * User's first name for personalization.
+     */
     private String firstName;
+
+    /**
+     * User's last name for personalization.
+     */
     private String lastName;
+    
+    /**
+     * User's birth date for age verification and personalization.
+     */
     private LocalDate birthDate;
 
+    /**
+     * Optional profile image associated with the user.
+     * Lazy-loaded to improve performance.
+     */
     @JsonManagedReference
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profileImageId", referencedColumnName = "id")
     private UserProfileImage profileImage;
 
+    /**
+     * Indicates whether the user's email address has been verified.
+     */
     private boolean emailVerified = false;
+    
+    /**
+     * Indicates whether the user's age has been verified.
+     */
     private boolean ageVerified = false;
+    
+    /**
+     * Indicates whether the user's phone number has been verified.
+     */
     private boolean phoneVerified = false;
+    
+    /**
+     * Indicates whether the user's address has been verified.
+     */
     private boolean addressVerified = false;
 
+    /**
+     * Creates a new User entity with complete profile information.
+     * 
+     * @param username  The unique username for the user
+     * @param email     The user's email address
+     * @param password  The plain text password (will be hashed)
+     * @param firstName The user's first name
+     * @param lastName  The user's last name
+     * @param birthDate The user's birth date
+     * @return A new User entity ready for persistence
+     */
     public static User create(String username, String email, String password, String firstName, String lastName,
             LocalDate birthDate) {
         User entity = new User();
@@ -149,9 +208,11 @@ public class User extends DomainEntity {
     }
 
     /**
-     * Creates a User entity from a UserKto (Data Transfer Object)
+     * Creates a User entity from a UserKto (Key Transfer Object).
+     * Used when only basic identification is needed without full user data.
      * 
-     * @param kto
+     * @param kto The UserKto containing ID and entity key
+     * @return A User entity with minimal data for references
      */
     public static User fromKto(UserKto kto) {
         return User.builder()

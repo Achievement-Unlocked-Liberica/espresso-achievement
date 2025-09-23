@@ -5,9 +5,20 @@ import java.util.List;
 
 import espresso.achievement.domain.entities.Achievement;
 
+/**
+ * Repository interface for Achievement entity operations.
+ * Combines both command and query operations for achievements,
+ * providing CRUD operations and specialized query methods for achievement data.
+ */
 public interface IAchievementRepository {
 
     // Command operations (from IAchievementCmdRepository)
+    /**
+     * Saves a new achievement to the repository.
+     * 
+     * @param achievement The achievement entity to save
+     * @return The saved Achievement entity with generated ID and timestamps
+     */
     Achievement save(Achievement achievement);
     
     /**

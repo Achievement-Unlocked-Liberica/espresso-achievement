@@ -18,15 +18,41 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * JWT authentication filter that processes incoming HTTP requests to validate JWT tokens.
+ * Extends Spring Security's OncePerRequestFilter to ensure authentication is processed
+ * exactly once per request. Extracts and validates JWT tokens from Authorization headers,
+ * sets up the security context for authenticated users, and allows unauthenticated
+ * access to authentication endpoints.
+ */
 @Component
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
+    /**
+     * JWT token service for token validation and claim extraction.
+     * Used to verify token authenticity and extract user information.
+     */
     @Autowired
     private JWTAuthToken jwtAuthToken;
 
+    /**
+     * Spring Security user details service for loading user information.
+     * Provides user details for authentication context setup after token validation.
+     */
     @Autowired
     private UserDetailsService userDetailsService;
 
+    /**
+     * Processes each HTTP request to validate JWT tokens and set up authentication context.
+     * Skips authentication for login endpoints, extracts tokens from Authorization headers,
+     * validates tokens, and establishes security context for authenticated requests.
+     *
+     * @param request The HTTP servlet request containing potential JWT tokens
+     * @param response The HTTP servlet response for the request
+     * @param filterChain The filter chain to continue processing the request
+     * @throws ServletException If servlet processing fails
+     * @throws IOException If I/O operations fail during request processing
+     */
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, 
                                   @NonNull FilterChain filterChain) throws ServletException, IOException {

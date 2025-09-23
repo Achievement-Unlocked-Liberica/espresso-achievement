@@ -10,8 +10,18 @@ import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.operational.ApiLogger;
 
+/**
+ * Base class for all API controllers in the system.
+ * Provides common functionality including health checks and standardized response processing.
+ * Handles the translation between internal HandlerResponse objects and HTTP ServiceResponse objects.
+ */
 public class CommonApi {
 
+    /**
+     * Health check endpoint to verify API availability.
+     * 
+     * @return ResponseEntity with OK status and version information
+     */
     @Operation(summary = "Health Check", description = "Checks the health of the API.")
     @GetMapping(value = "/health", headers = "X-API-Version=1")
     @ApiResponse(responseCode = "200:OK", description = "API is healthy.")
@@ -20,8 +30,12 @@ public class CommonApi {
         return ResponseEntity.ok("OK V1.0");
     }
 
-    /*
-     * This method is used to process the result of the handler
+    /**
+     * Processes handler results and converts them to appropriate HTTP responses.
+     * Maps internal response types to HTTP status codes and formats responses consistently.
+     * 
+     * @param result The handler response to process
+     * @return ServiceResponse with appropriate HTTP status and data
      */
     public ServiceResponse<Object> processHandlerResult(HandlerResponse<Object> result) {
         if (result.isSuccess()) {
@@ -53,8 +67,12 @@ public class CommonApi {
         }
     }
 
-    /*
-     * This method is used to process any error that occurs during the handler
+    /**
+     * Processes unexpected exceptions that occur during handler execution.
+     * Provides a consistent error response format for unhandled exceptions.
+     * 
+     * @param e The exception that occurred
+     * @return ServiceResponse with internal server error status
      */
     public ServiceResponse<Object> processHandlerError(Exception e) {
         return ServiceResponse.error(HttpStatus.INTERNAL_SERVER_ERROR, null);

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import espresso.common.domain.queries.QuerySizeType;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+import espresso.common.application.handlers.CommonQueryHandler;
 import espresso.user.domain.queries.GetUserByKeyQuery;
 import espresso.user.domain.queries.GetUserNameExistsQuery;
 import espresso.user.domain.queries.GetEmailExistsQuery;
@@ -17,7 +18,7 @@ import espresso.user.domain.entities.UserDtoMd;
 import espresso.user.domain.entities.UserDtoSm;
 
 @Service
-public class UserQueryHandler implements IUserQueryHandler {
+public class UserQueryHandler extends CommonQueryHandler implements IUserQueryHandler {
 
     @Autowired
     private IUserRepository userRepository;
@@ -29,11 +30,9 @@ public class UserQueryHandler implements IUserQueryHandler {
 
         try {
             // Validate the query
-            var validationErrors = qry.validate();
-
-            if (!validationErrors.isEmpty()) {
-                return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
-            }
+            var validationResult = validateQuery(qry);
+            if (validationResult != null)
+                return validationResult;
 
             // Get the registered user by user key and size, then set the response
             Object userDto = this.userRepository.findByKey(qry.getEntityKey(), getDtoSize(qry.getSize()));
@@ -53,11 +52,9 @@ public class UserQueryHandler implements IUserQueryHandler {
     public HandlerResponse<Object> handle(GetUserNameExistsQuery qry) {
         try {
             // Validate the query
-            var validationErrors = qry.validate();
-
-            if (!validationErrors.isEmpty()) {
-                return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
-            }
+            var validationResult = validateQuery(qry);
+            if (validationResult != null)
+                return validationResult;
 
             // Check if username exists in the database
             boolean usernameExists = this.userRepository.checkUsernameExists(qry.getUsername());
@@ -73,11 +70,9 @@ public class UserQueryHandler implements IUserQueryHandler {
     public HandlerResponse<Object> handle(GetEmailExistsQuery qry) {
         try {
             // Validate the query
-            var validationErrors = qry.validate();
-
-            if (!validationErrors.isEmpty()) {
-                return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
-            }
+            var validationResult = validateQuery(qry);
+            if (validationResult != null)
+                return validationResult;
 
             // Check if email exists in the database
             boolean emailExists = this.userRepository.checkEmailExists(qry.getEmail());
@@ -93,11 +88,9 @@ public class UserQueryHandler implements IUserQueryHandler {
     public HandlerResponse<Object> handle(GetMyUserQuery qry) {
         try {
             // Validate the query
-            var validationErrors = qry.validate();
-
-            if (!validationErrors.isEmpty()) {
-                return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
-            }
+            var validationResult = validateQuery(qry);
+            if (validationResult != null)
+                return validationResult;
 
             // Get the user by entity key using UserDtoLg (same as GetUserByKeyQuery)
             Object userDto = this.userRepository.findByKey(qry.getEntityKey(), UserDtoLg.class);

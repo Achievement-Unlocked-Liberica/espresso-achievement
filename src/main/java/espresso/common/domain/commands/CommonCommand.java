@@ -9,7 +9,12 @@ import jakarta.validation.ConstraintViolation;
 import lombok.Getter;
 import lombok.Setter;
 
-
+/**
+ * Base class for all command objects in the CQRS architecture.
+ * Commands represent write operations and contain all necessary data to perform an action.
+ * Provides common validation infrastructure using JSR-303 Bean Validation and custom validation hooks.
+ * Commands are simple DTOs - validation logic is executed by command handlers using Spring's Validator.
+ */
 @Getter
 @Setter
 public abstract class CommonCommand {

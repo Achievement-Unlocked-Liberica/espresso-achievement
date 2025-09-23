@@ -34,29 +34,56 @@ import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonCmdApi;
 import espresso.common.service.operational.ApiLogger;
 
+/**
+ * REST API controller for handling achievement command operations.
+ * Provides endpoints for creating, updating, deleting, and managing achievements
+ * including media uploads, comments, and celebrations.
+ * All endpoints require proper authentication and authorization.
+ */
 @RestController("Achievement Cmd Api")
 @RequestMapping("/api/cmd/achievement")
 @Tag(name = "Achievement Command API", description = "API for handling Achievement commands.")
 public class AchievementCmdApi extends CommonCmdApi {
 
+	/**
+	 * Handler for processing achievement creation commands.
+	 */
 	@Autowired
 	private ICreateAchivementCommandHandler createAchivementCommandHandler;
 
+	/**
+	 * Handler for processing achievement media upload commands.
+	 */
 	@Autowired
 	private IUploadAchievementMediaCommandHandler uploadAchievementMediaCommandHandler;
 
+	/**
+	 * Handler for processing achievement comment commands.
+	 */
 	@Autowired
 	private IAddAchievementCommentCommandHandler addAchievementCommentCommandHandler;
 
+	/**
+	 * Handler for processing achievement celebration commands.
+	 */
 	@Autowired
 	private IAddAchievementCelebrationCommandHandler addAchievementCelebrationCommandHandler;
 
+	/**
+	 * Handler for processing achievement update commands.
+	 */
 	@Autowired
 	private IUpdateAchievementCommandHandler updateAchievementCommandHandler;
 
+	/**
+	 * Handler for processing achievement disable commands.
+	 */
 	@Autowired
 	private IDisableAchievementCommandHandler disableAchievementCommandHandler;
 
+	/**
+	 * Handler for processing achievement deletion commands.
+	 */
 	@Autowired
 	private IDeleteAchievementCommandHandler deleteAchievementCommandHandler;
 

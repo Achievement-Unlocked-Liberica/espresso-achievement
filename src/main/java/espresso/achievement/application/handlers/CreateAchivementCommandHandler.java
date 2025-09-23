@@ -19,27 +19,40 @@ import espresso.common.domain.responses.ResponseType;
 // Validation centralized in CommonCommandHandler
 
 /**
- * Handles the creation of a new achievement.
+ * Handles the creation of new achievements.
  * 
- * This handler validates the provided {@link CreateAchivementCommand},
- * retrieves
- * the user
- * associated with the command, and creates a new achievement entity. The
- * created achievement
- * is then saved to the repository.
+ * This handler validates the provided {@link CreateAchivementCommand}, retrieves the user
+ * associated with the command, creates a new achievement entity, and saves it to the repository.
+ * The handler also includes placeholder logic for content safety verification of the achievement
+ * title and description using AI services.
  */
 @Service
 public class CreateAchivementCommandHandler extends CommonCommandHandler implements ICreateAchivementCommandHandler {
 
+    /**
+     * Repository for achievement entity persistence operations.
+     */
     @Autowired
     private IAchievementRepository achievementRepository;
 
+    /**
+     * Repository for user entity queries and operations.
+     */
     @Autowired
     private IUserRepository userRepository;
 
+    /**
+     * Service for content safety verification using AI.
+     */
     @Autowired
     private IContentSafetyAIService contentSafetyAIService;
 
+    /**
+     * Processes the achievement creation command.
+     * 
+     * @param cmd The command containing achievement creation data
+     * @return HandlerResponse with the created achievement or error information
+     */
     public HandlerResponse<Object> handle(CreateAchivementCommand cmd) {
 
         try {

@@ -4,6 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Component;
@@ -11,12 +12,29 @@ import org.springframework.stereotype.Component;
 import espresso.achievement.domain.contracts.IAchievementRepository;
 import espresso.achievement.domain.entities.Achievement;
 
+/**
+ * Primary implementation of the Achievement repository interface.
+ * Provides a unified interface for both command and query operations on Achievement entities.
+ * Delegates actual data operations to specialized providers (PostgreSQL) while maintaining
+ * proper validation and error handling at the repository level.
+ */
 @Primary
 @Component
 public class AchievementRepository implements IAchievementRepository {
 
+    /**
+     * Default page size for query operations, configurable via application properties.
+     */
+    @Value("${achievement.query.defaultPageSize}")
+    private Integer queryDefaultPageSize;
+
+    /**
+     * PostgreSQL data provider for achievement entity operations.
+     */
     @Autowired
     AchievementPSQLProvider achievementPSQLProvider;
+
+
 
     // Command operations (from AchievementCmdRepository)
     @Override
@@ -85,7 +103,7 @@ public class AchievementRepository implements IAchievementRepository {
         List<T> entities;
 
         if (limit == null || limit <= 0) {
-            limit = 10; // Default limit
+            limit = queryDefaultPageSize; // Default limit
         }
 
         // If fromDate is null, get all latest achievements

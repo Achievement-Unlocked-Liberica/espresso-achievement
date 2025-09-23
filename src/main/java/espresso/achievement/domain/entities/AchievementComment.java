@@ -28,6 +28,8 @@ import lombok.NoArgsConstructor;
 
 /**
  * Entity representing a comment on an achievement.
+ * Comments allow users to provide feedback, congratulations, or questions about achievements.
+ * Each comment undergoes sentiment analysis and language detection for moderation and enhanced user experience.
  * Contains the comment text, metadata, and relationships to Achievement and User entities.
  */
 @Data
