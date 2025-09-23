@@ -7,26 +7,31 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.AfterDomainEventPublication;
 import org.springframework.data.domain.DomainEvents;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@EqualsAndHashCode(callSuper = true)
-@MappedSuperclass
-public class DomainAggregate extends DomainEntity {
 
-    @Transient    
+//@Data
+//@MappedSuperclass
+//@EqualsAndHashCode(callSuper = true)
+public abstract class DomainAggregate extends DomainEntity {
+
+    @Transient 
+    @JsonIgnore
     protected final List<Object> domainEvents = new ArrayList<>();
 
     @DomainEvents
-    protected List<Object> getDomainEvents() {
+    public List<Object> getDomainEvents() {
         return domainEvents;
     }
 
     @AfterDomainEventPublication
-    protected void clearDomainEvents() {
+    public void clearDomainEvents() {
         domainEvents.clear();
     }
 

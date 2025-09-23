@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import espresso.achievement.application.response.HandlerResult;
-import espresso.achievement.domain.contracts.IAchievementQryRepository;
+import espresso.achievement.domain.contracts.IAchievementRepository;
 import espresso.achievement.domain.contracts.IAchievementQueryHandler;
 import espresso.achievement.domain.entities.AchievementDtoLg;
 import espresso.achievement.domain.entities.AchievementDtoMd;
@@ -32,7 +32,7 @@ import lombok.NoArgsConstructor;
  * achievement queries
  * and return the corresponding read models or handler responses.
  * <p>
- * This handler interacts with the {@link IAchievementQryRepository} to fetch
+ * This handler interacts with the {@link IAchievementRepository} to fetch
  * achievement details,
  * summaries, and the latest achievements based on the provided queries.
  * </p>
@@ -73,7 +73,7 @@ import lombok.NoArgsConstructor;
 public class AchievementQueryHandler implements IAchievementQueryHandler {
 
     @Autowired
-    IAchievementQryRepository achievementRepository;
+    IAchievementRepository achievementRepository;
 
     @Override
     public HandlerResponse<Object> handle(GetLatestAchievementsQuery qry) {

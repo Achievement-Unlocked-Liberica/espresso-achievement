@@ -8,11 +8,14 @@ import lombok.Setter;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.validation.constraints.*;
 
 /**
  * Command for updating an existing achievement.
- * Contains the necessary data for updating achievement title, description, skills, and visibility.
+ * Contains the necessary data for updating achievement title, description,
+ * skills, and visibility.
  */
 @Getter
 @Setter
@@ -20,18 +23,22 @@ import jakarta.validation.constraints.*;
 public class UpdateAchievementCommand extends CommonCommand {
 
     /**
-     * The 7-character alphanumeric key of the achievement to update
-     */
-    @NotBlank(message = "LOCALIZE: ACHIEVEMENT KEY MUST BE PROVIDED")
-    @Size(min = 7, max = 7, message = "LOCALIZE: ACHIEVEMENT KEY MUST BE EXACTLY 7 CHARACTERS")
-    private String achievementKey;
-
-    /**
      * The 7-character alphanumeric key of the user who owns the achievement
      */
+    @JsonIgnore
+    @Schema(hidden = true)
     @NotBlank(message = "LOCALIZE: A USER KEY MUST BE PROVIDED")
     @Size(min = 7, max = 7, message = "LOCALIZE: ENTITY KEY MUST BE EXACTLY 7 CHARACTERS")
     private String userKey;
+
+    /**
+     * The 7-character alphanumeric key of the achievement to update
+     */
+    @JsonIgnore
+    @Schema(hidden = true)
+    @NotBlank(message = "LOCALIZE: ACHIEVEMENT KEY MUST BE PROVIDED")
+    @Size(min = 7, max = 7, message = "LOCALIZE: ACHIEVEMENT KEY MUST BE EXACTLY 7 CHARACTERS")
+    private String achievementKey;
 
     /**
      * The updated title of the achievement
@@ -59,20 +66,15 @@ public class UpdateAchievementCommand extends CommonCommand {
     private Boolean isPublic = true;
 
     /**
-     * Validates the command data including parent validation and custom skill validation.
+     * Validates the command data including parent validation and custom skill
+     * validation.
      * 
      * @return Set of validation error messages, empty if valid
      */
     @Override
-    public Set<String> validate() {
-        // Call parent validation first to get standard JSR-303 validation errors
-        Set<String> parentErrors = super.validate();
-
-        // Create a new mutable set to avoid UnsupportedOperationException
+    public Set<String> validateCustom() {
+        // Create a new mutable set to collect custom validation errors
         Set<String> errors = new HashSet<>();
-        if (parentErrors != null) {
-            errors.addAll(parentErrors);
-        }
 
         // Validate skills if present
         if (skills != null && skills.length > 0) {
@@ -81,7 +83,8 @@ public class UpdateAchievementCommand extends CommonCommand {
                 if (skill != null && !skill.trim().isEmpty()) {
                     String normalizedSkill = skill.trim().toLowerCase();
                     if (!AchievementConstants.ALLOWED_SKILLS.contains(normalizedSkill)) {
-                        errors.add("skills[" + i + "]:" + String.format(AchievementConstants.ERROR_INVALID_SKILL, skill));
+                        errors.add(
+                                "skills[" + i + "]:" + String.format(AchievementConstants.ERROR_INVALID_SKILL, skill));
                     }
                 }
             }

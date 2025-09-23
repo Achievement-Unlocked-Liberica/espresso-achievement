@@ -5,7 +5,7 @@ X-API-Version: 1
 
 ### Create a new Achievement
 
-@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5Ijoibnp4eGIxYiIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiRWR3aW4iLCJsYXN0TmFtZSI6IlZhbmNlIiwiaWF0IjoxNzU1NDE1NzExLCJleHAiOjE3NTU1MDIxMTF9.RuNWVxOIM87Gs3yjwPjfogl5lDZxYft0TAP2xHksszuRQjWPdcABALMZblYe7ZpL
+@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5IjoidHdXcnlXTSIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiVGhyb2siLCJsYXN0TmFtZSI6IkJvbmUiLCJpYXQiOjE3NTg2MDc1MjMsImV4cCI6MTc1ODY5MzkyMn0.RSvZSFRDGmmfA1GTDog3eJaWzuGJz6yns8tw2zVMbwxhNFWon-H2mTSjdtTy4IVS
 
 POST http://localhost:8080/api/cmd/achievement HTTP/1.1
 Content-Type: application/json
@@ -14,45 +14,40 @@ X-API-Version: 1
 Authorization: Bearer {{authToken}}
 
 {
-  "userKey": "A3Rc2mQ",
-  "title": "Completed Miilti File Upload",
-  "description": "Sucessfully implemented multi file upload for achievement media.",
-  "completedDate": "2025-07-18",
-  "skills": ["int", "wis", "luc"],
+  "title": "A title for an achievement",
+  "description": "This is a test for the text analyzer, now continue",
+  "completedDate": "2025-09-15",
+  "skills": ["int", "cha", "luc"],
   "isPublic": true
 }
 
 ### Get achievement details by entityKey
 
-GET http://localhost:8080/api/qry/achievement/detail?size=lg&entityKey=PFBB8UQ HTTP/1.1
+GET http://localhost:8080/api/qry/achievement/detail?size=lg&entityKey=JP5HVXl HTTP/1.1
 Content-Type: application/json
 accept: application/json
 X-API-Version: 1
 Authorization: Bearer {{authToken}}
 
 ### Add a Comment to the Achievement
-POST http://localhost:8080/api/cmd/achievement/comments HTTP/1.1
+POST http://localhost:8080/api/cmd/achievement/JP5HVXl/comments HTTP/1.1
 Content-Type: application/json
 accept: application/json
 X-API-Version: 1
 Authorization: Bearer {{authToken}}
 
 {
-"achievementKey": "gCbuccA",
-"userKey": "nzxxb1b",
-"commentText": "This is a test comment for the achievement."
+"commentText": "Best achievmeent I've ever achieved"
 }
 
 ### Update an existing Achievement
-PUT http://localhost:8080/api/cmd/achievement/PFBB8UQ HTTP/1.1
+PUT http://localhost:8080/api/cmd/achievement/JP5HVXl HTTP/1.1
 Content-Type: application/json
 accept: application/json
 X-API-Version: 1
 Authorization: Bearer {{authToken}}
 
 {
-  "achievementKey": "PFBB8UQ",
-  "userKey": "nzxxb1b",
   "title": "A new updated title",
   "description": "A new updated description",
   "skills": ["str", "dex", "int"],
@@ -72,3 +67,15 @@ Content-Type: application/json
 accept: application/json
 X-API-Version: 1
 Authorization: Bearer {{authToken}}
+
+
+### Add a Celebration to the Achievement
+POST http://localhost:8080/api/cmd/achievement/oYIuT8w/celebration HTTP/1.1
+Content-Type: application/json
+accept: application/json
+X-API-Version: 1
+Authorization: Bearer {{authToken}}
+
+{
+  "count":9
+}

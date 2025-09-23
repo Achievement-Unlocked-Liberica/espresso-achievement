@@ -16,13 +16,20 @@ import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import espresso.achievement.domain.commands.AddAchievementCelebrationCommand;
 import espresso.achievement.domain.commands.AddAchievementCommentCommand;
 import espresso.achievement.domain.commands.CreateAchivementCommand;
 import espresso.achievement.domain.commands.DeleteAchievementCommand;
 import espresso.achievement.domain.commands.DisableAchievementCommand;
 import espresso.achievement.domain.commands.UpdateAchievementCommand;
 import espresso.achievement.domain.commands.UploadAchievementMediaCommand;
-import espresso.achievement.domain.contracts.IAchievementCommandHandler;
+import espresso.achievement.domain.contracts.ICreateAchivementCommandHandler;
+import espresso.achievement.domain.contracts.IUploadAchievementMediaCommandHandler;
+import espresso.achievement.domain.contracts.IAddAchievementCommentCommandHandler;
+import espresso.achievement.domain.contracts.IAddAchievementCelebrationCommandHandler;
+import espresso.achievement.domain.contracts.IUpdateAchievementCommandHandler;
+import espresso.achievement.domain.contracts.IDisableAchievementCommandHandler;
+import espresso.achievement.domain.contracts.IDeleteAchievementCommandHandler;
 import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonCmdApi;
 import espresso.common.service.operational.ApiLogger;
@@ -33,7 +40,25 @@ import espresso.common.service.operational.ApiLogger;
 public class AchievementCmdApi extends CommonCmdApi {
 
 	@Autowired
-	private IAchievementCommandHandler achievementCommandHandler;
+	private ICreateAchivementCommandHandler createAchivementCommandHandler;
+
+	@Autowired
+	private IUploadAchievementMediaCommandHandler uploadAchievementMediaCommandHandler;
+
+	@Autowired
+	private IAddAchievementCommentCommandHandler addAchievementCommentCommandHandler;
+
+	@Autowired
+	private IAddAchievementCelebrationCommandHandler addAchievementCelebrationCommandHandler;
+
+	@Autowired
+	private IUpdateAchievementCommandHandler updateAchievementCommandHandler;
+
+	@Autowired
+	private IDisableAchievementCommandHandler disableAchievementCommandHandler;
+
+	@Autowired
+	private IDeleteAchievementCommandHandler deleteAchievementCommandHandler;
 
 	@Operation(summary = "Create New Achivement", description = "Creates a new Achievement from the provided command.")
 	@PostMapping("")
@@ -47,7 +72,7 @@ public class AchievementCmdApi extends CommonCmdApi {
 
 		command.setUserKey(userKey);
 
-		return executeCommand(command, achievementCommandHandler::handle);
+		return executeCommand(command, createAchivementCommandHandler::handle);
 	}
 
 	@Operation(summary = "Upload Achievement Media", description = "Uploads media files for an existing Achievement.")
@@ -66,7 +91,7 @@ public class AchievementCmdApi extends CommonCmdApi {
 
 		UploadAchievementMediaCommand command = new UploadAchievementMediaCommand(key, userKey, images);
 
-		return executeCommand(command, achievementCommandHandler::handle);
+		return executeCommand(command, uploadAchievementMediaCommandHandler::handle);
 	}
 
 	/**
@@ -88,7 +113,22 @@ public class AchievementCmdApi extends CommonCmdApi {
 		String userKey = getAuthenticatedUserKey();
 		command.setUserKey(userKey);
 		command.setAchievementKey(key);
-		return executeCommand(command, achievementCommandHandler::handle);
+		return executeCommand(command, addAchievementCommentCommandHandler::handle);
+	}
+
+	@Operation(summary = "Add Achievement Celebration", description = "Adds a celebration to an existing achievement from the authenticated user.")
+	@PostMapping("/{key}/celebration")
+	@ApiResponse(responseCode = "201:CREATED", description = "Celebration added successfully.")
+	@ApiResponse(responseCode = "400:BAD_REQUEST", description = "Validation error in the request.")
+	@ApiResponse(responseCode = "401:UNAUTHORIZED", description = "Unauthorized access - invalid or missing JWT token.")
+	@ApiResponse(responseCode = "404:NOT_FOUND", description = "Achievement or user not found.")
+	@ApiResponse(responseCode = "500:INTERNAL_SERVER_ERROR", description = "An internal error occurred.")
+	@ApiLogger("Add achievement celebration")
+	public ResponseEntity<ServiceResponse<Object>> addAchievementCelebration(@PathVariable String key, @RequestBody AddAchievementCelebrationCommand command) {
+		String userKey = getAuthenticatedUserKey();
+		command.setUserKey(userKey);
+		command.setAchievementKey(key);
+		return executeCommand(command, addAchievementCelebrationCommandHandler::handle);
 	}
 
 	/**
@@ -111,7 +151,7 @@ public class AchievementCmdApi extends CommonCmdApi {
 		String userKey = getAuthenticatedUserKey();
 		command.setUserKey(userKey);
 		command.setAchievementKey(key);
-		return executeCommand(command, achievementCommandHandler::handle);
+		return executeCommand(command, updateAchievementCommandHandler::handle);
 	}
 
 	/**
@@ -136,7 +176,7 @@ public class AchievementCmdApi extends CommonCmdApi {
 
 		DisableAchievementCommand command = new DisableAchievementCommand(key, userKey);
 
-		return executeCommand(command, achievementCommandHandler::handle);
+		return executeCommand(command, disableAchievementCommandHandler::handle);
 	}
 
 	/**
@@ -163,6 +203,6 @@ public class AchievementCmdApi extends CommonCmdApi {
 
 		DeleteAchievementCommand command = new DeleteAchievementCommand(key, userKey);
 
-		return executeCommand(command, achievementCommandHandler::handle);
+		return executeCommand(command, deleteAchievementCommandHandler::handle);
 	}
 }

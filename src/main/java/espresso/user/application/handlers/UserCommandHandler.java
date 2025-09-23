@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import espresso.common.application.handlers.CommonCommandHandler;
+// Validation centralized in CommonCommandHandler
 
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
@@ -16,7 +18,7 @@ import espresso.user.domain.entities.User;
 import espresso.user.domain.entities.UserProfileImage;
 
 @Service
-public class UserCommandHandler implements IUserCommandHandler {
+public class UserCommandHandler extends CommonCommandHandler implements IUserCommandHandler {
 
     @Autowired
     private IUserRepository userRepository;
@@ -24,15 +26,14 @@ public class UserCommandHandler implements IUserCommandHandler {
     @Autowired
     private IUserProfilePictureRepository userProfileImageRepository;
 
+    // validator provided by base class
+
 
     public HandlerResponse<Object> handle(AddUserCommand command) {
         try {
-            // Validate the command
-            var validationErrors = command.validate();
-
-            if (!validationErrors.isEmpty()) {
-                return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
-            }
+            // Validate the command using shared Validator and any custom command checks
+            var invalid = validateCommand(command);
+            if (invalid != null) return invalid;
 
             // Check if username already exists
             User existingUserByUsername = userRepository.findByUsername(command.getUsername());
@@ -67,12 +68,10 @@ public class UserCommandHandler implements IUserCommandHandler {
     @Override
     public HandlerResponse<Object> handle(UpdateProfilePictureCommand cmd) {
         try {
-            // Validate the command
-            var validationErrors = cmd.validate();
-
-            if (!validationErrors.isEmpty()) {
-                return HandlerResponse.error(validationErrors, ResponseType.VALIDATION_ERROR);
-            }
+            // Validate the command using shared Validator and any custom command checks
+            var validationResult = validateCommand(cmd);
+            if (validationResult != null)
+                return validationResult;
 
             // Retrieve the RegisteredUser by key
             User user = userRepository.findByKey(cmd.getRegisteredUserKey(), User.class);

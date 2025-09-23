@@ -60,11 +60,10 @@ public class UpdateProfilePictureCommand extends CommonCommand {
     private MultipartFile image;
 
     @Override
-    public Set<String> validate() {
-        Set<String> errors = super.validate();
-        if (errors == null || errors.isEmpty()) {
-            errors = new HashSet<>();
-        } // Check if image exists
+    public Set<String> validateCustom() {
+        Set<String> errors = new HashSet<>();
+
+        // Check if image exists
         if (image == null || image.isEmpty()) {
             errors.add("image:" + ERROR_EMPTY_IMAGE);
             return errors; // Return early as we can't validate further without an image
@@ -102,7 +101,9 @@ public class UpdateProfilePictureCommand extends CommonCommand {
             }
         } catch (IOException e) {
             errors.add("image:" + String.format(ERROR_PROCESSING_IMAGE, e.getMessage()));
-        } // Validate filename
+        }
+
+        // Validate filename
         String originalFilename = image.getOriginalFilename();
         if (originalFilename != null && !originalFilename.matches(FILENAME_REGEX_PATTERN)) {
             errors.add("filename:" + ERROR_INVALID_FILENAME);

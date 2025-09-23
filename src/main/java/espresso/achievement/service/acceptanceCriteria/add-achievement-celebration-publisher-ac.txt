@@ -1,0 +1,176 @@
+# Achievement Celebration Publisher - Acceptance Criteria
+
+## Feature: Add Achievement Celebration
+
+As a user, I want to celebrate an achievement from another player, and I can show my support to their accomplishment.
+
+### Background:
+Given the system is running and accessible
+And the database contains valid achievements and users
+And the authentication system is functioning
+And the message queue system is available
+
+## Scenario: Successfully celebrate an achievement
+**Given** I am an authenticated user with userKey "USER001"
+**And** there exists an achievement with achievementKey "ACH0001"
+**And** the achievement belongs to a different user
+**When** I send a POST request to "/api/cmd/achievement/celebration" with valid celebration data:
+```json
+{
+  "achievementKey": "ACH0001",
+  "count": 3
+}
+```
+**Then** the response status should be 201 CREATED
+**And** the response should contain the created celebration details
+**And** the celebration should be saved with status "PENDING"
+**And** the celebration should be published to the "achievement.celebration.queue" message queue
+**And** the achievement should have the celebration added to its internal list
+**And** an "AchievementCelebrationAddedEvent" domain event should be raised
+
+## Scenario: Validation error - missing achievement key
+**Given** I am an authenticated user
+**When** I send a POST request to "/api/cmd/achievement/celebration" without achievementKey:
+```json
+{
+  "count": 5
+}
+```
+**Then** the response status should be 400 BAD REQUEST
+**And** the response should contain validation errors about missing achievement key
+**And** no celebration should be created
+**And** no message should be published to the queue
+
+## Scenario: Validation error - invalid achievement key length
+**Given** I am an authenticated user
+**When** I send a POST request to "/api/cmd/achievement/celebration" with invalid achievementKey:
+```json
+{
+  "achievementKey": "SHORT",
+  "count": 2
+}
+```
+**Then** the response status should be 400 BAD REQUEST
+**And** the response should contain validation errors about achievement key length
+**And** no celebration should be created
+
+## Scenario: Validation error - missing count
+**Given** I am an authenticated user
+**When** I send a POST request to "/api/cmd/achievement/celebration" without count:
+```json
+{
+  "achievementKey": "ACH0001"
+}
+```
+**Then** the response status should be 400 BAD REQUEST
+**And** the response should contain validation errors about missing count
+**And** no celebration should be created
+
+## Scenario: Validation error - count too low
+**Given** I am an authenticated user
+**When** I send a POST request to "/api/cmd/achievement/celebration" with count below minimum:
+```json
+{
+  "achievementKey": "ACH0001",
+  "count": 0
+}
+```
+**Then** the response status should be 400 BAD REQUEST
+**And** the response should contain validation errors about count being too low
+**And** no celebration should be created
+
+## Scenario: Validation error - count too high
+**Given** I am an authenticated user
+**When** I send a POST request to "/api/cmd/achievement/celebration" with count above maximum:
+```json
+{
+  "achievementKey": "ACH0001",
+  "count": 10
+}
+```
+**Then** the response status should be 400 BAD REQUEST
+**And** the response should contain validation errors about count being too high
+**And** no celebration should be created
+
+## Scenario: Achievement not found
+**Given** I am an authenticated user
+**When** I send a POST request to "/api/cmd/achievement/celebration" with non-existent achievement:
+```json
+{
+  "achievementKey": "INVALID",
+  "count": 1
+}
+```
+**Then** the response status should be 404 NOT FOUND
+**And** the response should contain error message "Achievement not found"
+**And** no celebration should be created
+
+## Scenario: User not authenticated
+**Given** I am not authenticated
+**When** I send a POST request to "/api/cmd/achievement/celebration" with valid data
+**Then** the response status should be 401 UNAUTHORIZED
+**And** no celebration should be created
+**And** no message should be published to the queue
+
+## Scenario: User not found in system
+**Given** I have an invalid JWT token with userKey "INVALID"
+**When** I send a POST request to "/api/cmd/achievement/celebration" with valid celebration data
+**Then** the response status should be 404 NOT FOUND
+**And** the response should contain error message "User not found"
+**And** no celebration should be created
+
+## Scenario: System error during processing
+**Given** I am an authenticated user
+**And** there is a system error (database unavailable, queue unavailable, etc.)
+**When** I send a POST request to "/api/cmd/achievement/celebration" with valid data
+**Then** the response status should be 500 INTERNAL SERVER ERROR
+**And** the response should contain appropriate error message
+**And** no partial data should be persisted
+
+## Scenario: Celebrate with minimum count
+**Given** I am an authenticated user with userKey "USER001"
+**And** there exists an achievement with achievementKey "ACH0001"
+**When** I send a POST request with count of 1:
+```json
+{
+  "achievementKey": "ACH0001",
+  "count": 1
+}
+```
+**Then** the response status should be 201 CREATED
+**And** the celebration should be created with count 1
+
+## Scenario: Celebrate with maximum count
+**Given** I am an authenticated user with userKey "USER001"
+**And** there exists an achievement with achievementKey "ACH0001"
+**When** I send a POST request with count of 9:
+```json
+{
+  "achievementKey": "ACH0001",
+  "count": 9
+}
+```
+**Then** the response status should be 201 CREATED
+**And** the celebration should be created with count 9
+
+## Non-Functional Requirements
+
+### Performance
+- The celebration endpoint should respond within 500ms under normal load
+- The message queue publishing should not block the API response
+
+### Security
+- All requests must include valid JWT authentication
+- User can only celebrate with their own userKey (extracted from JWT)
+- Input validation must prevent SQL injection and other attacks
+
+### Reliability
+- If queue publishing fails, the API should still return success for the celebration creation
+- Database transactions should ensure data consistency
+- Proper error handling and logging should be implemented
+
+### Data Integrity
+- Each celebration record must have a unique ID
+- Timestamps should be in UTC
+- Status should default to PENDING
+- All required fields must be validated
