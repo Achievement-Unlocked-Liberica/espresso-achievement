@@ -17,8 +17,19 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class AchievementCelebrationEvent extends CommonEvent {
 
+    /**
+     * The 7-character alphanumeric key of the achievement being celebrated.
+     */
     private String achievementKey;
+    
+    /**
+     * The 7-character alphanumeric key of the user giving the celebration.
+     */
     private String userKey;
+    
+    /**
+     * The number of celebrations given (between 1 and 9).
+     */
     private int count;
 
     /**

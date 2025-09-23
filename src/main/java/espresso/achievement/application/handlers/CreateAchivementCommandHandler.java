@@ -11,6 +11,7 @@ import espresso.achievement.domain.contracts.IAchievementRepository;
 import espresso.achievement.domain.contracts.IContentSafetyAIService;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
+import espresso.user.domain.entities.UserKto;
 import espresso.achievement.domain.entities.Achievement;
 import espresso.common.application.handlers.CommonCommandHandler;
 import espresso.common.domain.responses.HandlerResponse;
@@ -39,36 +40,31 @@ public class CreateAchivementCommandHandler extends CommonCommandHandler impleme
     @Autowired
     private IContentSafetyAIService contentSafetyAIService;
 
-    // Validator logic centralized in CommonCommandHandler
-
-    public HandlerResponse<Object> handle(CreateAchivementCommand command) {
+    public HandlerResponse<Object> handle(CreateAchivementCommand cmd) {
 
         try {
-            var validationResult = validateCommand(command);
+            var validationResult = validateCommand(cmd);
             if (validationResult != null)
                 return validationResult;
 
-            // Verify content safety for title and description
-            String contentToVerify = command.getTitle() + "|" + command.getDescription();
-            contentSafetyAIService.verifyTextContent(contentToVerify);
+            // TODO: Verify content safety for title and description
+            // String contentToVerify = command.getTitle() + "|" + command.getDescription();
+            // contentSafetyAIService.verifyTextContent(contentToVerify);
 
             // Get the profile of the user that is creating the achievemnet
-            User user = userRepository.findByKey(command.getUserKey(), User.class);
+            UserKto userKto = userRepository.findByKey(cmd.getUserKey(), UserKto.class);
 
-            if (user == null) {
+            if (userKto == null) {
                 return HandlerResponse.error("User not found", ResponseType.NOT_FOUND);
             }
 
-            // Get the skills of the achievement to be created
-            List<String> skills = Arrays.asList(command.getSkills());
-
             Achievement entity = Achievement.create(
-                    command.getTitle(),
-                    command.getDescription(),
-                    command.getCompletedDate(),
-                    command.getIsPublic(),
-                    user,
-                    skills);
+                    cmd.getTitle(),
+                    cmd.getDescription(),
+                    cmd.getCompletedDate(),
+                    cmd.getIsPublic(),
+                    User.fromKto(userKto),
+                    Arrays.asList(cmd.getSkills()));
 
             Achievement savedEntity = achievementRepository.save(entity);
 

@@ -8,6 +8,7 @@ import espresso.achievement.domain.commands.DeleteAchievementCommand;
 import espresso.achievement.domain.contracts.IAchievementRepository;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
+import espresso.user.domain.entities.UserKto;
 import espresso.achievement.domain.entities.Achievement;
 import espresso.common.application.handlers.CommonCommandHandler;
 import espresso.common.domain.responses.HandlerResponse;
@@ -40,13 +41,16 @@ public class DeleteAchievementCommandHandler extends CommonCommandHandler implem
     public HandlerResponse<Object> handle(DeleteAchievementCommand cmd) {
         try {
             // Validate the command using shared Validator and command-specific checks
-            var invalid = validateCommand(cmd);
-            if (invalid != null) return invalid;
+            var validationResult = validateCommand(cmd);
+            if (validationResult != null) 
+                return validationResult;
 
-            // Retrieve user by userKey - throw not found error if missing
-            User user = userRepository.findByKey(cmd.getUserKey(), User.class);
-            if (user == null) {
-                return HandlerResponse.error("LOCALIZE: USER NOT FOUND", ResponseType.NOT_FOUND);
+            // Get the profile of the user that is creating the achievemnet
+            // We use a Kto instance since we just need to know if it exists and its keys,
+            UserKto userKto = userRepository.findByKey(cmd.getUserKey(), UserKto.class);
+
+            if (userKto == null) {
+                return HandlerResponse.error("User not found", ResponseType.NOT_FOUND);
             }
 
             // Retrieve achievement by achievementKey - return No Content if missing (per
@@ -59,9 +63,8 @@ public class DeleteAchievementCommandHandler extends CommonCommandHandler implem
                 return HandlerResponse.noContent();
             }
 
-            // Verify that the user is authorized to delete this achievement (user must own
-            // the achievement)
-            if (!achievement.getUser().getEntityKey().equals(cmd.getUserKey())) {
+            // Verify that the user is authorized to delete this achievement (user must own the achievement)
+            if (!achievement.isCreator(User.fromKto(userKto))) {
                 return HandlerResponse.error("LOCALIZE: USER IS NOT AUTHORIZED TO DELETE THIS ACHIEVEMENT",
                         ResponseType.UNAUTHORIZED);
             }

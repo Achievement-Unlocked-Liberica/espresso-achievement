@@ -4,5 +4,5 @@ import espresso.achievement.domain.commands.CreateAchivementCommand;
 import espresso.common.domain.responses.HandlerResponse;
 
 public interface ICreateAchivementCommandHandler {
-    HandlerResponse<Object> handle(CreateAchivementCommand command);
+    HandlerResponse<Object> handle(CreateAchivementCommand cmd);
 }

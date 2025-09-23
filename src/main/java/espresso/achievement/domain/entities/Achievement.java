@@ -17,6 +17,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import espresso.achievement.domain.events.AchievementCelebrationEvent;
 import espresso.achievement.domain.events.AchievementCommentEvent;
@@ -49,35 +50,74 @@ import lombok.NoArgsConstructor;
 // columnList = "key", unique = true)})
 public class Achievement extends DomainAggregate {
 
+    /**
+     * The title or name of the achievement (maximum 200 characters).
+     */
     @Column(name = "title", nullable = false, length = 200)
     private String title;
 
+    /**
+     * A detailed description of what the achievement represents (maximum 1000 characters).
+     */
     @Column(name = "description", nullable = false, length = 1000)
     private String description;
 
-    @Column(name = "completeddate", nullable = false)
+    /**
+     * The date when this achievement was completed by the user.
+     */
+    @Column(name = "completedDate", nullable = false)
     private Date completedDate;
 
+    /**
+     * The user who created and owns this achievement.
+     * Lazy-loaded to improve performance.
+     */
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", referencedColumnName = "id")
     private User user;
 
+    /**
+     * List of skill abbreviations associated with this achievement.
+     * Stored as a comma-separated string in the database.
+     */
     @Convert(converter = StringListConverter.class)
     private List<String> skills;
 
+    /**
+     * Collection of media files (images) associated with this achievement.
+     * Lazy-loaded to improve performance.
+     */
     @JsonManagedReference
     @OneToMany(mappedBy = "achievement", fetch = FetchType.LAZY)
     private List<AchievementMedia> media;
 
+    /**
+     * Collection of comments posted on this achievement by users.
+     * Lazy-loaded to improve performance.
+     */
     @JsonManagedReference
     @OneToMany(mappedBy = "achievement", fetch = FetchType.LAZY)
     private List<AchievementComment> comments;
 
+    /**
+     * Collection of celebrations given to this achievement by users.
+     * Lazy-loaded to improve performance.
+     */
     @JsonManagedReference
     @OneToMany(mappedBy = "achievement", fetch = FetchType.LAZY)
     private List<AchievementCelebration> celebrations = new ArrayList<>();
 
+    /**
+     * Aggregated celebration counts for this achievement.
+     * Contains the total count and last updated timestamp.
+     */
+    @OneToOne(mappedBy = "achievement", fetch = FetchType.LAZY)
+    private AchievementCelebrationCounts celebrationCounts;
+
+    /**
+     * The visibility status of the achievement (PRIVATE, EVERYONE, etc.).
+     */
     @Enumerated(EnumType.STRING)
     private AchievementVisibilityStatus achievementVisibility;
 
@@ -120,13 +160,10 @@ public class Achievement extends DomainAggregate {
         this.setEntityKey(espresso.common.domain.support.KeyGenerator.generateKey(7));
     }
 
-    // public void setSkills(List<String> skills) {
-    // this.skills = skills;
-    // }
-
-    // public void setMedia(AchievementMedia media) {
-    // this.media = media;
-    // }
+    public boolean isCreator(User user) {
+        return this.getUser().getEntityKey().equals(user.getEntityKey()) &&
+               this.getUser().getId().equals(user.getId());
+    }
 
     /**
      * Updates the achievement with new values for title, description, skills, and
@@ -215,7 +252,8 @@ public class Achievement extends DomainAggregate {
 
     /**
      * Adds media to this achievement.
-     * This method adds the media to the internal list and raises a media added event.
+     * This method adds the media to the internal list and raises a media added
+     * event.
      * 
      * @param media The media being added to this achievement
      */

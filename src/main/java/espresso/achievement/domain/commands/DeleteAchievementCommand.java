@@ -1,5 +1,7 @@
 package espresso.achievement.domain.commands;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import espresso.common.domain.commands.CommonCommand;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -11,8 +13,10 @@ import jakarta.validation.constraints.*;
 
 /**
  * Command for deleting an existing achievement.
- * This command permanently removes the achievement and all associated data from the database.
- * The deletion follows proper dependency order: comments first, then media, then the achievement record.
+ * This command permanently removes the achievement and all associated data from
+ * the database.
+ * The deletion follows proper dependency order: comments first, then media,
+ * then the achievement record.
  */
 @Getter
 @Setter
@@ -22,18 +26,20 @@ import jakarta.validation.constraints.*;
 public class DeleteAchievementCommand extends CommonCommand {
 
     /**
-     * The 7-character alphanumeric key of the achievement to delete
-     */
-    @NotBlank(message = "LOCALIZE: ACHIEVEMENT KEY MUST BE PROVIDED")
-    @Size(min = 7, max = 7, message = "LOCALIZE: ACHIEVEMENT KEY MUST BE EXACTLY 7 CHARACTERS")
-    @Schema(description = "The 7-character alphanumeric key of the achievement to delete", example = "ACHI001")
-    private String achievementKey;
-
-    /**
      * The 7-character alphanumeric key of the user who owns the achievement
      */
+    @JsonIgnore
+    @Schema(hidden = true)
     @NotBlank(message = "LOCALIZE: A USER KEY MUST BE PROVIDED")
     @Size(min = 7, max = 7, message = "LOCALIZE: ENTITY KEY MUST BE EXACTLY 7 CHARACTERS")
-    @Schema(description = "The 7-character alphanumeric key of the user who owns the achievement", example = "USER123")
     private String userKey;
+
+    /**
+     * The 7-character alphanumeric key of the achievement to delete
+     */
+    @JsonIgnore
+    @Schema(hidden = true)
+    @NotBlank(message = "LOCALIZE: ACHIEVEMENT KEY MUST BE PROVIDED")
+    @Size(min = 7, max = 7, message = "LOCALIZE: ACHIEVEMENT KEY MUST BE EXACTLY 7 CHARACTERS")
+    private String achievementKey;
 }

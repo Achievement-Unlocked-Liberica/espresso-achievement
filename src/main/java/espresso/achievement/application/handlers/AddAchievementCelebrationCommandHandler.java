@@ -10,6 +10,7 @@ import espresso.achievement.domain.contracts.IAchievementRepository;
 import espresso.achievement.domain.entities.AchievementCelebration;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
+import espresso.user.domain.entities.UserKto;
 import espresso.achievement.domain.entities.Achievement;
 import espresso.common.application.handlers.CommonCommandHandler;
 import espresso.common.domain.responses.HandlerResponse;
@@ -49,25 +50,28 @@ public class AddAchievementCelebrationCommandHandler extends CommonCommandHandle
             if (validationResult != null)
                 return validationResult;
 
+            // Get the profile of the user that is creating the achievemnet
+            // We use a Kto instance since we just need to know if it exists and its keys,
+            UserKto userKto = userRepository.findByKey(cmd.getUserKey(), UserKto.class);
+
+            if (userKto == null) {
+                return HandlerResponse.error("User not found", ResponseType.NOT_FOUND);
+            }
+
             // Verify achievement exists
-            Achievement achievement = achievementRepository.getAchievementByKey(Achievement.class,
+            Achievement achievement = achievementRepository.getAchievementByKey(
+                    Achievement.class,
                     cmd.getAchievementKey());
 
             if (achievement == null) {
                 return HandlerResponse.error("Achievement not found", ResponseType.NOT_FOUND);
             }
 
-            // Verify user exists
-            User user = userRepository.findByKey(cmd.getUserKey(), User.class);
-            if (user == null) {
-                return HandlerResponse.error("User not found", ResponseType.NOT_FOUND);
-            }
-
             // Create the celebration
             AchievementCelebration celebration = AchievementCelebration.create(
                     cmd.getCount(),
                     achievement,
-                    user);
+                    User.fromKto(userKto));
 
             // Add celebration to achievement (this will raise domain events)
             achievement.addCelebration(celebration);

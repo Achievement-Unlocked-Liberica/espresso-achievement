@@ -3,7 +3,10 @@ package espresso.achievement.domain.commands;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import espresso.common.domain.commands.CommonCommand;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -22,18 +25,22 @@ import lombok.Setter;
 public class AddAchievementCommentCommand extends CommonCommand {
 
     /**
-     * The 7-character alphanumeric key of the achievement to comment on
-     */
-    @NotBlank(message = "LOCALIZE: ACHIEVEMENT KEY MUST BE PROVIDED")
-    @Size(min = 7, max = 7, message = "LOCALIZE: ACHIEVEMENT KEY MUST BE EXACTLY 7 CHARACTERS")
-    private String achievementKey;
-
-    /**
      * The 7-character alphanumeric key of the user posting the comment
      */
+    @JsonIgnore
+    @Schema(hidden = true)
     @NotBlank(message = "LOCALIZE: USER KEY MUST BE PROVIDED")
     @Size(min = 7, max = 7, message = "LOCALIZE: USER KEY MUST BE EXACTLY 7 CHARACTERS")
     private String userKey;
+
+    /**
+     * The 7-character alphanumeric key of the achievement to comment on
+     */
+    @JsonIgnore
+    @Schema(hidden = true)
+    @NotBlank(message = "LOCALIZE: ACHIEVEMENT KEY MUST BE PROVIDED")
+    @Size(min = 7, max = 7, message = "LOCALIZE: ACHIEVEMENT KEY MUST BE EXACTLY 7 CHARACTERS")
+    private String achievementKey;
 
     /**
      * The text content of the comment

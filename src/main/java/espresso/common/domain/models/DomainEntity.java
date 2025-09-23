@@ -11,10 +11,15 @@ import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
+@SuperBuilder
+@NoArgsConstructor
 @MappedSuperclass
 @EqualsAndHashCode
 public abstract class DomainEntity {
@@ -37,6 +42,8 @@ public abstract class DomainEntity {
     @Column(name = "enabled", nullable = false, columnDefinition = "boolean default true")
     private boolean enabled = true;
 
+    @Column(name = "active", nullable = false, columnDefinition = "boolean default true")
+    private boolean active = true;
 
     protected void updateEntity() {
         this.updatedAt = OffsetDateTime.now();

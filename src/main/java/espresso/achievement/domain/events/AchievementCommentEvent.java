@@ -16,8 +16,19 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class AchievementCommentEvent extends CommonEvent {
 
+    /**
+     * The 7-character alphanumeric key of the achievement being commented on.
+     */
     private String achievementKey;
+    
+    /**
+     * The 7-character alphanumeric key of the user posting the comment.
+     */
     private String userKey;
+    
+    /**
+     * The text content of the comment.
+     */
     private String commentText;
 
     /**

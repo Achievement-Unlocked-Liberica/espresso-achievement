@@ -30,7 +30,11 @@ public class CommonRBMQProvider {
             // Send the JSON string to the queue
             rabbitTemplate.convertAndSend(
                     queueName,
-                    objectMapper.writeValueAsString(event)
+                    objectMapper.writeValueAsString(event),
+                    message -> {
+                        message.getMessageProperties().setContentType("text/json");
+                        return message;
+                    }
             );
 
         } catch (JsonProcessingException ex) {

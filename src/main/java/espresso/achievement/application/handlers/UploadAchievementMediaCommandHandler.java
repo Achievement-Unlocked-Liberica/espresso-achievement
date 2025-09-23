@@ -10,7 +10,9 @@ import espresso.achievement.domain.commands.UploadAchievementMediaCommand;
 import espresso.achievement.domain.contracts.IAchievementRepository;
 import espresso.achievement.domain.contracts.IContentSafetyAIService;
 import espresso.achievement.domain.contracts.IAchievementMediaRepository;
+import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
+import espresso.user.domain.entities.UserKto;
 import espresso.achievement.domain.entities.Achievement;
 import espresso.achievement.domain.entities.AchievementMedia;
 import espresso.common.application.handlers.CommonCommandHandler;
@@ -32,6 +34,9 @@ public class UploadAchievementMediaCommandHandler extends CommonCommandHandler
     private IAchievementMediaRepository achievementMediaRepository;
 
     @Autowired
+    private IUserRepository userRepository;
+
+    @Autowired
     private IContentSafetyAIService contentSafetyAIService;
 
     public HandlerResponse<Object> handle(UploadAchievementMediaCommand cmd) {
@@ -41,6 +46,14 @@ public class UploadAchievementMediaCommandHandler extends CommonCommandHandler
             if (validationResult != null)
                 return validationResult;
 
+            // Get the profile of the user that is creating the achievemnet
+            // We use a Kto instance since we just need to know if it exists and its keys,
+            UserKto userKto = userRepository.findByKey(cmd.getUserKey(), UserKto.class);
+
+            if (userKto == null) {
+                return HandlerResponse.error("User not found", ResponseType.NOT_FOUND);
+            }
+
             // Get the achievement by key
             Achievement achievement = achievementRepository.getAchievementByKey(Achievement.class,
                     cmd.getAchievementKey());
@@ -49,18 +62,10 @@ public class UploadAchievementMediaCommandHandler extends CommonCommandHandler
                 return HandlerResponse.error("Achievement not found", ResponseType.NOT_FOUND);
             }
 
-            // Check if the requester is the owner of the achievement
-            User achievementOwner = achievement.getUser();
-
-            if (achievementOwner == null) {
-                return HandlerResponse.error("Achievement owner not found", ResponseType.NOT_FOUND);
-            }
-
-            String ownerEntityKey = achievementOwner.getEntityKey();
-            String requesterEntityKey = cmd.getUserKey();
-
-            if (!ownerEntityKey.equals(requesterEntityKey)) {
-                return HandlerResponse.error("The requester is not the owner of the achievment",
+            // Verify that the user is authorized to delete this achievement (user must own
+            // the achievement)
+            if (!achievement.isCreator(User.fromKto(userKto))) {
+                return HandlerResponse.error("LOCALIZE: USER IS NOT AUTHORIZED TO DELETE THIS ACHIEVEMENT",
                         ResponseType.UNAUTHORIZED);
             }
 
@@ -68,8 +73,8 @@ public class UploadAchievementMediaCommandHandler extends CommonCommandHandler
             for (MultipartFile image : cmd.getImages()) {
 
                 // Validate the image content safety
-                byte[] contentToVerify = image.getBytes();
-                contentSafetyAIService.verifyImageContent(contentToVerify);
+                // byte[] contentToVerify = image.getBytes();
+                // contentSafetyAIService.verifyImageContent(contentToVerify);
 
                 // Create AchievementMedia entity
                 AchievementMedia media = AchievementMedia.create(

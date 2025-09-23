@@ -69,8 +69,9 @@ public class UserCommandHandler extends CommonCommandHandler implements IUserCom
     public HandlerResponse<Object> handle(UpdateProfilePictureCommand cmd) {
         try {
             // Validate the command using shared Validator and any custom command checks
-            var invalid = validateCommand(cmd);
-            if (invalid != null) return invalid;
+            var validationResult = validateCommand(cmd);
+            if (validationResult != null)
+                return validationResult;
 
             // Retrieve the RegisteredUser by key
             User user = userRepository.findByKey(cmd.getRegisteredUserKey(), User.class);

@@ -16,12 +16,39 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class AchievementMediaEvent extends CommonEvent {
 
+    /**
+     * The 7-character alphanumeric key of the achievement the media was added to.
+     */
     private String achievementKey;
+    
+    /**
+     * The 7-character alphanumeric key of the user who uploaded the media.
+     */
     private String userKey;
+    
+    /**
+     * The unique key identifying the media file.
+     */
     private String mediaKey;
+    
+    /**
+     * The URL where the media file can be accessed.
+     */
     private String mediaUrl;
+    
+    /**
+     * The original filename of the uploaded media as provided by the user.
+     */
     private String originalImageName;
+    
+    /**
+     * The MIME content type of the media file (e.g., image/jpeg, image/png).
+     */
     private String contentType;
+    
+    /**
+     * The size of the media file in bytes.
+     */
     private Long fileSize;
 
     /**

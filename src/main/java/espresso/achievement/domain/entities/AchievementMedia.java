@@ -48,23 +48,42 @@ public class AchievementMedia extends ValueEntity {
     @JoinColumn(name = "achievementId", referencedColumnName = "id")
     private Achievement achievement;
 
+    /**
+     * The stored filename of the image in the storage system.
+     */
     @Column(name = "imageName", nullable = false)
     private String imageName;
 
+    /**
+     * The original filename of the uploaded image as provided by the user.
+     */
     @Column(name = "originalImageName", nullable = false)
     private String originalImageName;
 
+    /**
+     * The MIME content type of the image (e.g., image/jpeg, image/png).
+     */
     @Column(name = "contentType")
     private String contentType;
 
+    /**
+     * The binary data of the image. Currently stored as transient and not persisted to database.
+     * Image data is stored externally and accessed via mediaUrl.
+     */
     // @Lob
     // @Column(name = "imageData")
     @Transient
     private byte[] imageData;
 
+    /**
+     * The URL where the image can be accessed from external storage.
+     */
     @Column(name = "mediaUrl")
     private String mediaUrl;
 
+    /**
+     * The timestamp when the image was uploaded to the system.
+     */
     @Column(name = "uploadTimestamp", nullable = false)
     private LocalDateTime uploadTimestamp;
 

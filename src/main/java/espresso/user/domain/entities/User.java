@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import espresso.common.domain.models.DomainEntity;
 import espresso.common.domain.support.KeyGenerator;
 import espresso.common.domain.support.NameGenerator;
@@ -20,8 +21,8 @@ import espresso.common.domain.support.PasswordService;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-@AllArgsConstructor
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@SuperBuilder
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 @Entity(name = "User")
 @Table(name = "Users", indexes = {
         @Index(name = "idx_user_id_pkey", columnList = "id", unique = true),
@@ -43,24 +44,16 @@ public class User extends DomainEntity {
     private String firstName;
     private String lastName;
     private LocalDate birthDate;
-    // private String profilePictureUrl;
 
     @JsonManagedReference
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profileImageId", referencedColumnName = "id")
     private UserProfileImage profileImage;
 
-    // @JsonBackReference
-    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    // private List<Achievement> achievements;
-
-    private boolean emailVerified;
-    private boolean ageVerified;
-    private boolean phoneVerified;
-    private boolean addressVerified;
-
-    private boolean active;
-    private OffsetDateTime registeredAt;
+    private boolean emailVerified = false;
+    private boolean ageVerified = false;
+    private boolean phoneVerified = false;
+    private boolean addressVerified = false;
 
     public static User create(String username, String email, String password, String firstName, String lastName,
             LocalDate birthDate) {
@@ -74,10 +67,6 @@ public class User extends DomainEntity {
         entity.setFirstName(firstName);
         entity.setLastName(lastName);
         entity.setBirthDate(birthDate);
-
-        entity.registeredAt = OffsetDateTime.now(ZoneOffset.UTC);
-        entity.active = true;
-        entity.emailVerified = false;
 
         return entity;
     }
@@ -97,13 +86,6 @@ public class User extends DomainEntity {
         entity.setUsername(username);
         entity.setEmail(email);
         entity.setPasswordHash(PasswordService.hashPassword(password));
-
-        entity.registeredAt = OffsetDateTime.now(ZoneOffset.UTC);
-        entity.active = true;
-        entity.emailVerified = false;
-        entity.ageVerified = false;
-        entity.phoneVerified = false;
-        entity.addressVerified = false;
 
         String randomName = NameGenerator.generateProfileName();
 
@@ -166,4 +148,15 @@ public class User extends DomainEntity {
         this.passwordHash = PasswordService.hashPassword(newPassword);
     }
 
+    /**
+     * Creates a User entity from a UserKto (Data Transfer Object)
+     * 
+     * @param kto
+     */
+    public static User fromKto(UserKto kto) {
+        return User.builder()
+            .id(kto.getId())
+            .entityKey(kto.getEntityKey())
+            .build();
+    }
 }
