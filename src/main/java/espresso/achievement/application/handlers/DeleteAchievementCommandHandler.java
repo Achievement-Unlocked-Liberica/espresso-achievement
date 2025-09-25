@@ -13,11 +13,15 @@ import espresso.achievement.domain.entities.Achievement;
 import espresso.common.application.handlers.CommonCommandHandler;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+import espresso.achievement.domain.operational.exceptionPolicy.AchievementHandlerExceptionPolicy;
+
+import lombok.extern.slf4j.Slf4j;
 // Validation centralized in CommonCommandHandler
 
 /**
  * Handles the command to delete an existing achievement.
  */
+@Slf4j
 @Service
 public class DeleteAchievementCommandHandler extends CommonCommandHandler implements IDeleteAchievementCommandHandler {
 
@@ -26,6 +30,12 @@ public class DeleteAchievementCommandHandler extends CommonCommandHandler implem
 
     @Autowired
     private IUserRepository userRepository;
+
+    /**
+     * Centralized exception handling policy.
+     */
+    @Autowired
+    private AchievementHandlerExceptionPolicy exceptionPolicy;
 
     // validator provided by base class
 
@@ -79,7 +89,7 @@ public class DeleteAchievementCommandHandler extends CommonCommandHandler implem
             return HandlerResponse.success(null);
 
         } catch (Exception ex) {
-            return HandlerResponse.error("LOCALIZE: " + ex.getMessage().toUpperCase(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "delete achievement");
         }
     }
 }

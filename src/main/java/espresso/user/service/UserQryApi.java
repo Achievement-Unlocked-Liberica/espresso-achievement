@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import espresso.ApiMessageHelper;
 import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonQryApi;
 import espresso.common.service.operational.ApiLogger;
@@ -27,6 +28,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/api/qry/user")
 @Tag(name = "Users Query API", description = "Query API for Users")
 public class UserQryApi extends CommonQryApi {
+
+    public UserQryApi(ApiMessageHelper messageHelper) {
+        super(messageHelper);
+    }
 
     @Autowired
     private IUserQueryHandler usersQueryHandler;

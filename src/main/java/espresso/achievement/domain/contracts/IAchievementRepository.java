@@ -12,7 +12,7 @@ import espresso.achievement.domain.entities.Achievement;
  */
 public interface IAchievementRepository {
 
-    // Command operations (from IAchievementCmdRepository)
+    // Command operations
     /**
      * Saves a new achievement to the repository.
      * 
@@ -40,7 +40,7 @@ public interface IAchievementRepository {
      */
     void deleteWithDependencies(Achievement achievement);
 
-    // Query operations (from IAchievementQryRepository)
+    // Query operations
     /**
      * Gets the latest achievements ordered by completion date (newest first)
      * @param <T> The type of the DTO to project to (e.g., AchievementDtoSm.class)

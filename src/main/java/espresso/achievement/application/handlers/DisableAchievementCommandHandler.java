@@ -13,11 +13,15 @@ import espresso.achievement.domain.entities.Achievement;
 import espresso.common.application.handlers.CommonCommandHandler;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+import espresso.achievement.domain.operational.exceptionPolicy.AchievementHandlerExceptionPolicy;
+
+import lombok.extern.slf4j.Slf4j;
 // Validation centralized in CommonCommandHandler
 
 /**
  * Handles the command to disable an existing achievement.
  */
+@Slf4j
 @Service
 public class DisableAchievementCommandHandler extends CommonCommandHandler
         implements IDisableAchievementCommandHandler {
@@ -27,6 +31,12 @@ public class DisableAchievementCommandHandler extends CommonCommandHandler
 
     @Autowired
     private IUserRepository userRepository;
+
+    /**
+     * Centralized exception handling policy.
+     */
+    @Autowired
+    private AchievementHandlerExceptionPolicy exceptionPolicy;
 
     // validator provided by base class
 
@@ -85,7 +95,7 @@ public class DisableAchievementCommandHandler extends CommonCommandHandler
             return HandlerResponse.success(disabledAchievement);
 
         } catch (Exception ex) {
-            return HandlerResponse.error("LOCALIZE: " + ex.getMessage().toUpperCase(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "disable achievement");
         }
     }
 }

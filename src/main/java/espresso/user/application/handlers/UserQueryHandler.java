@@ -16,12 +16,16 @@ import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.UserDtoLg;
 import espresso.user.domain.entities.UserDtoMd;
 import espresso.user.domain.entities.UserDtoSm;
+import espresso.user.domain.operational.exceptionPolicy.UserHandlerExceptionPolicy;
 
 @Service
 public class UserQueryHandler extends CommonQueryHandler implements IUserQueryHandler {
 
     @Autowired
     private IUserRepository userRepository;
+    
+    @Autowired
+    private UserHandlerExceptionPolicy exceptionPolicy;
 
     @Override
     public HandlerResponse<Object> handle(GetUserByKeyQuery qry) {
@@ -44,7 +48,7 @@ public class UserQueryHandler extends CommonQueryHandler implements IUserQueryHa
             return response;
 
         } catch (Exception ex) {
-            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "get user by key");
         }
     }
 
@@ -62,7 +66,7 @@ public class UserQueryHandler extends CommonQueryHandler implements IUserQueryHa
             return HandlerResponse.success(usernameExists);
 
         } catch (Exception ex) {
-            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "check username exists");
         }
     }
 
@@ -80,7 +84,7 @@ public class UserQueryHandler extends CommonQueryHandler implements IUserQueryHa
             return HandlerResponse.success(emailExists);
 
         } catch (Exception ex) {
-            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "check email exists");
         }
     }
 
@@ -100,7 +104,7 @@ public class UserQueryHandler extends CommonQueryHandler implements IUserQueryHa
                     : HandlerResponse.error("User not found", ResponseType.NOT_FOUND);
 
         } catch (Exception ex) {
-            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "get my user");
         }
     }
 

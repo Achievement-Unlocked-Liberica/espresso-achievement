@@ -14,6 +14,7 @@ import espresso.security.domain.entities.JWTAuthToken;
 import espresso.security.domain.entities.JWTUserToken;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
+import espresso.security.domain.operational.exceptionPolicy.SecurityHandlerExceptionPolicy;
 
 /**
  * Command handler for user authentication and credential validation.
@@ -30,6 +31,12 @@ public class CredentialsCommandHandler extends CommonCommandHandler implements I
      */
     @Autowired
     private IUserRepository userRepository;
+    
+    /**
+     * Exception policy for centralized security exception handling.
+     */
+    @Autowired
+    private SecurityHandlerExceptionPolicy exceptionPolicy;
 
     // validator provided by base class
 
@@ -84,7 +91,7 @@ public class CredentialsCommandHandler extends CommonCommandHandler implements I
             return HandlerResponse.success(jwtToken);
 
         } catch (Exception ex) {
-            return HandlerResponse.error("LOCALIZE: AUTHENTICATION FAILED - " + ex.getMessage(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "authenticate user credentials");
         }
     }
 

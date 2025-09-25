@@ -6,11 +6,16 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Limit;
 import org.springframework.stereotype.Component;
 
 import espresso.achievement.domain.contracts.IAchievementRepository;
 import espresso.achievement.domain.entities.Achievement;
+import espresso.achievement.domain.operational.exceptionPolicy.AchievementException;
+import espresso.achievement.domain.operational.validationPolicy.AchievementValidator;
 
 /**
  * Primary implementation of the Achievement repository interface.
@@ -34,24 +39,24 @@ public class AchievementRepository implements IAchievementRepository {
     @Autowired
     AchievementPSQLProvider achievementPSQLProvider;
 
-
-
-    // Command operations (from AchievementCmdRepository)
+    // Command operations
     @Override
     public Achievement save(Achievement achievement) {
         try {
-            if (achievement == null) {
-                throw new IllegalArgumentException("The achievement is null");
-            }
+            AchievementValidator.validateForPersistence(achievement);
 
             Achievement entity = this.achievementPSQLProvider.save(achievement);
-
             return entity;
 
-        } catch (Exception e) {
-            e.printStackTrace();
-
+        } catch (AchievementException e) {
+            // Re-throw domain exceptions as-is
             throw e;
+        } catch (DataIntegrityViolationException e) {
+            throw AchievementException.creationFailed("Achievement with this key already exists");
+        } catch (DataAccessException e) {
+            throw AchievementException.creationFailed("Database error during achievement save operation");
+        } catch (Exception e) {
+            throw AchievementException.creationFailed("Unexpected error occurred while saving achievement");
         }
     }
 
@@ -61,15 +66,31 @@ public class AchievementRepository implements IAchievementRepository {
      * 
      * @param achievement The achievement entity to update
      * @return The updated Achievement entity
-     * @throws IllegalArgumentException if the achievement is null
-     * @throws RuntimeException if there's an error during the update operation
+     * @throws AchievementException if the achievement is null or update fails
      */
     @Override
     public Achievement update(Achievement achievement) {
-        // Use the PSQL provider's update method (leverages JPA save for updates)
-        Achievement updatedEntity = this.achievementPSQLProvider.updateAchievement(achievement);
+        try {
+            AchievementValidator.validateForUpdate(achievement);
 
-        return updatedEntity;
+            Achievement updatedEntity = this.achievementPSQLProvider.updateAchievement(achievement);
+            return updatedEntity;
+
+        } catch (AchievementException e) {
+            // Re-throw domain exceptions as-is
+            throw e;
+        } catch (EmptyResultDataAccessException e) {
+            throw AchievementException.notFound(achievement.getEntityKey());
+        } catch (DataIntegrityViolationException e) {
+            throw AchievementException.updateFailed(achievement.getEntityKey(), "Data integrity violation");
+        } catch (DataAccessException e) {
+            throw AchievementException.updateFailed(achievement.getEntityKey(), "Database error during update operation");
+        } catch (Exception e) {
+            throw AchievementException.updateFailed(
+                achievement != null ? achievement.getEntityKey() : "unknown", 
+                "Unexpected error occurred during update"
+            );
+        }
     }
 
     /**
@@ -78,50 +99,78 @@ public class AchievementRepository implements IAchievementRepository {
      * Uses database transactions to ensure atomicity of the entire deletion process.
      * 
      * @param achievement The achievement entity to delete along with its dependencies
-     * @throws IllegalArgumentException if the achievement is null
-     * @throws RuntimeException if there's an error during the deletion process
+     * @throws AchievementException if the achievement is null or deletion fails
      */
     @Override
     public void deleteWithDependencies(Achievement achievement) {
         try {
-            if (achievement == null) {
-                throw new IllegalArgumentException("The achievement is null");
-            }
+            AchievementValidator.validateForDeletion(achievement);
 
             // Forward to PSQL provider to delete the achievement and all associated data in proper dependency order
             this.achievementPSQLProvider.deleteAchievementWithDependencies(achievement);
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (AchievementException e) {
+            // Re-throw domain exceptions as-is
             throw e;
+        } catch (EmptyResultDataAccessException e) {
+            throw AchievementException.notFound(achievement.getEntityKey());
+        } catch (DataIntegrityViolationException e) {
+            throw AchievementException.updateFailed(achievement.getEntityKey(), "Cannot delete achievement due to foreign key constraints");
+        } catch (DataAccessException e) {
+            throw AchievementException.updateFailed(achievement.getEntityKey(), "Database error during deletion operation");
+        } catch (Exception e) {
+            throw AchievementException.updateFailed(
+                achievement != null ? achievement.getEntityKey() : "unknown", 
+                "Unexpected error occurred during deletion"
+            );
         }
     }
 
-    // Query operations (from AchievementQryRepository)
+    // Query operations
     @Override
     public <T> List<T> getLatestAchievements(Class<T> dtoType, Integer limit, OffsetDateTime fromDate) {
-        List<T> entities;
+        try {
+            AchievementValidator.validateDtoType(dtoType);
+            limit = AchievementValidator.validateAndNormalizeLimit(limit);
 
-        if (limit == null || limit <= 0) {
-            limit = queryDefaultPageSize; // Default limit
+            // If fromDate is null, get all latest achievements
+            // If fromDate is provided, filter achievements from that date
+            // This allows for pagination and filtering based on date
+            List<T> entities = fromDate == null
+                    ? achievementPSQLProvider.findLatestAchievements(dtoType, Limit.of(limit))
+                    : achievementPSQLProvider.findLatestAchievements(dtoType, Limit.of(limit), fromDate);
+
+            return entities;
+
+        } catch (AchievementException e) {
+            // Re-throw domain exceptions as-is
+            throw e;
+        } catch (DataAccessException e) {
+            throw AchievementException.creationFailed("Database error while retrieving latest achievements");
+        } catch (Exception e) {
+            throw AchievementException.creationFailed("Unexpected error occurred while retrieving latest achievements");
         }
-
-        // If fromDate is null, get all latest achievements
-        // If fromDate is provided, filter achievements from that date
-        // This allows for pagination and filtering based on date
-        entities = fromDate == null
-                ? achievementPSQLProvider.findLatestAchievements(dtoType, Limit.of(limit))
-                : achievementPSQLProvider.findLatestAchievements(dtoType, Limit.of(limit), fromDate);
-
-        return entities;
     }
 
     @Override
     public <T> T getAchievementByKey(Class<T> dtoType, String entityKey) {
-        T entity;
+        try {
+            AchievementValidator.validateDtoType(dtoType);
+            AchievementValidator.validateEntityKey(entityKey);
 
-        entity = achievementPSQLProvider.findAchievementByKey(dtoType, entityKey);
+            T entity = achievementPSQLProvider.findAchievementByKey(dtoType, entityKey);
+            
+            AchievementValidator.validateQueryResult(entity, entityKey);
+            
+            return entity;
 
-        return entity;
+        } catch (AchievementException e) {
+            // Re-throw domain exceptions as-is
+            throw e;
+        } catch (DataAccessException e) {
+            throw AchievementException.creationFailed("Database error while retrieving achievement by key: " + entityKey);
+        } catch (Exception e) {
+            throw AchievementException.creationFailed("Unexpected error occurred while retrieving achievement by key: " + entityKey);
+        }
     }
 }

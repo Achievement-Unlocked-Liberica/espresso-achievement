@@ -9,6 +9,7 @@ import espresso.security.domain.commands.RegisterUserCommand;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
 import espresso.common.application.handlers.CommonCommandHandler;
+import espresso.security.domain.operational.exceptionPolicy.SecurityHandlerExceptionPolicy;
 // Validation centralized in CommonCommandHandler
 
 /**
@@ -26,6 +27,12 @@ public class RegisterUserCommandHandler extends CommonCommandHandler {
      */
     @Autowired
     private IUserRepository userRepository;
+    
+    /**
+     * Exception policy for centralized security exception handling.
+     */
+    @Autowired
+    private SecurityHandlerExceptionPolicy exceptionPolicy;
 
     // validator provided by base class
 
@@ -68,7 +75,7 @@ public class RegisterUserCommandHandler extends CommonCommandHandler {
             return HandlerResponse.success(savedUser);
 
         } catch (Exception ex) {
-            return HandlerResponse.error("LOCALIZE: USER REGISTRATION FAILED - " + ex.getMessage(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "register user");
         }
     }
 }

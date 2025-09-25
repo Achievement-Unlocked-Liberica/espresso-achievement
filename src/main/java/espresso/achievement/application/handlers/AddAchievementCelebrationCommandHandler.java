@@ -15,11 +15,15 @@ import espresso.achievement.domain.entities.Achievement;
 import espresso.common.application.handlers.CommonCommandHandler;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+import espresso.achievement.domain.operational.exceptionPolicy.AchievementHandlerExceptionPolicy;
+
+import lombok.extern.slf4j.Slf4j;
 // Validation centralized in CommonCommandHandler
 
 /**
  * Handles the command to add a celebration to an existing achievement.
  */
+@Slf4j
 @Service
 public class AddAchievementCelebrationCommandHandler extends CommonCommandHandler
         implements IAddAchievementCelebrationCommandHandler {
@@ -32,6 +36,12 @@ public class AddAchievementCelebrationCommandHandler extends CommonCommandHandle
 
     @Autowired
     private IAchievementCelebrationRepository celebrationRepository;
+
+    /**
+     * Centralized exception handling policy.
+     */
+    @Autowired
+    private AchievementHandlerExceptionPolicy exceptionPolicy;
 
     /**
      * Handles the command to add a celebration to an existing achievement.
@@ -84,7 +94,7 @@ public class AddAchievementCelebrationCommandHandler extends CommonCommandHandle
             return HandlerResponse.success(savedCelebration);
 
         } catch (Exception ex) {
-            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "add celebration to achievement");
         }
     }
 }

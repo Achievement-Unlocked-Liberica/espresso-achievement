@@ -16,6 +16,7 @@ import espresso.user.domain.contracts.IUserProfilePictureRepository;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
 import espresso.user.domain.entities.UserProfileImage;
+import espresso.user.domain.operational.exceptionPolicy.UserHandlerExceptionPolicy;
 
 @Service
 public class UserCommandHandler extends CommonCommandHandler implements IUserCommandHandler {
@@ -25,6 +26,9 @@ public class UserCommandHandler extends CommonCommandHandler implements IUserCom
 
     @Autowired
     private IUserProfilePictureRepository userProfileImageRepository;
+    
+    @Autowired
+    private UserHandlerExceptionPolicy exceptionPolicy;
 
     // validator provided by base class
 
@@ -61,7 +65,7 @@ public class UserCommandHandler extends CommonCommandHandler implements IUserCom
             return HandlerResponse.created(savedEntity);
 
         } catch (Exception ex) {
-            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "add user");
         }
     }
 
@@ -102,7 +106,7 @@ public class UserCommandHandler extends CommonCommandHandler implements IUserCom
 
             return HandlerResponse.success(savedEntity);
         } catch (Exception ex) {
-            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "update profile picture");
         }
     }
 

@@ -7,11 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 
 import espresso.achievement.domain.entities.AchievementMedia;
+import espresso.achievement.domain.operational.exceptionPolicy.AchievementException;
+import espresso.achievement.domain.operational.validationPolicy.AchievementValidator;
 
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 
@@ -23,9 +26,10 @@ public class AchievementMediaS3Provider {
     @Value("${digitalocean.spaces.bucketName}")
     private String bucketName;
 
-    public String uploadImage(String basePath, AchievementMedia achievementMedia) throws IOException {
-
+    public String uploadImage(String basePath, AchievementMedia achievementMedia) {
         try {
+            AchievementValidator.validateAchievementMediaForUpload(achievementMedia);
+
             // Build the path for the achievement media
             String imagePath = basePath + "/" + achievementMedia.getImageName();
 
@@ -36,14 +40,19 @@ public class AchievementMediaS3Provider {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(achievementMedia.getImageData());
 
             PutObjectRequest putRequest = new PutObjectRequest(bucketName, imagePath, inputStream, meta);
-
             putRequest.setCannedAcl(CannedAccessControlList.PublicRead);
 
             s3Client.putObject(putRequest);
 
             return s3Client.getUrl(bucketName, imagePath).toString();
+
+        } catch (AchievementException e) {
+            // Re-throw domain exceptions as-is
+            throw e;
+        } catch (AmazonServiceException e) {
+            throw AchievementException.mediaProcessingFailed("image", "AWS S3 service error: " + e.getErrorMessage());
         } catch (Exception e) {
-            throw new IOException("Error uploading achievement media to S3: " + e.getMessage(), e);
+            throw AchievementException.mediaProcessingFailed("image", "Unexpected error during S3 upload: " + e.getMessage());
         }
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import espresso.ApiMessageHelper;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonCmdApi;
@@ -26,6 +27,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/api/cmd/user")
 @Tag(name = "User Command API", description = "API for handling User commands.")
 public class UserCmdApi extends CommonCmdApi {
+
+    public UserCmdApi(ApiMessageHelper messageHelper) {
+        super(messageHelper);
+    }
 
     @Autowired
     private IUserCommandHandler userCommandHandler;

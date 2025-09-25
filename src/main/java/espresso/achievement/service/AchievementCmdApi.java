@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import espresso.ApiMessageHelper;
 import espresso.achievement.domain.commands.AddAchievementCelebrationCommand;
 import espresso.achievement.domain.commands.AddAchievementCommentCommand;
 import espresso.achievement.domain.commands.CreateAchivementCommand;
@@ -44,6 +45,10 @@ import espresso.common.service.operational.ApiLogger;
 @RequestMapping("/api/cmd/achievement")
 @Tag(name = "Achievement Command API", description = "API for handling Achievement commands.")
 public class AchievementCmdApi extends CommonCmdApi {
+
+	public AchievementCmdApi(ApiMessageHelper messageHelper) {
+		super(messageHelper);
+	}
 
 	/**
 	 * Handler for processing achievement creation commands.

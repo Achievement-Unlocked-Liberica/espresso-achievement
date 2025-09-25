@@ -15,11 +15,15 @@ import espresso.achievement.domain.entities.Achievement;
 import espresso.common.application.handlers.CommonCommandHandler;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+import espresso.achievement.domain.operational.exceptionPolicy.AchievementHandlerExceptionPolicy;
+
+import lombok.extern.slf4j.Slf4j;
 // Validation centralized in CommonCommandHandler
 
 /**
  * Handles the command to add a new comment to an achievement.
  */
+@Slf4j
 @Service
 public class AddAchievementCommentCommandHandler extends CommonCommandHandler
         implements IAddAchievementCommentCommandHandler {
@@ -32,6 +36,12 @@ public class AddAchievementCommentCommandHandler extends CommonCommandHandler
 
     @Autowired
     private IAchievementCommentRepository achievementCommentRepository;
+
+    /**
+     * Centralized exception handling policy.
+     */
+    @Autowired
+    private AchievementHandlerExceptionPolicy exceptionPolicy;
 
     // validator provided by base class
 
@@ -83,7 +93,7 @@ public class AddAchievementCommentCommandHandler extends CommonCommandHandler
             return HandlerResponse.created(savedComment);
 
         } catch (Exception ex) {
-            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "add comment to achievement");
         }
     }
 }

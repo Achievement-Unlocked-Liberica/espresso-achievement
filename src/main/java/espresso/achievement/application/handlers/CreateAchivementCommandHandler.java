@@ -16,6 +16,9 @@ import espresso.achievement.domain.entities.Achievement;
 import espresso.common.application.handlers.CommonCommandHandler;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+import espresso.achievement.domain.operational.exceptionPolicy.AchievementHandlerExceptionPolicy;
+
+import lombok.extern.slf4j.Slf4j;
 // Validation centralized in CommonCommandHandler
 
 /**
@@ -26,6 +29,7 @@ import espresso.common.domain.responses.ResponseType;
  * The handler also includes placeholder logic for content safety verification of the achievement
  * title and description using AI services.
  */
+@Slf4j
 @Service
 public class CreateAchivementCommandHandler extends CommonCommandHandler implements ICreateAchivementCommandHandler {
 
@@ -46,6 +50,12 @@ public class CreateAchivementCommandHandler extends CommonCommandHandler impleme
      */
     @Autowired
     private IContentSafetyAIService contentSafetyAIService;
+
+    /**
+     * Centralized exception handling policy.
+     */
+    @Autowired
+    private AchievementHandlerExceptionPolicy exceptionPolicy;
 
     /**
      * Processes the achievement creation command.
@@ -87,7 +97,7 @@ public class CreateAchivementCommandHandler extends CommonCommandHandler impleme
             return HandlerResponse.created(savedEntity);
 
         } catch (Exception ex) {
-            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "create achievement");
         }
     }
 }

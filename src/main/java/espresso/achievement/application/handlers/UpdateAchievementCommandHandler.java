@@ -15,11 +15,15 @@ import espresso.achievement.domain.entities.Achievement;
 import espresso.common.application.handlers.CommonCommandHandler;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+import espresso.achievement.domain.operational.exceptionPolicy.AchievementHandlerExceptionPolicy;
+
+import lombok.extern.slf4j.Slf4j;
 // Validation now handled by CommonCommandHandler
 
 /**
  * Handles the command to update an existing achievement.
  */
+@Slf4j
 @Service
 public class UpdateAchievementCommandHandler extends CommonCommandHandler implements IUpdateAchievementCommandHandler {
 
@@ -28,6 +32,12 @@ public class UpdateAchievementCommandHandler extends CommonCommandHandler implem
 
     @Autowired
     private IUserRepository userRepository;
+
+    /**
+     * Centralized exception handling policy.
+     */
+    @Autowired
+    private AchievementHandlerExceptionPolicy exceptionPolicy;
 
     // validator provided by base class
 
@@ -89,7 +99,7 @@ public class UpdateAchievementCommandHandler extends CommonCommandHandler implem
             return HandlerResponse.success(updatedAchievement);
 
         } catch (Exception ex) {
-            return HandlerResponse.error("LOCALIZE: " + ex.getMessage().toUpperCase(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "update achievement");
         }
     }
 }

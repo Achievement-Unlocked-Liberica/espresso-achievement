@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.Builder.Default;
 import lombok.experimental.SuperBuilder;
 import espresso.common.domain.models.DomainEntity;
 import espresso.common.domain.support.KeyGenerator;
@@ -86,21 +87,25 @@ public class User extends DomainEntity {
     /**
      * Indicates whether the user's email address has been verified.
      */
+    @Default
     private boolean emailVerified = false;
     
     /**
      * Indicates whether the user's age has been verified.
      */
+    @Default
     private boolean ageVerified = false;
     
     /**
      * Indicates whether the user's phone number has been verified.
      */
+    @Default
     private boolean phoneVerified = false;
     
     /**
      * Indicates whether the user's address has been verified.
      */
+    @Default
     private boolean addressVerified = false;
 
     /**

@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.Builder.Default;
 import lombok.experimental.SuperBuilder;
 
 /**
@@ -66,6 +67,7 @@ public abstract class DomainEntity {
      * When false, entity is excluded from normal operations without deletion.
      */
     @Column(name = "enabled", nullable = false, columnDefinition = "boolean default true")
+    @Default
     private boolean enabled = true;
 
     /**
@@ -73,6 +75,7 @@ public abstract class DomainEntity {
      * Used for soft deletion and lifecycle management.
      */
     @Column(name = "active", nullable = false, columnDefinition = "boolean default true")
+    @Default
     private boolean active = true;
 
     /**

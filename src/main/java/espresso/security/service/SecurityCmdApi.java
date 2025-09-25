@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import espresso.ApiMessageHelper;
 import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonCmdApi;
 import espresso.common.service.operational.ApiLogger;
@@ -21,6 +22,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/api/cmd/security")
 @Tag(name = "Security Command API", description = "API for handling authentication and authorization commands.")
 public class SecurityCmdApi extends CommonCmdApi {
+
+    public SecurityCmdApi(ApiMessageHelper messageHelper) {
+        super(messageHelper);
+    }
 
     @Autowired
     private ISecurityCommandHandler securityCommandHandler;

@@ -1,6 +1,5 @@
 package espresso.achievement.application.handlers;
 
-import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,11 +17,15 @@ import espresso.achievement.domain.entities.AchievementMedia;
 import espresso.common.application.handlers.CommonCommandHandler;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+import espresso.achievement.domain.operational.exceptionPolicy.AchievementHandlerExceptionPolicy;
+
+import lombok.extern.slf4j.Slf4j;
 // Validation centralized in CommonCommandHandler
 
 /**
  * Handles the upload of media files for an achievement.
  */
+@Slf4j
 @Service
 public class UploadAchievementMediaCommandHandler extends CommonCommandHandler
         implements IUploadAchievementMediaCommandHandler {
@@ -38,6 +41,12 @@ public class UploadAchievementMediaCommandHandler extends CommonCommandHandler
 
     @Autowired
     private IContentSafetyAIService contentSafetyAIService;
+
+    /**
+     * Centralized exception handling policy.
+     */
+    @Autowired
+    private AchievementHandlerExceptionPolicy exceptionPolicy;
 
     public HandlerResponse<Object> handle(UploadAchievementMediaCommand cmd) {
         try {
@@ -96,7 +105,7 @@ public class UploadAchievementMediaCommandHandler extends CommonCommandHandler
             return HandlerResponse.created(achievement.getMedia());
 
         } catch (Exception ex) {
-            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "upload media to achievement");
         }
     }
 }
