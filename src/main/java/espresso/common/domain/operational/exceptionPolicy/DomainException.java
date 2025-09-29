@@ -1,5 +1,6 @@
 package espresso.common.domain.operational.exceptionPolicy;
 
+import espresso.common.infrastructure.correlation.CorrelationContext;
 import lombok.Getter;
 
 /**
@@ -41,6 +42,12 @@ public abstract class DomainException extends RuntimeException {
     private final String errorCode;
     
     /**
+     * Correlation ID for tracing the exception across distributed system calls.
+     * Automatically populated from the current request context when the exception is created.
+     */
+    private final String correlationId;
+    
+    /**
      * Constructor for creating domain exceptions with full error context.
      *
      * @param messageKey The localization key for the error message
@@ -54,6 +61,7 @@ public abstract class DomainException extends RuntimeException {
         this.messageArgs = messageArgs != null ? messageArgs : new Object[0];
         this.scenario = scenario;
         this.errorCode = errorCode;
+        this.correlationId = CorrelationContext.getCorrelationId(); // Auto-populate from context
     }
     
     /**

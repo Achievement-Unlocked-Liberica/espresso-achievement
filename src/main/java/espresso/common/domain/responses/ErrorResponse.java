@@ -34,6 +34,11 @@ public class ErrorResponse {
     private String operationContext;
     
     /**
+     * Correlation ID for tracing the error across distributed system calls.
+     */
+    private String correlationId;
+    
+    /**
      * Timestamp when the error occurred.
      */
     private OffsetDateTime timestamp;

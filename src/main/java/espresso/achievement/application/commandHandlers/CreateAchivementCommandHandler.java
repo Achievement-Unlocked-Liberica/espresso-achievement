@@ -1,7 +1,6 @@
-package espresso.achievement.application.handlers;
+package espresso.achievement.application.commandHandlers;
 
 import java.util.Arrays;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,9 +46,9 @@ public class CreateAchivementCommandHandler extends CommonCommandHandler impleme
 
     /**
      * Service for content safety verification using AI.
-     */
-    @Autowired
-    private IContentSafetyAIService contentSafetyAIService;
+     */    
+    // @Autowired
+    // private IContentSafetyAIService contentSafetyAIService;
 
     /**
      * Centralized exception handling policy.
@@ -81,7 +80,7 @@ public class CreateAchivementCommandHandler extends CommonCommandHandler impleme
                 return HandlerResponse.error("User not found", ResponseType.NOT_FOUND);
             }
 
-            Achievement entity = Achievement.create(
+            Achievement achievement = Achievement.create(
                     cmd.getTitle(),
                     cmd.getDescription(),
                     cmd.getCompletedDate(),
@@ -89,12 +88,12 @@ public class CreateAchivementCommandHandler extends CommonCommandHandler impleme
                     User.fromKto(userKto),
                     Arrays.asList(cmd.getSkills()));
 
-            Achievement savedEntity = achievementRepository.save(entity);
+            Achievement savedAchievement = achievementRepository.save(achievement);
 
             // We don't need to call 'publish events' explicitly,
             // the JPA call to save the entity will take care of the event publishing
 
-            return HandlerResponse.created(savedEntity);
+            return HandlerResponse.created(savedAchievement.toKto());
 
         } catch (Exception ex) {
             return exceptionPolicy.handleException(ex, "create achievement");

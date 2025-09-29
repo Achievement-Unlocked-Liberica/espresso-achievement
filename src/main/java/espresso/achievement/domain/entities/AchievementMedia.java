@@ -143,4 +143,23 @@ public class AchievementMedia extends ValueEntity {
         return media;
     }
 
+
+    public AchievementMediaKto toKto(){
+        return new AchievementMediaKto() {
+            @Override
+            public Long getId() {
+                return AchievementMedia.this.getId();
+            }
+            
+            @Override
+            public String getImageKey() {
+                return AchievementMedia.this.getImageKey();
+            }
+
+            @Override
+            public String getMediaUrl(){
+                return AchievementMedia.this.getMediaUrl();
+            }
+        };
+    }
 }

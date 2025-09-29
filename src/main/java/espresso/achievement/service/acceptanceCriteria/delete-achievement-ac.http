@@ -1,0 +1,70 @@
+### Variables for Delete Achievement Tests
+@baseUrl = http://localhost:8080
+@jwtToken = YOUR_JWT_TOKEN_HERE
+@validUserKey = ABC1234
+@invalidUserKey = XYZ9999
+@validAchievementKey = 8NctRKY
+@nonExistentAchievementKey = MISSING
+@otherUserAchievementKey = OTHER123
+
+### AC1: Successful Achievement Deletion
+# Tests: Valid JWT token, user owns achievement, achievement exists
+# Expected: HTTP 200 OK with entity key response
+DELETE {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC2: Achievement Not Found (No Content Response)
+# Tests: Valid user but achievement doesn't exist
+# Expected: HTTP 204 No Content
+DELETE {{baseUrl}}/api/cmd/achievement/{{nonExistentAchievementKey}}
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC3.1: Missing JWT Token
+# Tests: Authentication failure - no JWT token provided
+# Expected: HTTP 401 Unauthorized
+DELETE {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}
+X-API-Version: 1.0
+
+### AC3.2: Invalid or Expired JWT Token
+# Tests: Authentication failure - invalid JWT token
+# Expected: HTTP 401 Unauthorized
+DELETE {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}
+Authorization: Bearer INVALID_TOKEN_HERE
+X-API-Version: 1.0
+
+### AC4: User Not Found
+# Tests: Valid JWT but user doesn't exist in system
+# Expected: HTTP 404 Not Found with correlation ID
+DELETE {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC5: Unauthorized Access (Not Owner)
+# Tests: User doesn't own the achievement being deleted
+# Expected: HTTP 401 Unauthorized with correlation ID
+DELETE {{baseUrl}}/api/cmd/achievement/{{otherUserAchievementKey}}
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC - Test Cascade Deletion with Comments and Media
+# Tests: Achievement with associated comments and media files
+# Expected: HTTP 200 OK - all dependencies deleted in proper order
+DELETE {{baseUrl}}/api/cmd/achievement/ACHIEVE_WITH_DEPENDENCIES
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC - Invalid Achievement Key Format (Too Short)
+# Tests: Achievement key validation - less than 7 characters
+# Expected: HTTP 400 Bad Request with validation error
+DELETE {{baseUrl}}/api/cmd/achievement/SHORT
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC - Invalid Achievement Key Format (Too Long)
+# Tests: Achievement key validation - more than 7 characters
+# Expected: HTTP 400 Bad Request with validation error
+DELETE {{baseUrl}}/api/cmd/achievement/TOOLONG123
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0

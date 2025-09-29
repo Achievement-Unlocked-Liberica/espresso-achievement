@@ -1,4 +1,4 @@
-package espresso.achievement.application.handlers;
+package espresso.achievement.application.commandHandlers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -86,7 +86,7 @@ public class DeleteAchievementCommandHandler extends CommonCommandHandler implem
             achievementRepository.deleteWithDependencies(achievement);
 
             // Return success confirmation (HTTP 200 OK with no content data)
-            return HandlerResponse.success(null);
+            return HandlerResponse.success(achievement.toKto());
 
         } catch (Exception ex) {
             return exceptionPolicy.handleException(ex, "delete achievement");

@@ -269,6 +269,21 @@ public class Achievement extends DomainAggregate {
         this.raiseMediaAdded(media);
     }
 
+    // Converts this achievement to a DTO (Data Transfer Object) representation.
+    public AchievementKto toKto(){
+        return new AchievementKto() {
+            @Override
+            public Long getId() {
+                return Achievement.this.getId();
+            }
+            
+            @Override
+            public String getEntityKey() {
+                return Achievement.this.getEntityKey();
+            }
+        };
+    }
+
     // #region Domain Events
 
     private void raiseCommentAdded(AchievementComment comment) {

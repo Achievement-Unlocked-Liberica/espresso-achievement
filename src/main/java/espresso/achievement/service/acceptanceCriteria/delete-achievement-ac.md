@@ -3,114 +3,265 @@
 ## Feature: Delete Achievement Endpoint
 
 ### User Story
-As a player, I want to delete an achievement, so that I can permanently remove it and all associated data from the database.
+As a player, I want to delete my achievements, so that I can permanently remove them and all associated data from the database when they are no longer needed.
 
 ### Endpoint Details
 - **Method**: DELETE
-- **URL**: `/api/cmd/achievement/{key}`
-- **Authentication**: JWT token required
-- **Content-Type**: application/json
+- **URL**: `/api/cmd/achievement/{achievementKey}`
+- **Authentication**: JWT token required (userKey extracted automatically)
 - **API Version**: X-API-Version header required
 
 ## Acceptance Criteria
 
 ### AC1: Successful Achievement Deletion
-**Given** a valid JWT token and achievement key
-**And** the user owns the achievement
-**And** the achievement exists in the database
-**When** the DELETE request is made to `/api/cmd/achievement/{key}`
+**Given** a valid JWT token with userKey "ABC1234"
+**And** a user exists in the system with key "ABC1234"
+**And** an achievement exists with key "8NctRKY" owned by user "ABC1234"
+**When** the DELETE request is made to `/api/cmd/achievement/8NctRKY`
 **Then** the system should:
-- Delete all comments associated with the achievement
-- Delete all media files associated with the achievement  
-- Delete the achievement record itself
+- Extract userKey from JWT token (not from request body)
+- Extract achievementKey "8NctRKY" from URL path parameter
+- Validate command via CommonCommand.validateCommand()
+- Look up user by key "ABC1234" via IUserRepository.findByKey()
+- Retrieve achievement by key "8NctRKY" via IAchievementRepository.getAchievementByKey()
+- Verify user "ABC1234" owns the achievement via achievement.isCreator()
+- Call achievement.delete() to raise domain events before deletion
+- Delete achievement and dependencies via IAchievementRepository.deleteWithDependencies()
 - Return HTTP 200 OK
-- Return a success response confirming deletion
+- Return response with entity key:
+```json
+{
+  "success": true,
+  "data": {
+    "entityKey": "8NctRKY"
+  },
+  "responseType": "SUCCESS"
+}
+```
 
-### AC2: Achievement Doesn't Exist
-**Given** a valid JWT token and achievement key
-**And** the achievement does not exist in the database
-**When** the DELETE request is made to `/api/cmd/achievement/{key}`
+### AC2: Achievement Not Found (No Content Response)
+**Given** a valid JWT token with userKey "ABC1234"
+**And** a user exists with key "ABC1234"
+**And** no achievement exists with key "MISSING"
+**When** the DELETE request is made to `/api/cmd/achievement/MISSING`
 **Then** the system should:
+- Extract userKey from JWT token
+- Look up user successfully
+- Attempt achievement lookup via IAchievementRepository.getAchievementByKey("MISSING")
+- Find achievement is null
+- Return HandlerResponse.noContent()
 - Return HTTP 204 No Content
 - Take no action (no deletion performed)
 
-### AC3: Unauthorized User Access
-**Given** a valid JWT token and achievement key
-**And** the user does not own the achievement
-**When** the DELETE request is made to `/api/cmd/achievement/{key}`
-**Then** the system should:
-- Return HTTP 403 Forbidden
-- Return an error message indicating lack of authorization
-- Take no action (no deletion performed)
+### AC3: Authentication Failures
 
-### AC4: Invalid JWT Token
-**Given** an invalid or missing JWT token
-**When** the DELETE request is made to `/api/cmd/achievement/{key}`
+#### AC3.1: Missing JWT Token
+**Given** no JWT token is provided in the request
+**When** the DELETE request is made to `/api/cmd/achievement/8NctRKY`
 **Then** the system should:
 - Return HTTP 401 Unauthorized
-- Return an error message about authentication
+- Return authentication error message
 - Take no action (no deletion performed)
 
-### AC5: Invalid Achievement Key Format
-**Given** a valid JWT token
-**And** an achievement key that doesn't meet validation requirements (not exactly 7 characters)
-**When** the DELETE request is made to `/api/cmd/achievement/{key}`
+#### AC3.2: Invalid or Expired JWT Token
+**Given** an invalid or expired JWT token is provided
+**When** the DELETE request is made to `/api/cmd/achievement/8NctRKY`
 **Then** the system should:
-- Return HTTP 400 Bad Request
-- Return validation error messages
+- Return HTTP 401 Unauthorized
+- Return authentication error message
 - Take no action (no deletion performed)
 
-### AC6: User Not Found
-**Given** a JWT token with a userKey that doesn't exist in the system
-**When** the DELETE request is made to `/api/cmd/achievement/{key}`
+### AC4: User Not Found
+**Given** a valid JWT token with userKey "XYZ9999"
+**And** no user exists in the system with key "XYZ9999"
+**When** the DELETE request is made to `/api/cmd/achievement/8NctRKY`
 **Then** the system should:
+- Extract userKey from JWT token
+- Attempt user lookup via IUserRepository.findByKey("XYZ9999", UserKto.class)
+- Return HandlerResponse.error("User not found", ResponseType.NOT_FOUND)
 - Return HTTP 404 Not Found
-- Return an error message indicating user not found
+- Return error response with correlation ID:
+```json
+{
+  "success": false,
+  "error": "User not found",
+  "correlationId": "correlation-uuid-123",
+  "timestamp": "2025-09-26T10:30:00Z"
+}
+```
 - Take no action (no deletion performed)
 
-### AC7: Database Transaction Failure
-**Given** a valid request that should succeed
-**And** a database error occurs during the deletion process
-**When** the DELETE request is made to `/api/cmd/achievement/{key}`
+### AC5: Unauthorized Access (Not Owner)
+**Given** a valid JWT token with userKey "ABC1234"
+**And** a user exists with key "ABC1234"
+**And** an achievement exists with key "8NctRKY" owned by user "OTHER123"
+**When** the DELETE request is made to `/api/cmd/achievement/8NctRKY`
 **Then** the system should:
-- Return HTTP 500 Internal Server Error
-- Roll back any partial changes
-- Maintain data integrity
-- Return an appropriate error message
+- Extract userKey "ABC1234" from JWT token
+- Look up user "ABC1234" successfully
+- Retrieve achievement "8NctRKY" successfully
+- Check achievement.isCreator(User.fromKto(userKto)) returns false
+- Return HandlerResponse.error("LOCALIZE: USER IS NOT AUTHORIZED TO DELETE THIS ACHIEVEMENT", ResponseType.UNAUTHORIZED)
+- Return HTTP 401 Unauthorized
+- Return error response with correlation ID:
+```json
+{
+  "success": false,
+  "error": "LOCALIZE: USER IS NOT AUTHORIZED TO DELETE THIS ACHIEVEMENT",
+  "correlationId": "correlation-uuid-123",
+  "timestamp": "2025-09-26T10:30:00Z"
+}
+```
+- Take no action (no deletion performed)
 
-### AC8: Proper Deletion Order
-**Given** a valid deletion request
-**And** the achievement has associated comments and media
-**When** the DELETE operation is executed
+### AC6: JSR-303 Validation Failures
+
+#### AC6.1: Invalid Achievement Key Format
+**Given** a valid JWT token with userKey "ABC1234"
+**And** an achievement key "SHORT" that doesn't meet validation requirements
+**When** the DELETE request is made to `/api/cmd/achievement/SHORT`
 **Then** the system should:
-- Delete comments first (to maintain referential integrity)
-- Delete media files second (to maintain referential integrity)
-- Delete the achievement record last
-- Use database transactions to ensure atomicity
-- Ensure no foreign key constraint violations occur
+- Validate achievementKey via @Size(min = 7, max = 7) annotation
+- Return HTTP 400 Bad Request
+- Return validation error: "LOCALIZE: ACHIEVEMENT KEY MUST BE EXACTLY 7 CHARACTERS"
+- Take no action (no deletion performed)
+
+#### AC6.2: Invalid User Key Format  
+**Given** a JWT token with userKey "TOOLONG123" (10 characters)
+**When** the DELETE request is made to `/api/cmd/achievement/8NctRKY`
+**Then** the system should:
+- Validate userKey via @Size(min = 7, max = 7) annotation
+- Return HTTP 400 Bad Request
+- Return error: "LOCALIZE: ENTITY KEY MUST BE EXACTLY 7 CHARACTERS"
+- Take no action (no deletion performed)
+
+### AC7: Database and System Errors
+**Given** a valid deletion request that should succeed
+**And** a database error occurs during the deletion process
+**When** the DELETE request is made to `/api/cmd/achievement/8NctRKY`
+**Then** the system should:
+- Catch exception in AchievementHandlerExceptionPolicy.handleException()
+- Return HTTP 500 Internal Server Error
+- Return error response with correlation ID for traceability
+- Roll back any partial changes to maintain data integrity
+- Log error details with correlation ID
+
+### AC8: Proper Deletion Order and Domain Events
+**Given** a valid deletion request for achievement with associated data
+**And** the achievement has comments, celebrations, and media
+**When** the DELETE operation is executed successfully
+**Then** the system should:
+1. Call achievement.delete() to raise domain events before deletion
+2. Execute IAchievementRepository.deleteWithDependencies(achievement)
+3. Delete in proper dependency order:
+   - Achievement comments first (referential integrity)
+   - Achievement celebrations second
+   - Achievement media third  
+   - Achievement record last
+4. Use database transactions to ensure atomicity
+5. Ensure no foreign key constraint violations occur
+6. Return success response with entity key
+
+## Implementation Details
+
+### Command Handler: DeleteAchievementCommandHandler
+- **Base Class**: extends CommonCommandHandler<DeleteAchievementCommand>
+- **Dependencies**: IAchievementRepository, IUserRepository, AchievementHandlerExceptionPolicy
+- **Validation**: Inherits validateCommand() from CommonCommandHandler
+- **Response**: HandlerResponse.success(achievement.toKto()) for success, HandlerResponse.noContent() for not found
+
+### Command Model: DeleteAchievementCommand
+- **Base Class**: extends CommonCommand
+- **JWT Extraction**: userKey automatically populated from JWT token
+- **Path Parameter**: achievementKey from URL path parameter
+- **Validation Annotations**: @NotBlank, @Size(min = 7, max = 7) for both keys
+- **No Custom Validation**: Only JSR-303 annotations needed
+
+### Entity Deletion Flow
+- **Domain Events**: achievement.delete() raises domain events before deletion
+- **Dependency Deletion**: IAchievementRepository.deleteWithDependencies(achievement)
+- **Transaction Management**: Atomic operation with rollback on failure
+- **Cascade Order**: Comments → Celebrations → Media → Achievement
+
+### Repository Operations
+- **User Lookup**: IUserRepository.findByKey(userKey, UserKto.class)
+- **Achievement Retrieval**: IAchievementRepository.getAchievementByKey(Achievement.class, achievementKey)
+- **Cascading Delete**: IAchievementRepository.deleteWithDependencies(achievement)
+- **Authorization Check**: achievement.isCreator(User.fromKto(userKto))
+
+### Error Handling: AchievementHandlerExceptionPolicy
+- **Exception Mapping**: Maps domain exceptions to HTTP status codes
+- **Correlation Tracking**: Includes correlation ID in all error responses
+- **Structured Responses**: Consistent error format across all failures
 
 ## Data Validation Rules
-- Achievement key must be exactly 7 alphanumeric characters
-- User key must be exactly 7 alphanumeric characters
-- JWT token must be valid and not expired
-- User must own the achievement being deleted
 
-## Response Codes
-- **200 OK**: Achievement successfully deleted
-- **204 No Content**: Achievement didn't exist, no action taken
-- **400 Bad Request**: Validation errors in request
-- **401 Unauthorized**: Invalid or missing authentication
-- **403 Forbidden**: User not authorized to delete this achievement
-- **404 Not Found**: User or achievement not found
-- **500 Internal Server Error**: Server error during deletion
+### Required Fields (JSR-303)
+- `userKey`: 7 characters exactly (from JWT token)
+- `achievementKey`: 7 characters exactly (from URL path parameter)
 
-## Security Considerations
-- Users can only delete their own achievements
-- Proper authentication and authorization validation required
-- All deletion operations must be logged for audit purposes
-- Cascading deletion must maintain referential integrity
+### No Optional Fields
+- DeleteAchievementCommand contains only identification keys
 
-## Performance Considerations
-- Deletion operations should be atomic (all or nothing)
-- Database transactions should be used to ensure consistency
-- Proper indexing on foreign key relationships for efficient cascading deletes
+## Response Format
+
+### Success Response (HTTP 200 OK)
+```json
+{
+  "success": true,
+  "data": {
+    "entityKey": "8NctRKY"
+  },
+  "responseType": "SUCCESS"
+}
+```
+
+### No Content Response (HTTP 204 No Content)
+```json
+{
+  "success": true,
+  "data": null,
+  "responseType": "NO_CONTENT"
+}
+```
+
+### Error Response Format
+```json
+{
+  "success": false,
+  "error": "Error message text",
+  "correlationId": "uuid-correlation-id",
+  "timestamp": "2025-09-26T10:30:00Z"
+}
+```
+
+## HTTP Status Codes
+
+### Success Codes
+- **200 OK**: Achievement deleted successfully, returns entity key
+- **204 No Content**: Achievement not found, no action taken
+
+### Client Error Codes (4xx)
+- **400 Bad Request**: JSR-303 validation failures (invalid key format)
+- **401 Unauthorized**: Missing/invalid JWT token, user not authorized to delete achievement
+- **404 Not Found**: User not found
+
+### Server Error Codes (5xx)
+- **500 Internal Server Error**: Database errors, unexpected system exceptions
+
+## Security & Traceability
+
+### Authentication & Authorization
+- JWT token required with automatic userKey extraction
+- User must own the achievement (achievement.isCreator() check)
+- No cross-user deletion allowed
+
+### Cascade Deletion Safety
+- Proper dependency order prevents constraint violations
+- Database transactions ensure atomicity
+- Domain events raised before deletion for cleanup
+
+### Correlation Tracking
+- Correlation ID included in all error responses
+- End-to-end request tracing for debugging
+- Audit logging for compliance

@@ -8,6 +8,7 @@ import espresso.achievement.domain.operational.exceptionPolicy.AchievementExcept
 import espresso.common.domain.responses.ErrorResponse;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+import espresso.common.infrastructure.correlation.CorrelationContext;
 import espresso.user.domain.operational.exceptionPolicy.UserException;
 import espresso.security.domain.operational.exceptionPolicy.SecurityException;
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +69,7 @@ public class SecurityHandlerExceptionPolicy {
             .errorCode(ex.getErrorCode())
             .responseType(ResponseType.FORBIDDEN)
             .operationContext(operationContext)
+            .correlationId(ex.getCorrelationId())
             .timestamp(OffsetDateTime.now())
             .build();
     }
@@ -86,6 +88,7 @@ public class SecurityHandlerExceptionPolicy {
             .errorCode(ex.getErrorCode())
             .responseType(ResponseType.BAD_REQUEST)
             .operationContext(operationContext)
+            .correlationId(ex.getCorrelationId())
             .timestamp(OffsetDateTime.now())
             .build();
     }
@@ -104,6 +107,7 @@ public class SecurityHandlerExceptionPolicy {
             .errorCode(ex.getErrorCode())
             .responseType(ResponseType.BAD_REQUEST)
             .operationContext(operationContext)
+            .correlationId(ex.getCorrelationId())
             .timestamp(OffsetDateTime.now())
             .build();
     }
@@ -122,6 +126,7 @@ public class SecurityHandlerExceptionPolicy {
             .errorCode("SYSTEM_ERROR")
             .responseType(ResponseType.INTERNAL_ERROR)
             .operationContext(operationContext)
+            .correlationId(CorrelationContext.getCorrelationId()) // Get from context for system exceptions
             .timestamp(OffsetDateTime.now())
             .build();
     }

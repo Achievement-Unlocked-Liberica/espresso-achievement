@@ -1,4 +1,4 @@
-package espresso.achievement.application.handlers;
+package espresso.achievement.application.commandHandlers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -85,12 +85,12 @@ public class AddAchievementCommentCommandHandler extends CommonCommandHandler
             achievement.addComment(comment);
 
             // Save the comment through the repository
-            AchievementComment savedComment = achievementCommentRepository.save(comment);
+            achievementCommentRepository.save(comment);
 
             this.publishDomainEvents(achievement);
 
             // Return success response with the created comment
-            return HandlerResponse.created(savedComment);
+            return HandlerResponse.success(achievement.toKto());
 
         } catch (Exception ex) {
             return exceptionPolicy.handleException(ex, "add comment to achievement");

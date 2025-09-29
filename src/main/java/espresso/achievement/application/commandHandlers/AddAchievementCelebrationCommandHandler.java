@@ -1,4 +1,4 @@
-package espresso.achievement.application.handlers;
+package espresso.achievement.application.commandHandlers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -86,12 +86,12 @@ public class AddAchievementCelebrationCommandHandler extends CommonCommandHandle
             // Add celebration to achievement (this will raise domain events)
             achievement.addCelebration(celebration);
 
-            AchievementCelebration savedCelebration = celebrationRepository.save(celebration);
+            celebrationRepository.save(celebration);
 
             this.publishDomainEvents(achievement);
 
             // Return success response
-            return HandlerResponse.success(savedCelebration);
+            return HandlerResponse.success(achievement.toKto());
 
         } catch (Exception ex) {
             return exceptionPolicy.handleException(ex, "add celebration to achievement");

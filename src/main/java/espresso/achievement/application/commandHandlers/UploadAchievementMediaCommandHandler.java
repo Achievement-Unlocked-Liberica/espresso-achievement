@@ -1,4 +1,7 @@
-package espresso.achievement.application.handlers;
+package espresso.achievement.application.commandHandlers;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -101,8 +104,7 @@ public class UploadAchievementMediaCommandHandler extends CommonCommandHandler
 
             this.publishDomainEvents(achievement);
 
-            // Return the achievement instance
-            return HandlerResponse.created(achievement.getMedia());
+            return HandlerResponse.success(achievement.toKto());
 
         } catch (Exception ex) {
             return exceptionPolicy.handleException(ex, "upload media to achievement");

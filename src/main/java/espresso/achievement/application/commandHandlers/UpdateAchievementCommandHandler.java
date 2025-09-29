@@ -1,4 +1,4 @@
-package espresso.achievement.application.handlers;
+package espresso.achievement.application.commandHandlers;
 
 import java.util.Arrays;
 import java.util.List;
@@ -94,9 +94,9 @@ public class UpdateAchievementCommandHandler extends CommonCommandHandler implem
                     cmd.getIsPublic());
 
             // Save updated achievement via achievementRepository.update
-            Achievement updatedAchievement = achievementRepository.update(achievement);
+            achievementRepository.update(achievement);
 
-            return HandlerResponse.success(updatedAchievement);
+            return HandlerResponse.success(achievement.toKto());
 
         } catch (Exception ex) {
             return exceptionPolicy.handleException(ex, "update achievement");

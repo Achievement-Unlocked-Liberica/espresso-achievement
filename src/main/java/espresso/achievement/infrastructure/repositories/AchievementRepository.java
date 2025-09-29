@@ -45,8 +45,7 @@ public class AchievementRepository implements IAchievementRepository {
         try {
             AchievementValidator.validateForPersistence(achievement);
 
-            Achievement entity = this.achievementPSQLProvider.save(achievement);
-            return entity;
+            return this.achievementPSQLProvider.save(achievement);
 
         } catch (AchievementException e) {
             // Re-throw domain exceptions as-is
@@ -73,8 +72,7 @@ public class AchievementRepository implements IAchievementRepository {
         try {
             AchievementValidator.validateForUpdate(achievement);
 
-            Achievement updatedEntity = this.achievementPSQLProvider.updateAchievement(achievement);
-            return updatedEntity;
+            return this.achievementPSQLProvider.updateAchievement(achievement);
 
         } catch (AchievementException e) {
             // Re-throw domain exceptions as-is
@@ -136,11 +134,9 @@ public class AchievementRepository implements IAchievementRepository {
             // If fromDate is null, get all latest achievements
             // If fromDate is provided, filter achievements from that date
             // This allows for pagination and filtering based on date
-            List<T> entities = fromDate == null
+            return fromDate == null
                     ? achievementPSQLProvider.findLatestAchievements(dtoType, Limit.of(limit))
                     : achievementPSQLProvider.findLatestAchievements(dtoType, Limit.of(limit), fromDate);
-
-            return entities;
 
         } catch (AchievementException e) {
             // Re-throw domain exceptions as-is

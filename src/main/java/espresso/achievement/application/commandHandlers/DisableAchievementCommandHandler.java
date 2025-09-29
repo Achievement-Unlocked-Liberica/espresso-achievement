@@ -1,4 +1,4 @@
-package espresso.achievement.application.handlers;
+package espresso.achievement.application.commandHandlers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -90,9 +90,9 @@ public class DisableAchievementCommandHandler extends CommonCommandHandler
 
             // Save updated achievement via achievementRepository.update (since we
             // modified the entity)
-            Achievement disabledAchievement = achievementRepository.update(achievement);
+            achievementRepository.update(achievement);
 
-            return HandlerResponse.success(disabledAchievement);
+            return HandlerResponse.success(achievement.toKto());
 
         } catch (Exception ex) {
             return exceptionPolicy.handleException(ex, "disable achievement");

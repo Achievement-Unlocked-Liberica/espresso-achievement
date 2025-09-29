@@ -57,4 +57,10 @@ public interface AchievementDtoMd {
      * @return The visibility setting
      */
     AchievementVisibilityStatus getAchievementVisibility();
+
+        /**
+     * Collection of media files associated with this achievement.
+     * @return List of media summary information
+     */
+    List<AchievementMediaDtoSm> getMedia();
 }

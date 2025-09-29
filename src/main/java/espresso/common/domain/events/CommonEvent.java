@@ -1,10 +1,7 @@
 package espresso.common.domain.events;
 
-import java.time.Instant;
 import java.time.OffsetDateTime;
 
-import espresso.common.domain.support.KeyGenerator;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
