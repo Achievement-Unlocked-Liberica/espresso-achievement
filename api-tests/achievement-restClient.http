@@ -5,7 +5,7 @@ X-API-Version: 1
 
 ### Create a new Achievement
 
-@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5IjoidHdXcnlXTSIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiVGhyb2siLCJsYXN0TmFtZSI6IkJvbmUiLCJpYXQiOjE3NTkwNDIzNDIsImV4cCI6MTc1OTEyODc0Mn0.M9FhOw2Jg0QGX1g-M-4aheEW_2tq8kL9L_pSxV8mq8Eiez6vGzy9p2bmA_jpG834
+@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5IjoidHdXcnlXTSIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiVGhyb2siLCJsYXN0TmFtZSI6IkJvbmUiLCJpYXQiOjE3NTkyMDgwMjAsImV4cCI6MTc1OTI5NDQyMH0.QlW60fwQxcqYOjKJIkCrDJn7uQc3j5s68zqeKEmnKl489Mh9k9dusFI65n8aCQOg
 
 POST http://localhost:8080/api/cmd/achievement HTTP/1.1
 Content-Type: application/json
@@ -30,7 +30,7 @@ X-API-Version: 1
 Authorization: Bearer {{authToken}}
 
 ### Add a Comment to the Achievement
-POST http://localhost:8080/api/cmd/achievement/8NctRKY/comments HTTP/1.1
+POST http://localhost:8080/api/cmd/achievement/G0x0SmZ/comments HTTP/1.1
 Content-Type: application/json
 accept: application/json
 X-API-Version: 1
@@ -70,7 +70,7 @@ Authorization: Bearer {{authToken}}
 
 
 ### Add a Celebration to the Achievement
-POST http://localhost:8080/api/cmd/achievement/oYIuT8w/celebration HTTP/1.1
+POST http://localhost:8080/api/cmd/achievement/G0x0SmZ/celebration HTTP/1.1
 Content-Type: application/json
 accept: application/json
 X-API-Version: 1

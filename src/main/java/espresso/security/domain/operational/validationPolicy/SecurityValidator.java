@@ -15,6 +15,11 @@ import espresso.security.domain.operational.exceptionPolicy.SecurityException;
  */
 public class SecurityValidator {
 
+    // Private constructor to prevent instantiation
+    private SecurityValidator() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
+
     /**
      * Validates a CommonEvent entity for queue operations.
      * Checks that the event is not null and has a valid source.

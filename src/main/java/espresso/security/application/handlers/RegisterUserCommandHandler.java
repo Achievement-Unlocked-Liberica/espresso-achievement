@@ -1,6 +1,5 @@
 package espresso.security.application.handlers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import espresso.common.domain.responses.HandlerResponse;
@@ -21,18 +20,21 @@ import espresso.security.domain.operational.exceptionPolicy.SecurityHandlerExcep
 @Service
 public class RegisterUserCommandHandler extends CommonCommandHandler {
 
+    private final IUserRepository userRepository;
+    private final SecurityHandlerExceptionPolicy exceptionPolicy;
+
     /**
-     * Repository for user data access and persistence operations.
-     * Used to check for existing users and save new user registrations.
+     * Constructor for dependency injection.
+     * 
+     * @param userRepository Repository for user data access and persistence operations
+     * @param exceptionPolicy Exception policy for centralized security exception handling
      */
-    @Autowired
-    private IUserRepository userRepository;
-    
-    /**
-     * Exception policy for centralized security exception handling.
-     */
-    @Autowired
-    private SecurityHandlerExceptionPolicy exceptionPolicy;
+    public RegisterUserCommandHandler(
+            IUserRepository userRepository,
+            SecurityHandlerExceptionPolicy exceptionPolicy) {
+        this.userRepository = userRepository;
+        this.exceptionPolicy = exceptionPolicy;
+    }
 
     // validator provided by base class
 

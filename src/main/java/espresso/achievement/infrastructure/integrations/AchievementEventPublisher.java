@@ -1,15 +1,10 @@
 package espresso.achievement.infrastructure.integrations;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
-import espresso.achievement.domain.entities.AchievementCelebration;
 import espresso.achievement.domain.events.AchievementCelebrationEvent;
 import espresso.achievement.domain.events.AchievementCommentEvent;
 import espresso.achievement.domain.events.AchievementEvent;
 import espresso.achievement.domain.events.AchievementMediaEvent;
-import espresso.common.domain.events.EventActionTypes;
 import espresso.common.infrastructure.integrations.CommonQueueIntegration;
 
 /**
@@ -20,8 +15,16 @@ import espresso.common.infrastructure.integrations.CommonQueueIntegration;
 @Component
 public class AchievementEventPublisher {
 
-    @Autowired
-    private CommonQueueIntegration queueIntegration;
+    private final CommonQueueIntegration queueIntegration;
+
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param queueIntegration Common queue integration service for message publishing
+     */
+    public AchievementEventPublisher(CommonQueueIntegration queueIntegration) {
+        this.queueIntegration = queueIntegration;
+    }
 
     public void publishEvent(AchievementEvent event) {
 

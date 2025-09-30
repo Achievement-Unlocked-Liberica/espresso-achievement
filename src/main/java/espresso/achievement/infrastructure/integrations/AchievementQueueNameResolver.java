@@ -3,7 +3,6 @@ package espresso.achievement.infrastructure.integrations;
 import org.springframework.stereotype.Component;
 
 import espresso.common.domain.contracts.IQueueNameResolver;
-import espresso.common.domain.events.EventActionTypes;
 
 /**
  * Queue name resolver for the achievement module.

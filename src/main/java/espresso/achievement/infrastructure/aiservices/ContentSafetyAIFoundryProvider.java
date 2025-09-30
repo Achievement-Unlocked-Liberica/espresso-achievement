@@ -5,17 +5,8 @@ import org.springframework.stereotype.Component;
 
 import com.azure.ai.contentsafety.ContentSafetyClient;
 import com.azure.ai.contentsafety.ContentSafetyClientBuilder;
-import com.azure.ai.contentsafety.models.AnalyzeImageOptions;
-import com.azure.ai.contentsafety.models.AnalyzeImageResult;
-import com.azure.ai.contentsafety.models.AnalyzeTextOptions;
-import com.azure.ai.contentsafety.models.AnalyzeTextResult;
-import com.azure.ai.contentsafety.models.ContentSafetyImageData;
-import com.azure.ai.contentsafety.models.ImageCategoriesAnalysis;
-import com.azure.ai.contentsafety.models.TextCategoriesAnalysis;
 import com.azure.core.credential.KeyCredential;
 import com.azure.core.exception.HttpResponseException;
-import com.azure.core.util.BinaryData;
-
 import espresso.achievement.domain.contracts.IContentSafetyAIProvider;
 import espresso.achievement.domain.operational.exceptionPolicy.AchievementException;
 import espresso.achievement.domain.operational.validationPolicy.AchievementValidator;
@@ -67,7 +58,7 @@ public class ContentSafetyAIFoundryProvider implements IContentSafetyAIProvider 
             // result.getSeverity());
             // }
 
-            System.out.println("Text content security verification is not implemented yet.");
+            //("Text content security verification is not implemented yet.");
             
         } catch (AchievementException e) {
             // Re-throw domain exceptions as-is
@@ -91,7 +82,7 @@ public class ContentSafetyAIFoundryProvider implements IContentSafetyAIProvider 
             //     System.out.println(result.getCategory() + " severity: " + result.getSeverity());
             // }
 
-            System.out.println("Image content security verification is not implemented yet.");
+            //System.out.println("Image content security verification is not implemented yet.");
             
         } catch (AchievementException e) {
             // Re-throw domain exceptions as-is

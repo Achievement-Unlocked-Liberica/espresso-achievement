@@ -1,6 +1,5 @@
 package espresso.achievement.application.commandHandlers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import espresso.achievement.domain.contracts.IAddAchievementCommentCommandHandler;
@@ -28,20 +27,29 @@ import lombok.extern.slf4j.Slf4j;
 public class AddAchievementCommentCommandHandler extends CommonCommandHandler
         implements IAddAchievementCommentCommandHandler {
 
-    @Autowired
-    private IAchievementRepository achievementRepository;
-
-    @Autowired
-    private IUserRepository userRepository;
-
-    @Autowired
-    private IAchievementCommentRepository achievementCommentRepository;
+    private final IAchievementRepository achievementRepository;
+    private final IUserRepository userRepository;
+    private final IAchievementCommentRepository achievementCommentRepository;
+    private final AchievementHandlerExceptionPolicy exceptionPolicy;
 
     /**
-     * Centralized exception handling policy.
+     * Constructor for dependency injection.
+     * 
+     * @param achievementRepository Repository for achievement entity persistence operations
+     * @param userRepository Repository for user entity queries and operations
+     * @param achievementCommentRepository Repository for achievement comment operations
+     * @param exceptionPolicy Centralized exception handling policy
      */
-    @Autowired
-    private AchievementHandlerExceptionPolicy exceptionPolicy;
+    public AddAchievementCommentCommandHandler(
+            IAchievementRepository achievementRepository,
+            IUserRepository userRepository,
+            IAchievementCommentRepository achievementCommentRepository,
+            AchievementHandlerExceptionPolicy exceptionPolicy) {
+        this.achievementRepository = achievementRepository;
+        this.userRepository = userRepository;
+        this.achievementCommentRepository = achievementCommentRepository;
+        this.exceptionPolicy = exceptionPolicy;
+    }
 
     // validator provided by base class
 

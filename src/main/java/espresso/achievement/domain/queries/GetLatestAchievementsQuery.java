@@ -44,6 +44,7 @@ public class GetLatestAchievementsQuery extends CommonQuery {
      * 
      * @return Set of validation error messages, empty if valid
      */
+    @Override
     public Set<String> validateCustom() {
         Set<String> errors = new HashSet<>();
 

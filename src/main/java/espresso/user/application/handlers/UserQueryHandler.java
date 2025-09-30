@@ -1,6 +1,5 @@
 package espresso.user.application.handlers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import espresso.common.domain.queries.QuerySizeType;
@@ -21,11 +20,21 @@ import espresso.user.domain.operational.exceptionPolicy.UserHandlerExceptionPoli
 @Service
 public class UserQueryHandler extends CommonQueryHandler implements IUserQueryHandler {
 
-    @Autowired
-    private IUserRepository userRepository;
-    
-    @Autowired
-    private UserHandlerExceptionPolicy exceptionPolicy;
+    private final IUserRepository userRepository;
+    private final UserHandlerExceptionPolicy exceptionPolicy;
+
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param userRepository Repository for user entity queries and operations
+     * @param exceptionPolicy Centralized exception handling policy
+     */
+    public UserQueryHandler(
+            IUserRepository userRepository,
+            UserHandlerExceptionPolicy exceptionPolicy) {
+        this.userRepository = userRepository;
+        this.exceptionPolicy = exceptionPolicy;
+    }
 
     @Override
     public HandlerResponse<Object> handle(GetUserByKeyQuery qry) {
@@ -111,13 +120,11 @@ public class UserQueryHandler extends CommonQueryHandler implements IUserQueryHa
     @Override
     public Class<?> getDtoSize(QuerySizeType querySizeType) {
         switch (querySizeType) {
-            case xl:
-            case lg:
+            case xl,lg:
                 return UserDtoLg.class;
             case md:
                 return UserDtoMd.class;
-            case sm:
-            case xs:
+            case sm,xs:
             default:
                 return UserDtoSm.class;
         }

@@ -10,7 +10,6 @@ import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
 import espresso.common.infrastructure.correlation.CorrelationContext;
 import espresso.user.domain.operational.exceptionPolicy.UserException;
-import espresso.security.domain.operational.exceptionPolicy.SecurityException;
 import lombok.extern.slf4j.Slf4j;
 
 /**

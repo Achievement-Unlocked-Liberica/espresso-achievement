@@ -2,7 +2,7 @@ package espresso.security.infrastructure.services;
 
 import java.util.ArrayList;
 
-import org.springframework.beans.factory.annotation.Autowired;
+ 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,8 +14,16 @@ import espresso.user.domain.entities.User;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    @Autowired
-    private IUserRepository userRepository;
+    private final IUserRepository userRepository;
+
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param userRepository Repository for user data access operations
+     */
+    public CustomUserDetailsService(IUserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

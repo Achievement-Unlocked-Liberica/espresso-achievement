@@ -3,8 +3,6 @@ package espresso.achievement.infrastructure.repositories;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -27,17 +25,16 @@ import espresso.achievement.domain.operational.validationPolicy.AchievementValid
 @Component
 public class AchievementRepository implements IAchievementRepository {
 
-    /**
-     * Default page size for query operations, configurable via application properties.
-     */
-    @Value("${achievement.query.defaultPageSize}")
-    private Integer queryDefaultPageSize;
+    private final AchievementPSQLProvider achievementPSQLProvider;
 
     /**
-     * PostgreSQL data provider for achievement entity operations.
+     * Constructor for dependency injection.
+     * 
+     * @param achievementPSQLProvider PostgreSQL data provider for achievement entity operations
      */
-    @Autowired
-    AchievementPSQLProvider achievementPSQLProvider;
+    public AchievementRepository(AchievementPSQLProvider achievementPSQLProvider) {
+        this.achievementPSQLProvider = achievementPSQLProvider;
+    }
 
     // Command operations
     @Override

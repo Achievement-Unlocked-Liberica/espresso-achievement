@@ -1,6 +1,5 @@
 package espresso.security.application.handlers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import espresso.common.application.handlers.CommonCommandHandler;
 // Validation centralized in CommonCommandHandler
@@ -25,34 +24,31 @@ import espresso.security.domain.operational.exceptionPolicy.SecurityHandlerExcep
 @Service
 public class CredentialsCommandHandler extends CommonCommandHandler implements ISecurityCommandHandler {
 
+    private final IUserRepository userRepository;
+    private final SecurityHandlerExceptionPolicy exceptionPolicy;
+    private final JWTAuthToken jwtAuthToken;
+    private final RegisterUserCommandHandler registerUserCommandHandler;
+
     /**
-     * Repository for user data access and authentication operations.
-     * Used to retrieve user information for credential verification.
+     * Constructor for dependency injection.
+     * 
+     * @param userRepository Repository for user data access and authentication operations
+     * @param exceptionPolicy Exception policy for centralized security exception handling
+     * @param jwtAuthToken JWT token service for generating and managing authentication tokens
+     * @param registerUserCommandHandler Specialized handler for user registration operations
      */
-    @Autowired
-    private IUserRepository userRepository;
-    
-    /**
-     * Exception policy for centralized security exception handling.
-     */
-    @Autowired
-    private SecurityHandlerExceptionPolicy exceptionPolicy;
+    public CredentialsCommandHandler(
+            IUserRepository userRepository,
+            SecurityHandlerExceptionPolicy exceptionPolicy,
+            JWTAuthToken jwtAuthToken,
+            RegisterUserCommandHandler registerUserCommandHandler) {
+        this.userRepository = userRepository;
+        this.exceptionPolicy = exceptionPolicy;
+        this.jwtAuthToken = jwtAuthToken;
+        this.registerUserCommandHandler = registerUserCommandHandler;
+    }
 
     // validator provided by base class
-
-    /**
-     * JWT token service for generating and managing authentication tokens.
-     * Creates secure tokens for authenticated user sessions.
-     */
-    @Autowired
-    private JWTAuthToken jwtAuthToken;
-
-    /**
-     * Specialized handler for user registration operations.
-     * Delegates registration commands to maintain separation of concerns.
-     */
-    @Autowired
-    private RegisterUserCommandHandler registerUserCommandHandler;
 
     /**
      * Handles authentication credential commands to verify user login.

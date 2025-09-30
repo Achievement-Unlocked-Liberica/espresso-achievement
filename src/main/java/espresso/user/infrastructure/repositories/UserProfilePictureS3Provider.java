@@ -1,9 +1,8 @@
 package espresso.user.infrastructure.repositories;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import java.io.File;
+ 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
@@ -20,21 +19,29 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 
 @Repository
 public class UserProfilePictureS3Provider {
-    @Autowired
-    private AmazonS3 s3Client;
+    
+    private final AmazonS3 s3Client;
+    private final String bucketName;
 
-    @Value("${digitalocean.spaces.bucketName}")
-    private String bucketName;
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param s3Client Amazon S3 client for storage operations
+     * @param bucketName S3 bucket name for storing user profile pictures
+     */
+    public UserProfilePictureS3Provider(
+            AmazonS3 s3Client,
+            @Value("${digitalocean.spaces.bucketName}") String bucketName) {
+        this.s3Client = s3Client;
+        this.bucketName = bucketName;
+    }
 
-    // public String uploadImage(MultipartFile file, String keyName) throws
-    // IOException {
-    public String uploadImage(String basePath, UserProfileImage userProfileImage) throws IOException {
+    public String uploadImage(String basePath, UserProfileImage userProfileImage) {
         try {
             UserValidator.validateUserProfileImageForUpload(userProfileImage);
             UserValidator.validateBasePath(basePath);
             
-            // Build the path for the profile image
-            String imagePath = basePath + "/" + userProfileImage.getUser().getEntityKey() + "." + userProfileImage.getImageExtension();
+            String imagePath = basePath + File.separator + userProfileImage.getUser().getEntityKey() + "." + userProfileImage.getImageExtension();           
 
             ObjectMetadata meta = new ObjectMetadata();
             meta.setContentLength(userProfileImage.getImageData().length);

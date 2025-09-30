@@ -1,16 +1,14 @@
 package espresso.common.infrastructure.integrations;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.time.OffsetDateTime;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+ 
 import org.springframework.stereotype.Component;
 
 import espresso.common.domain.contracts.IQueueNameResolver;
 import espresso.common.domain.events.CommonEvent;
-import espresso.common.domain.support.KeyGenerator;
+ 
 import espresso.security.domain.operational.exceptionPolicy.SecurityException;
 import espresso.security.domain.operational.validationPolicy.SecurityValidator;
 
@@ -18,9 +16,16 @@ import espresso.security.domain.operational.validationPolicy.SecurityValidator;
 public class CommonQueueIntegration {
 
     private final Map<String, IQueueNameResolver> resolvers = new ConcurrentHashMap<>();
-    
-    @Autowired
-    private CommonRBMQProvider rbmqProvider;
+    private final CommonRBMQProvider rbmqProvider;
+
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param rbmqProvider RabbitMQ provider for message operations
+     */
+    public CommonQueueIntegration(CommonRBMQProvider rbmqProvider) {
+        this.rbmqProvider = rbmqProvider;
+    }
 
     /**
      * Registers a queue name resolver for a specific source module.

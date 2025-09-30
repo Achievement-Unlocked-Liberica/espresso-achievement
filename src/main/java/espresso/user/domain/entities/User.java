@@ -1,8 +1,6 @@
 package espresso.user.domain.entities;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -15,9 +13,6 @@ import espresso.common.domain.models.DomainEntity;
 import espresso.common.domain.support.KeyGenerator;
 import espresso.common.domain.support.NameGenerator;
 import espresso.common.domain.support.PasswordService;
-
-//TODO: Add the birthDate to the vertical feature
-//TODO: Add the profilePictureUrl to the vertical feature
 
 /**
  * Represents a user entity in the achievement system.

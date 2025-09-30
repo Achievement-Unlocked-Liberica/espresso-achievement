@@ -6,7 +6,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -30,8 +29,16 @@ public class ApiLoggerAspect {
     private static final Logger logger = LoggerFactory.getLogger(ApiLoggerAspect.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
     
-    @Autowired
-    private ApiLoggingProperties apiLoggingProperties;
+    private final ApiLoggingProperties apiLoggingProperties;
+
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param apiLoggingProperties Configuration properties for API logging
+     */
+    public ApiLoggerAspect(ApiLoggingProperties apiLoggingProperties) {
+        this.apiLoggingProperties = apiLoggingProperties;
+    }
     
     // ANSI color codes for colorful logging
     private static final String RESET = "\u001B[0m";

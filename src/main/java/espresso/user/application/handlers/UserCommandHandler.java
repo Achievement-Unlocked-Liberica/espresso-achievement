@@ -2,7 +2,6 @@ package espresso.user.application.handlers;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import espresso.common.application.handlers.CommonCommandHandler;
 // Validation centralized in CommonCommandHandler
@@ -21,14 +20,25 @@ import espresso.user.domain.operational.exceptionPolicy.UserHandlerExceptionPoli
 @Service
 public class UserCommandHandler extends CommonCommandHandler implements IUserCommandHandler {
 
-    @Autowired
-    private IUserRepository userRepository;
+    private final IUserRepository userRepository;
+    private final IUserProfilePictureRepository userProfileImageRepository;
+    private final UserHandlerExceptionPolicy exceptionPolicy;
 
-    @Autowired
-    private IUserProfilePictureRepository userProfileImageRepository;
-    
-    @Autowired
-    private UserHandlerExceptionPolicy exceptionPolicy;
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param userRepository Repository for user entity persistence operations
+     * @param userProfileImageRepository Repository for user profile image operations
+     * @param exceptionPolicy Centralized exception handling policy
+     */
+    public UserCommandHandler(
+            IUserRepository userRepository,
+            IUserProfilePictureRepository userProfileImageRepository,
+            UserHandlerExceptionPolicy exceptionPolicy) {
+        this.userRepository = userRepository;
+        this.userProfileImageRepository = userProfileImageRepository;
+        this.exceptionPolicy = exceptionPolicy;
+    }
 
     // validator provided by base class
 

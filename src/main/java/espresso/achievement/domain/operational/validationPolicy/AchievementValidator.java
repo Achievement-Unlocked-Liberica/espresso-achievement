@@ -3,7 +3,7 @@ package espresso.achievement.domain.operational.validationPolicy;
 import espresso.achievement.domain.entities.Achievement;
 import espresso.achievement.domain.entities.AchievementMedia;
 import espresso.achievement.domain.operational.exceptionPolicy.AchievementException;
-import espresso.user.domain.entities.User;
+ 
 
 /**
  * Validation utility class for Achievement module entities and operations.

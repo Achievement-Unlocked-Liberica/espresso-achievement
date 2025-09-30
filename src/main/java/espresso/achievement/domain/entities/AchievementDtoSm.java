@@ -5,8 +5,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import espresso.user.domain.entities.UserDtoSm;
-
 /**
  * Small-sized Data Transfer Object interface for Achievement entities.
  * Contains minimal essential information for list views and summary displays.

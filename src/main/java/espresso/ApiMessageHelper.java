@@ -1,6 +1,5 @@
 package espresso;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.stereotype.Component;
@@ -10,8 +9,16 @@ import java.util.Locale;
 @Component
 public class ApiMessageHelper {
 
-    @Autowired
-    private MessageSource messageSource;
+    private final MessageSource messageSource;
+
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param messageSource Spring MessageSource for internationalization and localization
+     */
+    public ApiMessageHelper(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     /**
      * Gets a localized message for an error code within a specific operation context.

@@ -4,7 +4,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import espresso.achievement.domain.contracts.IAchievementMediaRepository;
@@ -17,17 +16,29 @@ import espresso.user.domain.entities.User;
 @Repository
 public class AchievementMediaRepository implements IAchievementMediaRepository {
 
-    @Autowired
-    private Environment environment;
+    private final Environment environment;
+    private final AchievementMediaS3Provider s3DataProvider;
+    private final AchievementMediaPSQLProvider psqlProvider;
+    private final String mediaDirectory;
 
-    @Autowired
-    AchievementMediaS3Provider s3DataProvider;
-
-    @Autowired
-    AchievementMediaPSQLProvider psqlProvider;
-
-    @Value("${achievement.media.directory}")
-    private String mediaDirectory;
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param environment Spring environment for configuration properties
+     * @param s3DataProvider S3 data provider for media storage operations
+     * @param psqlProvider PostgreSQL data provider for achievement media operations
+     * @param mediaDirectory Directory path for storing achievement media
+     */
+    public AchievementMediaRepository(
+            Environment environment,
+            AchievementMediaS3Provider s3DataProvider,
+            AchievementMediaPSQLProvider psqlProvider,
+            @Value("${achievement.media.directory}") String mediaDirectory) {
+        this.environment = environment;
+        this.s3DataProvider = s3DataProvider;
+        this.psqlProvider = psqlProvider;
+        this.mediaDirectory = mediaDirectory;
+    }
 
     @Override
     public AchievementMedia save(Achievement achievement, AchievementMedia achievementMedia) {
@@ -47,8 +58,7 @@ public class AchievementMediaRepository implements IAchievementMediaRepository {
             achievementMedia.setImageData(null);
             achievementMedia.setMediaUrl(objectStoragePath);
 
-            AchievementMedia savedEntity = psqlProvider.save(achievementMedia);
-            return savedEntity;
+            return psqlProvider.save(achievementMedia);
 
         } catch (AchievementException e) {
             // Re-throw domain exceptions as-is

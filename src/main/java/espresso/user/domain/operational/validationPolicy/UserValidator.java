@@ -15,6 +15,11 @@ import espresso.user.domain.operational.exceptionPolicy.UserException;
  */
 public class UserValidator {
 
+    // Private constructor to prevent instantiation
+    private UserValidator() {
+        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
+    }
+
     /**
      * Validates a User entity for persistence operations.
      * Checks that the user is not null.

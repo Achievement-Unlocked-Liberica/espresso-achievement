@@ -1,6 +1,5 @@
 package espresso.achievement.application.commandHandlers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import espresso.achievement.domain.contracts.IDisableAchievementCommandHandler;
@@ -26,17 +25,25 @@ import lombok.extern.slf4j.Slf4j;
 public class DisableAchievementCommandHandler extends CommonCommandHandler
         implements IDisableAchievementCommandHandler {
 
-    @Autowired
-    private IAchievementRepository achievementRepository;
-
-    @Autowired
-    private IUserRepository userRepository;
+    private final IAchievementRepository achievementRepository;
+    private final IUserRepository userRepository;
+    private final AchievementHandlerExceptionPolicy exceptionPolicy;
 
     /**
-     * Centralized exception handling policy.
+     * Constructor for dependency injection.
+     * 
+     * @param achievementRepository Repository for achievement entity persistence operations
+     * @param userRepository Repository for user entity queries and operations
+     * @param exceptionPolicy Centralized exception handling policy
      */
-    @Autowired
-    private AchievementHandlerExceptionPolicy exceptionPolicy;
+    public DisableAchievementCommandHandler(
+            IAchievementRepository achievementRepository,
+            IUserRepository userRepository,
+            AchievementHandlerExceptionPolicy exceptionPolicy) {
+        this.achievementRepository = achievementRepository;
+        this.userRepository = userRepository;
+        this.exceptionPolicy = exceptionPolicy;
+    }
 
     // validator provided by base class
 

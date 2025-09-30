@@ -9,11 +9,9 @@ import org.springframework.data.domain.DomainEvents;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.MappedSuperclass;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+
+ 
 
 /**
  * Base class for domain aggregate roots following Domain-Driven Design (DDD) principles.
@@ -23,7 +21,7 @@ import lombok.NoArgsConstructor;
  */
 //@Data
 //@MappedSuperclass
-//@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public abstract class DomainAggregate extends DomainEntity {
 
     /**

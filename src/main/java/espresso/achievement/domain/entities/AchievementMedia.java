@@ -10,7 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Lob;
+
 
 import espresso.common.domain.models.ValueEntity;
 import espresso.common.domain.support.KeyGenerator;

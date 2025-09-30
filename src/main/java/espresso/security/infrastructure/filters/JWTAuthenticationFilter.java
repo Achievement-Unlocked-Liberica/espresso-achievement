@@ -2,7 +2,7 @@ package espresso.security.infrastructure.filters;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
+ 
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,19 +28,21 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
-    /**
-     * JWT token service for token validation and claim extraction.
-     * Used to verify token authenticity and extract user information.
-     */
-    @Autowired
-    private JWTAuthToken jwtAuthToken;
+    private final JWTAuthToken jwtAuthToken;
+    private final UserDetailsService userDetailsService;
 
     /**
-     * Spring Security user details service for loading user information.
-     * Provides user details for authentication context setup after token validation.
+     * Constructor for dependency injection.
+     * 
+     * @param jwtAuthToken JWT token service for token validation and claim extraction
+     * @param userDetailsService Spring Security user details service for loading user information
      */
-    @Autowired
-    private UserDetailsService userDetailsService;
+    public JWTAuthenticationFilter(
+            JWTAuthToken jwtAuthToken,
+            UserDetailsService userDetailsService) {
+        this.jwtAuthToken = jwtAuthToken;
+        this.userDetailsService = userDetailsService;
+    }
 
     /**
      * Processes each HTTP request to validate JWT tokens and set up authentication context.

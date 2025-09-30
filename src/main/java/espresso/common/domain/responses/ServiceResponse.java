@@ -3,7 +3,6 @@ package espresso.common.domain.responses;
 import java.net.URI;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.util.UriBuilder;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

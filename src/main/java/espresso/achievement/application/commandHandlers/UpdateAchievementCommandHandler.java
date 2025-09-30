@@ -2,7 +2,6 @@ package espresso.achievement.application.commandHandlers;
 
 import java.util.Arrays;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import espresso.achievement.domain.contracts.IUpdateAchievementCommandHandler;
@@ -27,17 +26,25 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class UpdateAchievementCommandHandler extends CommonCommandHandler implements IUpdateAchievementCommandHandler {
 
-    @Autowired
-    private IAchievementRepository achievementRepository;
-
-    @Autowired
-    private IUserRepository userRepository;
+    private final IAchievementRepository achievementRepository;
+    private final IUserRepository userRepository;
+    private final AchievementHandlerExceptionPolicy exceptionPolicy;
 
     /**
-     * Centralized exception handling policy.
+     * Constructor for dependency injection.
+     * 
+     * @param achievementRepository Repository for achievement entity persistence operations
+     * @param userRepository Repository for user entity queries and operations
+     * @param exceptionPolicy Centralized exception handling policy
      */
-    @Autowired
-    private AchievementHandlerExceptionPolicy exceptionPolicy;
+    public UpdateAchievementCommandHandler(
+            IAchievementRepository achievementRepository,
+            IUserRepository userRepository,
+            AchievementHandlerExceptionPolicy exceptionPolicy) {
+        this.achievementRepository = achievementRepository;
+        this.userRepository = userRepository;
+        this.exceptionPolicy = exceptionPolicy;
+    }
 
     // validator provided by base class
 

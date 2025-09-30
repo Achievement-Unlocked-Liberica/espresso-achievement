@@ -129,7 +129,7 @@ public class Achievement extends DomainAggregate {
      * @param initializeEntity Indicates whether the entity should be initialized.
      */
     protected Achievement(boolean initializeEntity) {
-        if (initializeEntity == true) {
+        if (initializeEntity) {
             this.initializeEntity();
         }
     }

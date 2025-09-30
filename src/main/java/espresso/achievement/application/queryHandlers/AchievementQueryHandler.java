@@ -2,7 +2,6 @@ package espresso.achievement.application.queryHandlers;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import espresso.achievement.domain.contracts.IAchievementRepository;
@@ -10,23 +9,26 @@ import espresso.achievement.domain.contracts.IAchievementQueryHandler;
 import espresso.achievement.domain.entities.AchievementDtoLg;
 import espresso.achievement.domain.entities.AchievementDtoMd;
 import espresso.achievement.domain.entities.AchievementDtoSm;
-import espresso.achievement.domain.queries.GetAchievementDetailByKeyQuery;
 import espresso.achievement.domain.queries.GetAchievementDetailQuery;
-import espresso.achievement.domain.queries.GetAchievementSummariesByUserQuery;
-import espresso.achievement.domain.queries.GetAchievementSummaryByKeyQuery;
 import espresso.achievement.domain.queries.GetLatestAchievementsQuery;
 import espresso.common.domain.queries.QuerySizeType;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
 import espresso.common.application.handlers.CommonQueryHandler;
-import lombok.NoArgsConstructor;
 
 @Service
-@NoArgsConstructor
 public class AchievementQueryHandler extends CommonQueryHandler implements IAchievementQueryHandler {
 
-    @Autowired
-    IAchievementRepository achievementRepository;
+    private final IAchievementRepository achievementRepository;
+
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param achievementRepository Repository for achievement entity queries and operations
+     */
+    public AchievementQueryHandler(IAchievementRepository achievementRepository) {
+        this.achievementRepository = achievementRepository;
+    }
 
     @Override
     public HandlerResponse<Object> handle(GetLatestAchievementsQuery qry) {
@@ -86,13 +88,11 @@ public class AchievementQueryHandler extends CommonQueryHandler implements IAchi
      */
     public Class<?> getDtoSize(QuerySizeType querySizeType) {
         switch (querySizeType) {
-            case xl:
-            case lg:
+            case xl, lg:
                 return AchievementDtoLg.class;
             case md:
                 return AchievementDtoMd.class;
-            case sm:
-            case xs:
+            case sm,xs:
                 return AchievementDtoSm.class;
             default:
                 return AchievementDtoSm.class;

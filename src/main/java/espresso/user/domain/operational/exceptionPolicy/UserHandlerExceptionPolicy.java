@@ -10,7 +10,6 @@ import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
 import espresso.common.infrastructure.correlation.CorrelationContext;
 import espresso.security.domain.operational.exceptionPolicy.SecurityException;
-import espresso.user.domain.operational.exceptionPolicy.UserException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -44,15 +43,16 @@ public class UserHandlerExceptionPolicy {
      * @return ErrorResponse with structured error information
      */
     private ErrorResponse mapToErrorResponse(Exception ex, String operationContext) {
-        if (ex instanceof UserException) {
-            return mapUserException((UserException) ex, operationContext);
-        } else if (ex instanceof AchievementException) {
-            return mapAchievementException((AchievementException) ex, operationContext);
-        } else if (ex instanceof SecurityException) {
-            return mapSecurityException((SecurityException) ex, operationContext);
-        } else {
-            return mapSystemException(ex, operationContext);
-        }
+        return switch (ex) {
+          case UserException userException -> 
+            mapUserException(userException, operationContext);
+          case AchievementException achievementException -> 
+            mapAchievementException(achievementException, operationContext);
+          case SecurityException securityException -> 
+            mapSecurityException(securityException, operationContext);
+          default -> 
+            mapSystemException(ex, operationContext);
+        };
     }
     
     /**

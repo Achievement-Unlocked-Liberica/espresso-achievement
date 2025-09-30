@@ -6,7 +6,6 @@ import espresso.common.domain.events.CommonEvent;
 import espresso.common.domain.events.EventActionTypes;
 import espresso.common.domain.support.KeyGenerator;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 /**

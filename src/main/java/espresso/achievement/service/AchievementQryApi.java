@@ -1,6 +1,5 @@
 package espresso.achievement.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,25 +25,20 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 @RequestMapping("/api/qry/achievement")
 public class AchievementQryApi extends CommonQryApi {
 
-	public AchievementQryApi(ApiMessageHelper messageHelper) {
-		super(messageHelper);
-	}
-
-	/*
-	 * @Autowired
-	 * private ApiMessageHelper apiMsgHelper;
-	 * 
-	 * return ResponseEntity
-	 * .status(HttpStatus.NOT_FOUND)
-	 * .body(ApiResult.error(apiMsgHelper.getMessage(
-	 * "achievementRetrieveByKeyNotFound", null), null));
-	 */
+	private final IAchievementQueryHandler achievementQueryHandler;
 
 	/**
-	 * Handler for processing achievement query operations.
+	 * Constructor for dependency injection.
+	 * 
+	 * @param messageHelper Helper for API message handling
+	 * @param achievementQueryHandler Handler for processing achievement query operations
 	 */
-	@Autowired
-	private IAchievementQueryHandler achievementQueryHandler;
+	public AchievementQryApi(
+			ApiMessageHelper messageHelper,
+			IAchievementQueryHandler achievementQueryHandler) {
+		super(messageHelper);
+		this.achievementQueryHandler = achievementQueryHandler;
+	}
 
 	@Operation(summary = "Get Latest Achievements", description = "Retrieves the latest achievements ordered by completion date (newest first).")
 	@GetMapping("/latest")

@@ -4,7 +4,6 @@ import java.time.OffsetDateTime;
 
 import org.springframework.stereotype.Component;
 
-import espresso.achievement.domain.operational.exceptionPolicy.AchievementException;
 import espresso.common.domain.responses.ErrorResponse;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
@@ -14,47 +13,51 @@ import espresso.user.domain.operational.exceptionPolicy.UserException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Centralized exception policy for the Achievement module that handles mapping of different exception types
+ * Centralized exception policy for the Achievement module that handles mapping
+ * of different exception types
  * to appropriate HandlerResponse objects with user-friendly messages.
  * 
- * This policy eliminates code duplication across achievement handlers and provides consistent
+ * This policy eliminates code duplication across achievement handlers and
+ * provides consistent
  * error handling patterns throughout the achievement module.
  */
 @Component
 @Slf4j
 public class AchievementHandlerExceptionPolicy {
-    
+
     /**
      * Maps exceptions to appropriate HandlerResponse with user-friendly messages.
      * 
-     * @param ex The exception to handle
-     * @param operationContext Description of the operation being performed (e.g., "create achievement")
+     * @param ex               The exception to handle
+     * @param operationContext Description of the operation being performed (e.g.,
+     *                         "create achievement")
      * @return HandlerResponse with appropriate error message and status
      */
     public HandlerResponse<Object> handleException(Exception ex, String operationContext) {
         ErrorResponse errorResponse = mapToErrorResponse(ex, operationContext);
         return HandlerResponse.error(errorResponse.getMessage(), errorResponse.getResponseType());
     }
-    
+
     /**
      * Maps an exception to a structured ErrorResponse object.
      * 
-     * @param ex The exception to map
+     * @param ex               The exception to map
      * @param operationContext The operation context
      * @return ErrorResponse with structured error information
      */
     private ErrorResponse mapToErrorResponse(Exception ex, String operationContext) {
-        if (ex instanceof AchievementException) {
-            return mapAchievementException((AchievementException) ex, operationContext);
-        } else if (ex instanceof UserException) {
-            return mapUserException((UserException) ex, operationContext);
-        } else if (ex instanceof SecurityException) {
-            return mapSecurityException((SecurityException) ex, operationContext);
-        } else {
-            return mapSystemException(ex, operationContext);
-        }
+        return switch (ex) {
+            case AchievementException achievementException ->
+                mapAchievementException(achievementException, operationContext);
+            case UserException userException -> 
+                mapUserException(userException, operationContext);
+            case SecurityException securityException -> 
+                mapSecurityException(securityException, operationContext);
+            default -> 
+                mapSystemException(ex, operationContext);
+        };
     }
-    
+
     /**
      * Maps AchievementException to ErrorResponse.
      */
@@ -63,17 +66,17 @@ public class AchievementHandlerExceptionPolicy {
         if (log.isDebugEnabled()) {
             log.debug("Full error details for {}", operationContext, ex);
         }
-        
+
         return ErrorResponse.builder()
-            .message(ex.getMessage()) // Preserve original technical message
-            .errorCode(ex.getErrorCode())
-            .responseType(ResponseType.BAD_REQUEST)
-            .operationContext(operationContext)
-            .correlationId(ex.getCorrelationId())
-            .timestamp(OffsetDateTime.now())
-            .build();
+                .message(ex.getMessage()) // Preserve original technical message
+                .errorCode(ex.getErrorCode())
+                .responseType(ResponseType.BAD_REQUEST)
+                .operationContext(operationContext)
+                .correlationId(ex.getCorrelationId())
+                .timestamp(OffsetDateTime.now())
+                .build();
     }
-    
+
     /**
      * Maps UserException to ErrorResponse.
      */
@@ -82,17 +85,17 @@ public class AchievementHandlerExceptionPolicy {
         if (log.isDebugEnabled()) {
             log.debug("Full error details for {}", operationContext, ex);
         }
-        
+
         return ErrorResponse.builder()
-            .message(ex.getMessage()) // Preserve original technical message
-            .errorCode(ex.getErrorCode())
-            .responseType(ResponseType.BAD_REQUEST)
-            .operationContext(operationContext)
-            .correlationId(ex.getCorrelationId())
-            .timestamp(OffsetDateTime.now())
-            .build();
+                .message(ex.getMessage()) // Preserve original technical message
+                .errorCode(ex.getErrorCode())
+                .responseType(ResponseType.BAD_REQUEST)
+                .operationContext(operationContext)
+                .correlationId(ex.getCorrelationId())
+                .timestamp(OffsetDateTime.now())
+                .build();
     }
-    
+
     /**
      * Maps SecurityException to ErrorResponse.
      */
@@ -101,17 +104,17 @@ public class AchievementHandlerExceptionPolicy {
         if (log.isDebugEnabled()) {
             log.debug("Full error details for {}", operationContext, ex);
         }
-        
+
         return ErrorResponse.builder()
-            .message(ex.getMessage()) // Preserve original technical message
-            .errorCode(ex.getErrorCode())
-            .responseType(ResponseType.FORBIDDEN)
-            .operationContext(operationContext)
-            .correlationId(ex.getCorrelationId())
-            .timestamp(OffsetDateTime.now())
-            .build();
+                .message(ex.getMessage()) // Preserve original technical message
+                .errorCode(ex.getErrorCode())
+                .responseType(ResponseType.FORBIDDEN)
+                .operationContext(operationContext)
+                .correlationId(ex.getCorrelationId())
+                .timestamp(OffsetDateTime.now())
+                .build();
     }
-    
+
     /**
      * Maps system exceptions to ErrorResponse.
      */
@@ -120,14 +123,14 @@ public class AchievementHandlerExceptionPolicy {
         if (log.isDebugEnabled()) {
             log.debug("Full error details for {}", operationContext, ex);
         }
-        
+
         return ErrorResponse.builder()
-            .message(ex.getMessage()) // Preserve original technical message
-            .errorCode("SYSTEM_ERROR")
-            .responseType(ResponseType.INTERNAL_ERROR)
-            .operationContext(operationContext)
-            .correlationId(CorrelationContext.getCorrelationId()) // Get from context for system exceptions
-            .timestamp(OffsetDateTime.now())
-            .build();
+                .message(ex.getMessage()) // Preserve original technical message
+                .errorCode("SYSTEM_ERROR")
+                .responseType(ResponseType.INTERNAL_ERROR)
+                .operationContext(operationContext)
+                .correlationId(CorrelationContext.getCorrelationId()) // Get from context for system exceptions
+                .timestamp(OffsetDateTime.now())
+                .build();
     }
 }

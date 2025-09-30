@@ -1,13 +1,11 @@
 package espresso.achievement.application.commandHandlers;
 
 import java.util.Arrays;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import espresso.achievement.domain.contracts.ICreateAchivementCommandHandler;
 import espresso.achievement.domain.commands.CreateAchivementCommand;
 import espresso.achievement.domain.contracts.IAchievementRepository;
-import espresso.achievement.domain.contracts.IContentSafetyAIService;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
 import espresso.user.domain.entities.UserKto;
@@ -32,29 +30,25 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class CreateAchivementCommandHandler extends CommonCommandHandler implements ICreateAchivementCommandHandler {
 
-    /**
-     * Repository for achievement entity persistence operations.
-     */
-    @Autowired
-    private IAchievementRepository achievementRepository;
+    private final IAchievementRepository achievementRepository;
+    private final IUserRepository userRepository;
+    private final AchievementHandlerExceptionPolicy exceptionPolicy;
 
     /**
-     * Repository for user entity queries and operations.
+     * Constructor for dependency injection.
+     * 
+     * @param achievementRepository Repository for achievement entity persistence operations
+     * @param userRepository Repository for user entity queries and operations
+     * @param exceptionPolicy Centralized exception handling policy
      */
-    @Autowired
-    private IUserRepository userRepository;
-
-    /**
-     * Service for content safety verification using AI.
-     */    
-    // @Autowired
-    // private IContentSafetyAIService contentSafetyAIService;
-
-    /**
-     * Centralized exception handling policy.
-     */
-    @Autowired
-    private AchievementHandlerExceptionPolicy exceptionPolicy;
+    public CreateAchivementCommandHandler(
+            IAchievementRepository achievementRepository,
+            IUserRepository userRepository,
+            AchievementHandlerExceptionPolicy exceptionPolicy) {
+        this.achievementRepository = achievementRepository;
+        this.userRepository = userRepository;
+        this.exceptionPolicy = exceptionPolicy;
+    }
 
     /**
      * Processes the achievement creation command.
@@ -68,10 +62,6 @@ public class CreateAchivementCommandHandler extends CommonCommandHandler impleme
             var validationResult = validateCommand(cmd);
             if (validationResult != null)
                 return validationResult;
-
-            // TODO: Verify content safety for title and description
-            // String contentToVerify = command.getTitle() + "|" + command.getDescription();
-            // contentSafetyAIService.verifyTextContent(contentToVerify);
 
             // Get the profile of the user that is creating the achievemnet
             UserKto userKto = userRepository.findByKey(cmd.getUserKey(), UserKto.class);

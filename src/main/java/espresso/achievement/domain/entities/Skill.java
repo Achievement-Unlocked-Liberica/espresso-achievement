@@ -1,8 +1,7 @@
 package espresso.achievement.domain.entities;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+ 
 
 /**
  * Value object representing a skill that can be associated with achievements.

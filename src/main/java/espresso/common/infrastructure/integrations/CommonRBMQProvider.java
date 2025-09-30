@@ -2,7 +2,7 @@ package espresso.common.infrastructure.integrations;
 
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
+ 
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,11 +15,21 @@ import espresso.security.domain.operational.validationPolicy.SecurityValidator;
 @Component
 public class CommonRBMQProvider {
 
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
+    private final ObjectMapper objectMapper;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param rabbitTemplate Spring AMQP RabbitMQ template for message operations
+     * @param objectMapper Jackson object mapper for JSON serialization
+     */
+    public CommonRBMQProvider(
+            RabbitTemplate rabbitTemplate,
+            ObjectMapper objectMapper) {
+        this.rabbitTemplate = rabbitTemplate;
+        this.objectMapper = objectMapper;
+    }
 
     /**
      * Emit a JSON representation of the event to the specified RabbitMQ queue.
