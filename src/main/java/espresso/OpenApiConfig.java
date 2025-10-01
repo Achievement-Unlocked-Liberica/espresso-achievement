@@ -5,7 +5,6 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.servers.Server;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,8 +15,16 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
 
-    @Autowired
-    private EspressoPropertiesConfig espressoPropertiesConfig;
+    private final EspressoPropertiesConfig espressoPropertiesConfig;
+
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param espressoPropertiesConfig Configuration properties for the Espresso application
+     */
+    public OpenApiConfig(EspressoPropertiesConfig espressoPropertiesConfig) {
+        this.espressoPropertiesConfig = espressoPropertiesConfig;
+    }
 
     @Bean
     public OpenAPI customOpenAPI() {

@@ -1,6 +1,5 @@
 package espresso.achievement.infrastructure.repositories;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import espresso.achievement.domain.contracts.IAchievementCelebrationRepository;
@@ -13,8 +12,16 @@ import espresso.achievement.domain.entities.AchievementCelebration;
 @Repository
 public class AchievementCelebrationRepository implements IAchievementCelebrationRepository {
 
-    @Autowired
-    private AchievementCelebrationPSQLProvider psqlProvider;
+    private final AchievementCelebrationPSQLProvider psqlProvider;
+
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param psqlProvider PostgreSQL data provider for achievement celebration operations
+     */
+    public AchievementCelebrationRepository(AchievementCelebrationPSQLProvider psqlProvider) {
+        this.psqlProvider = psqlProvider;
+    }
 
     /**
      * Saves an achievement celebration record using the PostgreSQL provider.

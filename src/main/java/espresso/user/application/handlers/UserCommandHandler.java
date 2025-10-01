@@ -2,7 +2,6 @@ package espresso.user.application.handlers;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import espresso.common.application.handlers.CommonCommandHandler;
 // Validation centralized in CommonCommandHandler
@@ -16,15 +15,30 @@ import espresso.user.domain.contracts.IUserProfilePictureRepository;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
 import espresso.user.domain.entities.UserProfileImage;
+import espresso.user.domain.operational.exceptionPolicy.UserHandlerExceptionPolicy;
 
 @Service
 public class UserCommandHandler extends CommonCommandHandler implements IUserCommandHandler {
 
-    @Autowired
-    private IUserRepository userRepository;
+    private final IUserRepository userRepository;
+    private final IUserProfilePictureRepository userProfileImageRepository;
+    private final UserHandlerExceptionPolicy exceptionPolicy;
 
-    @Autowired
-    private IUserProfilePictureRepository userProfileImageRepository;
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param userRepository Repository for user entity persistence operations
+     * @param userProfileImageRepository Repository for user profile image operations
+     * @param exceptionPolicy Centralized exception handling policy
+     */
+    public UserCommandHandler(
+            IUserRepository userRepository,
+            IUserProfilePictureRepository userProfileImageRepository,
+            UserHandlerExceptionPolicy exceptionPolicy) {
+        this.userRepository = userRepository;
+        this.userProfileImageRepository = userProfileImageRepository;
+        this.exceptionPolicy = exceptionPolicy;
+    }
 
     // validator provided by base class
 
@@ -61,7 +75,7 @@ public class UserCommandHandler extends CommonCommandHandler implements IUserCom
             return HandlerResponse.created(savedEntity);
 
         } catch (Exception ex) {
-            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "add user");
         }
     }
 
@@ -102,7 +116,7 @@ public class UserCommandHandler extends CommonCommandHandler implements IUserCom
 
             return HandlerResponse.success(savedEntity);
         } catch (Exception ex) {
-            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "update profile picture");
         }
     }
 

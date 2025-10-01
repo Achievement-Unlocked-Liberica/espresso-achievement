@@ -1,7 +1,5 @@
 package espresso.achievement.domain.queries;
 
-import java.time.OffsetDateTime;
-
 import espresso.common.domain.queries.CommonQuery;
 import espresso.common.domain.queries.QuerySizeType;
 import jakarta.validation.constraints.NotNull;

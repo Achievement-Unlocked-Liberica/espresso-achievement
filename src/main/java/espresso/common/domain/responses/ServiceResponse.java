@@ -1,5 +1,7 @@
 package espresso.common.domain.responses;
 
+import java.net.URI;
+
 import org.springframework.http.HttpStatus;
 
 import lombok.AllArgsConstructor;
@@ -16,6 +18,7 @@ public class ServiceResponse<T> {
     private Integer count = null;
     private T data;
     private HttpStatus httpStatus;
+    private URI location;
 
     public static <T> ServiceResponse<T> empty() {
         return success(null, null, null);

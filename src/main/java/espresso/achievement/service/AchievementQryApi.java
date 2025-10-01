@@ -1,11 +1,11 @@
 package espresso.achievement.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import espresso.ApiMessageHelper;
 import espresso.achievement.domain.contracts.IAchievementQueryHandler;
 import espresso.achievement.domain.queries.GetAchievementDetailQuery;
 import espresso.achievement.domain.queries.GetLatestAchievementsQuery;
@@ -15,22 +15,30 @@ import espresso.common.service.operational.ApiLogger;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
+/**
+ * REST API controller for handling achievement query operations.
+ * Provides endpoints for retrieving achievement data including latest achievements
+ * and detailed achievement information. All endpoints support size-based DTOs
+ * for optimized data transfer.
+ */
 @RestController("Achievement Qry Api")
 @RequestMapping("/api/qry/achievement")
 public class AchievementQryApi extends CommonQryApi {
 
-	/*
-	 * @Autowired
-	 * private ApiMessageHelper apiMsgHelper;
-	 * 
-	 * return ResponseEntity
-	 * .status(HttpStatus.NOT_FOUND)
-	 * .body(ApiResult.error(apiMsgHelper.getMessage(
-	 * "achievementRetrieveByKeyNotFound", null), null));
-	 */
+	private final IAchievementQueryHandler achievementQueryHandler;
 
-	@Autowired
-	private IAchievementQueryHandler achievementQueryHandler;
+	/**
+	 * Constructor for dependency injection.
+	 * 
+	 * @param messageHelper Helper for API message handling
+	 * @param achievementQueryHandler Handler for processing achievement query operations
+	 */
+	public AchievementQryApi(
+			ApiMessageHelper messageHelper,
+			IAchievementQueryHandler achievementQueryHandler) {
+		super(messageHelper);
+		this.achievementQueryHandler = achievementQueryHandler;
+	}
 
 	@Operation(summary = "Get Latest Achievements", description = "Retrieves the latest achievements ordered by completion date (newest first).")
 	@GetMapping("/latest")

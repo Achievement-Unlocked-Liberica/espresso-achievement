@@ -3,27 +3,43 @@
 ## Feature: Disable Achievement Endpoint
 
 ### User Story
-As a player, I want to disable an achievement, so that I can remove it from all filters, searches, and visibility.
+As a player, I want to disable my achievements, so that I can remove them from public visibility and searches while keeping the data in the database.
 
 ### Endpoint Details
 - **Method**: PATCH
-- **URL**: `/api/cmd/achievement/{key}/disable`
-- **Authentication**: JWT token required
-- **Content-Type**: application/json
+- **URL**: `/api/cmd/achievement/{achievementKey}/disable`
+- **Authentication**: JWT token required (userKey extracted automatically)
 - **API Version**: X-API-Version header required
 
-### Acceptance Criteria
+## Acceptance Criteria
 
-#### AC1: Successful Achievement Disable
-**Given** a valid authenticated user  
-**And** the user owns an achievement with key "ACHI001"  
-**And** the achievement is currently enabled  
-**When** the user sends a PATCH request to `/api/cmd/achievement/ACHI001/disable`  
-**Then** the response status should be 200 OK  
-**And** the response should contain the disabled achievement  
-**And** the achievement's "enabled" property should be set to false  
-**And** the achievement should remain in the database  
-**And** the achievement should be removed from searches, filters, and public visibility  
+### AC1: Successful Achievement Disable
+**Given** a valid JWT token with userKey "ABC1234"
+**And** a user exists in the system with key "ABC1234"
+**And** an achievement exists with key "8NctRKY" owned by user "ABC1234"
+**And** the achievement is currently enabled (enabled=true)
+**When** the PATCH request is made to `/api/cmd/achievement/8NctRKY/disable`
+**Then** the system should:
+- Extract userKey from JWT token (not from request body)
+- Extract achievementKey "8NctRKY" from URL path parameter
+- Validate command via CommonCommand.validateCommand()
+- Look up user by key "ABC1234" via IUserRepository.findByKey()
+- Retrieve achievement by key "8NctRKY" via IAchievementRepository.getAchievementByKey()
+- Verify user "ABC1234" owns the achievement via achievement.isCreator()
+- Check achievement is enabled via achievement.isEnabled()
+- Call achievement.disable() to set enabled=false
+- Save updated achievement via IAchievementRepository.update()
+- Return HTTP 200 OK
+- Return response with entity key:
+```json
+{
+  "success": true,
+  "data": {
+    "entityKey": "8NctRKY"
+  },
+  "responseType": "SUCCESS"
+}
+```  
 
 #### AC2: Achievement Key Validation
 **Given** a valid authenticated user  

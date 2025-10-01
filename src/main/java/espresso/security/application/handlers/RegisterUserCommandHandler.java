@@ -1,6 +1,5 @@
 package espresso.security.application.handlers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import espresso.common.domain.responses.HandlerResponse;
@@ -9,16 +8,44 @@ import espresso.security.domain.commands.RegisterUserCommand;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
 import espresso.common.application.handlers.CommonCommandHandler;
+import espresso.security.domain.operational.exceptionPolicy.SecurityHandlerExceptionPolicy;
 // Validation centralized in CommonCommandHandler
 
+/**
+ * Command handler for user registration operations in the security domain.
+ * Processes user registration commands to create new user accounts with validation
+ * for unique usernames and email addresses. Extends CommonCommandHandler to inherit
+ * standard validation and error handling capabilities.
+ */
 @Service
 public class RegisterUserCommandHandler extends CommonCommandHandler {
 
-    @Autowired
-    private IUserRepository userRepository;
+    private final IUserRepository userRepository;
+    private final SecurityHandlerExceptionPolicy exceptionPolicy;
+
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param userRepository Repository for user data access and persistence operations
+     * @param exceptionPolicy Exception policy for centralized security exception handling
+     */
+    public RegisterUserCommandHandler(
+            IUserRepository userRepository,
+            SecurityHandlerExceptionPolicy exceptionPolicy) {
+        this.userRepository = userRepository;
+        this.exceptionPolicy = exceptionPolicy;
+    }
 
     // validator provided by base class
 
+    /**
+     * Handles user registration commands to create new user accounts.
+     * Validates command data, checks for username and email uniqueness,
+     * creates a new user entity, and persists it to the repository.
+     *
+     * @param command The registration command containing new user details
+     * @return HandlerResponse containing the created user on success or error details on failure
+     */
     public HandlerResponse<Object> handle(RegisterUserCommand command) {
         try {
             // Validate the command using shared Validator and any custom checks on the command
@@ -50,7 +77,7 @@ public class RegisterUserCommandHandler extends CommonCommandHandler {
             return HandlerResponse.success(savedUser);
 
         } catch (Exception ex) {
-            return HandlerResponse.error("LOCALIZE: USER REGISTRATION FAILED - " + ex.getMessage(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "register user");
         }
     }
 }

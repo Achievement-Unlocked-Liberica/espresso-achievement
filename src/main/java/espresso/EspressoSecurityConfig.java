@@ -1,6 +1,5 @@
 package espresso;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -20,11 +19,21 @@ import espresso.security.infrastructure.filters.JWTAuthenticationFilter;
 @EnableWebSecurity
 public class EspressoSecurityConfig {
 
-    @Autowired
-    private JWTAuthenticationFilter jwtAuthenticationFilter;
+    private final JWTAuthenticationFilter jwtAuthenticationFilter;
+    private final JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    @Autowired
-    private JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param jwtAuthenticationFilter JWT authentication filter for processing JWT tokens
+     * @param jwtAuthenticationEntryPoint JWT authentication entry point for handling authentication errors
+     */
+    public EspressoSecurityConfig(
+            JWTAuthenticationFilter jwtAuthenticationFilter,
+            JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

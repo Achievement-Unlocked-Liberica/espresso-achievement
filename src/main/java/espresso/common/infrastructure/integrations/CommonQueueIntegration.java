@@ -1,24 +1,31 @@
 package espresso.common.infrastructure.integrations;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.time.OffsetDateTime;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+ 
 import org.springframework.stereotype.Component;
 
 import espresso.common.domain.contracts.IQueueNameResolver;
 import espresso.common.domain.events.CommonEvent;
-import espresso.common.domain.support.KeyGenerator;
+ 
+import espresso.security.domain.operational.exceptionPolicy.SecurityException;
+import espresso.security.domain.operational.validationPolicy.SecurityValidator;
 
 @Component
 public class CommonQueueIntegration {
 
     private final Map<String, IQueueNameResolver> resolvers = new ConcurrentHashMap<>();
-    
-    @Autowired
-    private CommonRBMQProvider rbmqProvider;
+    private final CommonRBMQProvider rbmqProvider;
+
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param rbmqProvider RabbitMQ provider for message operations
+     */
+    public CommonQueueIntegration(CommonRBMQProvider rbmqProvider) {
+        this.rbmqProvider = rbmqProvider;
+    }
 
     /**
      * Registers a queue name resolver for a specific source module.
@@ -39,15 +46,25 @@ public class CommonQueueIntegration {
      * @throws IllegalStateException if no resolver is registered for the event's source
      */
     public void emitEvent(CommonEvent event) {
-        IQueueNameResolver resolver = resolvers.get(event.getSource());
-        
-        if (resolver == null) {
-            throw new IllegalStateException("No queue name resolver registered for source: " + event.getSource());
-        }
-        
-        String queueName = resolver.resolveQueueName(event.getEventType(), event.getSource());
+        try {
+            SecurityValidator.validateEvent(event);
+            
+            IQueueNameResolver resolver = resolvers.get(event.getSource());
+            
+            SecurityValidator.validateQueueNameResolver(resolver, event.getSource());
+            
+            String queueName = resolver.resolveQueueName(event.getEventType(), event.getSource());
+            
+            SecurityValidator.validateQueueName(queueName, event.getSource());
 
-        rbmqProvider.emitJson(event, queueName);
+            rbmqProvider.emitJson(event, queueName);
+            
+        } catch (SecurityException e) {
+            // Re-throw domain exceptions as-is
+            throw e;
+        } catch (Exception e) {
+            throw SecurityException.integrationFailed("Unexpected error occurred while emitting event: " + e.getMessage());
+        }
     }
 
     /**

@@ -17,6 +17,9 @@ import lombok.NoArgsConstructor;
 
 /**
  * Represents the aggregated celebration counts for an achievement.
+ * This entity maintains a denormalized count of all celebrations given to an achievement
+ * for performance optimization, avoiding the need to count individual celebration records
+ * when displaying achievement celebration totals.
  */
 @Data
 @NoArgsConstructor

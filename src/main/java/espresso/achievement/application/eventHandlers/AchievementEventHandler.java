@@ -1,6 +1,6 @@
 package espresso.achievement.application.eventHandlers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+ 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -14,38 +14,38 @@ import espresso.achievement.infrastructure.integrations.AchievementEventPublishe
 @Component
 public class AchievementEventHandler implements IAchievementEventHandler {
 
-    @Autowired
-    private AchievementEventPublisher achievementEventPublisher;
+    private final AchievementEventPublisher achievementEventPublisher;
+
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param achievementEventPublisher Event publisher for achievement events
+     */
+    public AchievementEventHandler(AchievementEventPublisher achievementEventPublisher) {
+        this.achievementEventPublisher = achievementEventPublisher;
+    }
 
     @Override
     @EventListener
     public void handleEvent(AchievementEvent event) {
-        System.out.println("EVENT HANDLED: " + event.toString());
-
         this.achievementEventPublisher.publishEvent(event);
     }
 
     @Override
     @EventListener
     public void handleEvent(AchievementCelebrationEvent event) {
-        System.out.println("EVENT HANDLED: " + event.toString());
-
         this.achievementEventPublisher.publishEvent(event);
     }
 
     @Override
     @EventListener
     public void handleEvent(AchievementCommentEvent event) {
-        System.out.println("EVENT HANDLED: " + event.toString());
-
         this.achievementEventPublisher.publishEvent(event);
     }
 
     @Override
     @EventListener
     public void handleEvent(AchievementMediaEvent event) {
-        System.out.println("EVENT HANDLED: " + event.toString());
-
         this.achievementEventPublisher.publishEvent(event);
     }
 

@@ -4,10 +4,15 @@ import java.util.function.Function;
 
 import org.springframework.http.ResponseEntity;
 
+import espresso.ApiMessageHelper;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ServiceResponse;
 
 public class CommonCmdApi extends CommonApi {
+
+    public CommonCmdApi(ApiMessageHelper messageHelper) {
+        super(messageHelper);
+    }
 
     /**
      * Generic helper method to handle command processing with consistent error handling
@@ -25,6 +30,7 @@ public class CommonCmdApi extends CommonApi {
         ServiceResponse<Object> apiResponse = null;
         try {
             HandlerResponse<Object> handlerResponse = handler.apply(command);
+            
             apiResponse = processHandlerResult(handlerResponse);
             
             return ResponseEntity

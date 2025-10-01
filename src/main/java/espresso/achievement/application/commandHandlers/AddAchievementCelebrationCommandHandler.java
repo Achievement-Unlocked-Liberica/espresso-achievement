@@ -1,6 +1,5 @@
-package espresso.achievement.application.handlers;
+package espresso.achievement.application.commandHandlers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import espresso.achievement.domain.contracts.IAddAchievementCelebrationCommandHandler;
@@ -15,23 +14,42 @@ import espresso.achievement.domain.entities.Achievement;
 import espresso.common.application.handlers.CommonCommandHandler;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+import espresso.achievement.domain.operational.exceptionPolicy.AchievementHandlerExceptionPolicy;
+
+import lombok.extern.slf4j.Slf4j;
 // Validation centralized in CommonCommandHandler
 
 /**
  * Handles the command to add a celebration to an existing achievement.
  */
+@Slf4j
 @Service
 public class AddAchievementCelebrationCommandHandler extends CommonCommandHandler
         implements IAddAchievementCelebrationCommandHandler {
 
-    @Autowired
-    private IAchievementRepository achievementRepository;
+    private final IAchievementRepository achievementRepository;
+    private final IUserRepository userRepository;
+    private final IAchievementCelebrationRepository celebrationRepository;
+    private final AchievementHandlerExceptionPolicy exceptionPolicy;
 
-    @Autowired
-    private IUserRepository userRepository;
-
-    @Autowired
-    private IAchievementCelebrationRepository celebrationRepository;
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param achievementRepository Repository for achievement entity persistence operations
+     * @param userRepository Repository for user entity queries and operations
+     * @param celebrationRepository Repository for achievement celebration operations
+     * @param exceptionPolicy Centralized exception handling policy
+     */
+    public AddAchievementCelebrationCommandHandler(
+            IAchievementRepository achievementRepository,
+            IUserRepository userRepository,
+            IAchievementCelebrationRepository celebrationRepository,
+            AchievementHandlerExceptionPolicy exceptionPolicy) {
+        this.achievementRepository = achievementRepository;
+        this.userRepository = userRepository;
+        this.celebrationRepository = celebrationRepository;
+        this.exceptionPolicy = exceptionPolicy;
+    }
 
     /**
      * Handles the command to add a celebration to an existing achievement.
@@ -76,15 +94,15 @@ public class AddAchievementCelebrationCommandHandler extends CommonCommandHandle
             // Add celebration to achievement (this will raise domain events)
             achievement.addCelebration(celebration);
 
-            AchievementCelebration savedCelebration = celebrationRepository.save(celebration);
+            celebrationRepository.save(celebration);
 
             this.publishDomainEvents(achievement);
 
             // Return success response
-            return HandlerResponse.success(savedCelebration);
+            return HandlerResponse.success(achievement.toKto());
 
         } catch (Exception ex) {
-            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "add celebration to achievement");
         }
     }
 }

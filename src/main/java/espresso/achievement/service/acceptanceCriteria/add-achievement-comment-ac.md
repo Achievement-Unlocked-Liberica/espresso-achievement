@@ -1,21 +1,51 @@
-# Achievement Comment Feature - Acceptance Criteria
+# Add Achievement Comment - Acceptance Criteria
 
-## Feature: Add Achievement Comment
-As a user, I want to add comments to existing achievements so that I can communicate with achievement owners.
+## Feature: Add Achievement Comment Endpoint
 
-### Scenario: Successfully add a comment to an existing achievement
-**Given** a user is authenticated with a valid JWT token
-**And** the user has a valid user key "USR123A"  
-**And** there exists an achievement with key "ACH456B"
-**When** the user submits a comment request with:
-  - achievementKey: "ACH456B"
-  - commentText: "Great achievement! Well done!"
-**Then** the system should create a new achievement comment
-**And** the comment should be saved with status "PENDING"
-**And** the comment should have default sentiment values (neutral)
-**And** the comment should have default language "en"
-**And** the response should return HTTP 201 Created
-**And** the response should contain the created comment data
+### User Story
+As a player, I want to add comments to achievements, so that I can share feedback, congratulations, or ask questions about the achievement.
+
+### Endpoint Details
+- **Method**: POST
+- **URL**: `/api/cmd/achievement/{achievementKey}/comment`
+- **Authentication**: JWT token required (userKey extracted automatically)
+- **Content-Type**: application/json
+- **API Version**: X-API-Version header required
+
+## Acceptance Criteria
+
+### AC1: Successful Comment Addition
+**Given** a valid JWT token with userKey "ABC1234"
+**And** a user exists in the system with key "ABC1234"
+**And** an achievement exists with key "8NctRKY"
+**And** the request payload contains valid comment data:
+```json
+{
+  "commentText": "Amazing achievement! Your dedication really shows in this accomplishment. Keep up the great work!"
+}
+```
+**When** the POST request is made to `/api/cmd/achievement/8NctRKY/comment`
+**Then** the system should:
+- Extract userKey from JWT token (not from request body)
+- Extract achievementKey "8NctRKY" from URL path parameter
+- Validate command via CommonCommand.validateCommand()
+- Look up user by key "ABC1234" via IUserRepository.findByKey()
+- Retrieve achievement by key "8NctRKY" via IAchievementRepository.getAchievementByKey()
+- Create new comment via AchievementComment.create(commentText, achievement, user)
+- Add comment to achievement via achievement.addComment(comment) (raises domain events)
+- Save comment via IAchievementCommentRepository.save(comment)
+- Publish domain events via publishDomainEvents(achievement)
+- Return HTTP 200 OK
+- Return response with achievement entity key:
+```json
+{
+  "success": true,
+  "data": {
+    "entityKey": "8NctRKY"
+  },
+  "responseType": "SUCCESS"
+}
+```
 
 ### Scenario: Fail to add comment with invalid achievement key
 **Given** a user is authenticated with a valid JWT token

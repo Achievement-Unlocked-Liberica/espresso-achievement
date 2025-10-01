@@ -1,8 +1,7 @@
-package espresso.achievement.application.handlers;
+package espresso.achievement.application.commandHandlers;
 
 import java.util.Arrays;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import espresso.achievement.domain.contracts.IUpdateAchievementCommandHandler;
@@ -15,19 +14,37 @@ import espresso.achievement.domain.entities.Achievement;
 import espresso.common.application.handlers.CommonCommandHandler;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+import espresso.achievement.domain.operational.exceptionPolicy.AchievementHandlerExceptionPolicy;
+
+import lombok.extern.slf4j.Slf4j;
 // Validation now handled by CommonCommandHandler
 
 /**
  * Handles the command to update an existing achievement.
  */
+@Slf4j
 @Service
 public class UpdateAchievementCommandHandler extends CommonCommandHandler implements IUpdateAchievementCommandHandler {
 
-    @Autowired
-    private IAchievementRepository achievementRepository;
+    private final IAchievementRepository achievementRepository;
+    private final IUserRepository userRepository;
+    private final AchievementHandlerExceptionPolicy exceptionPolicy;
 
-    @Autowired
-    private IUserRepository userRepository;
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param achievementRepository Repository for achievement entity persistence operations
+     * @param userRepository Repository for user entity queries and operations
+     * @param exceptionPolicy Centralized exception handling policy
+     */
+    public UpdateAchievementCommandHandler(
+            IAchievementRepository achievementRepository,
+            IUserRepository userRepository,
+            AchievementHandlerExceptionPolicy exceptionPolicy) {
+        this.achievementRepository = achievementRepository;
+        this.userRepository = userRepository;
+        this.exceptionPolicy = exceptionPolicy;
+    }
 
     // validator provided by base class
 
@@ -84,12 +101,12 @@ public class UpdateAchievementCommandHandler extends CommonCommandHandler implem
                     cmd.getIsPublic());
 
             // Save updated achievement via achievementRepository.update
-            Achievement updatedAchievement = achievementRepository.update(achievement);
+            achievementRepository.update(achievement);
 
-            return HandlerResponse.success(updatedAchievement);
+            return HandlerResponse.success(achievement.toKto());
 
         } catch (Exception ex) {
-            return HandlerResponse.error("LOCALIZE: " + ex.getMessage().toUpperCase(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "update achievement");
         }
     }
 }

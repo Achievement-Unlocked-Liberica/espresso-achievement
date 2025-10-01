@@ -1,0 +1,78 @@
+### Variables for Disable Achievement Tests
+@baseUrl = http://localhost:8080
+@jwtToken = YOUR_JWT_TOKEN_HERE
+@validUserKey = ABC1234
+@invalidUserKey = XYZ9999
+@validAchievementKey = 8NctRKY
+@nonExistentAchievementKey = MISSING
+@otherUserAchievementKey = OTHER123
+@alreadyDisabledAchievementKey = DISABLED
+
+### AC1: Successful Achievement Disable
+# Tests: Valid JWT token, user owns achievement, achievement is currently enabled
+# Expected: HTTP 200 OK with entity key response
+PATCH {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/disable
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC2.1: Missing JWT Token
+# Tests: Authentication failure - no JWT token provided
+# Expected: HTTP 401 Unauthorized
+PATCH {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/disable
+X-API-Version: 1.0
+
+### AC2.2: Invalid or Expired JWT Token
+# Tests: Authentication failure - invalid JWT token
+# Expected: HTTP 401 Unauthorized
+PATCH {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/disable
+Authorization: Bearer INVALID_TOKEN_HERE
+X-API-Version: 1.0
+
+### AC3: User Not Found
+# Tests: Valid JWT but user doesn't exist in system
+# Expected: HTTP 404 Not Found with correlation ID
+PATCH {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/disable
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC4: Achievement Not Found
+# Tests: Valid user but achievement doesn't exist
+# Expected: HTTP 404 Not Found with correlation ID
+PATCH {{baseUrl}}/api/cmd/achievement/{{nonExistentAchievementKey}}/disable
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC5: Unauthorized Access (Not Owner)
+# Tests: User doesn't own the achievement being disabled
+# Expected: HTTP 401 Unauthorized with correlation ID
+PATCH {{baseUrl}}/api/cmd/achievement/{{otherUserAchievementKey}}/disable
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC6: Achievement Already Disabled
+# Tests: Achievement is already disabled (enabled=false)
+# Expected: HTTP 204 No Content
+PATCH {{baseUrl}}/api/cmd/achievement/{{alreadyDisabledAchievementKey}}/disable
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC - Invalid Achievement Key Format (Too Short)
+# Tests: Achievement key validation - less than 7 characters
+# Expected: HTTP 400 Bad Request with validation error
+PATCH {{baseUrl}}/api/cmd/achievement/SHORT/disable
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC - Invalid Achievement Key Format (Too Long)
+# Tests: Achievement key validation - more than 7 characters
+# Expected: HTTP 400 Bad Request with validation error
+PATCH {{baseUrl}}/api/cmd/achievement/TOOLONG123/disable
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC - Re-disable Same Achievement
+# Tests: Multiple disable requests on same achievement
+# Expected: First request HTTP 200 OK, subsequent requests HTTP 204 No Content
+PATCH {{baseUrl}}/api/cmd/achievement/TEST_DISABLE_TWICE/disable
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0

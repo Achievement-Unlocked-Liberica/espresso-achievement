@@ -1,6 +1,5 @@
 package espresso.security.application.handlers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import espresso.common.application.handlers.CommonCommandHandler;
 // Validation centralized in CommonCommandHandler
@@ -14,21 +13,51 @@ import espresso.security.domain.entities.JWTAuthToken;
 import espresso.security.domain.entities.JWTUserToken;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
+import espresso.security.domain.operational.exceptionPolicy.SecurityHandlerExceptionPolicy;
 
+/**
+ * Command handler for user authentication and credential validation.
+ * Processes authentication commands to verify user credentials and generate JWT tokens.
+ * Also delegates user registration commands to the specialized registration handler.
+ * Extends CommonCommandHandler to inherit standard validation and error handling.
+ */
 @Service
 public class CredentialsCommandHandler extends CommonCommandHandler implements ISecurityCommandHandler {
 
-    @Autowired
-    private IUserRepository userRepository;
+    private final IUserRepository userRepository;
+    private final SecurityHandlerExceptionPolicy exceptionPolicy;
+    private final JWTAuthToken jwtAuthToken;
+    private final RegisterUserCommandHandler registerUserCommandHandler;
+
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param userRepository Repository for user data access and authentication operations
+     * @param exceptionPolicy Exception policy for centralized security exception handling
+     * @param jwtAuthToken JWT token service for generating and managing authentication tokens
+     * @param registerUserCommandHandler Specialized handler for user registration operations
+     */
+    public CredentialsCommandHandler(
+            IUserRepository userRepository,
+            SecurityHandlerExceptionPolicy exceptionPolicy,
+            JWTAuthToken jwtAuthToken,
+            RegisterUserCommandHandler registerUserCommandHandler) {
+        this.userRepository = userRepository;
+        this.exceptionPolicy = exceptionPolicy;
+        this.jwtAuthToken = jwtAuthToken;
+        this.registerUserCommandHandler = registerUserCommandHandler;
+    }
 
     // validator provided by base class
 
-    @Autowired
-    private JWTAuthToken jwtAuthToken;
-
-    @Autowired
-    private RegisterUserCommandHandler registerUserCommandHandler;
-
+    /**
+     * Handles authentication credential commands to verify user login.
+     * Validates user credentials, checks account status, and generates JWT tokens
+     * for successful authentication attempts.
+     *
+     * @param command The authentication credentials command containing username and password
+     * @return HandlerResponse containing JWT token on success or error details on failure
+     */
     @Override
     public HandlerResponse<Object> handle(AuthCredentialsCommand command) {
         // Validate the command using shared Validator and any custom checks
@@ -58,10 +87,17 @@ public class CredentialsCommandHandler extends CommonCommandHandler implements I
             return HandlerResponse.success(jwtToken);
 
         } catch (Exception ex) {
-            return HandlerResponse.error("LOCALIZE: AUTHENTICATION FAILED - " + ex.getMessage(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "authenticate user credentials");
         }
     }
 
+    /**
+     * Handles user registration commands by delegating to the specialized registration handler.
+     * Maintains clear separation of concerns between authentication and registration operations.
+     *
+     * @param command The user registration command containing new user details
+     * @return HandlerResponse from the registration handler
+     */
     @Override
     public HandlerResponse<Object> handle(RegisterUserCommand command) {
         return registerUserCommandHandler.handle(command);

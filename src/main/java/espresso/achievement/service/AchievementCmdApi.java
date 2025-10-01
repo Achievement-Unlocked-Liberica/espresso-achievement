@@ -1,6 +1,5 @@
 package espresso.achievement.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -16,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import espresso.ApiMessageHelper;
 import espresso.achievement.domain.commands.AddAchievementCelebrationCommand;
 import espresso.achievement.domain.commands.AddAchievementCommentCommand;
 import espresso.achievement.domain.commands.CreateAchivementCommand;
@@ -34,31 +34,55 @@ import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonCmdApi;
 import espresso.common.service.operational.ApiLogger;
 
+/**
+ * REST API controller for handling achievement command operations.
+ * Provides endpoints for creating, updating, deleting, and managing achievements
+ * including media uploads, comments, and celebrations.
+ * All endpoints require proper authentication and authorization.
+ */
 @RestController("Achievement Cmd Api")
 @RequestMapping("/api/cmd/achievement")
 @Tag(name = "Achievement Command API", description = "API for handling Achievement commands.")
 public class AchievementCmdApi extends CommonCmdApi {
 
-	@Autowired
-	private ICreateAchivementCommandHandler createAchivementCommandHandler;
+	private final ICreateAchivementCommandHandler createAchivementCommandHandler;
+	private final IUploadAchievementMediaCommandHandler uploadAchievementMediaCommandHandler;
+	private final IAddAchievementCommentCommandHandler addAchievementCommentCommandHandler;
+	private final IAddAchievementCelebrationCommandHandler addAchievementCelebrationCommandHandler;
+	private final IUpdateAchievementCommandHandler updateAchievementCommandHandler;
+	private final IDisableAchievementCommandHandler disableAchievementCommandHandler;
+	private final IDeleteAchievementCommandHandler deleteAchievementCommandHandler;
 
-	@Autowired
-	private IUploadAchievementMediaCommandHandler uploadAchievementMediaCommandHandler;
-
-	@Autowired
-	private IAddAchievementCommentCommandHandler addAchievementCommentCommandHandler;
-
-	@Autowired
-	private IAddAchievementCelebrationCommandHandler addAchievementCelebrationCommandHandler;
-
-	@Autowired
-	private IUpdateAchievementCommandHandler updateAchievementCommandHandler;
-
-	@Autowired
-	private IDisableAchievementCommandHandler disableAchievementCommandHandler;
-
-	@Autowired
-	private IDeleteAchievementCommandHandler deleteAchievementCommandHandler;
+	/**
+	 * Constructor for dependency injection.
+	 * 
+	 * @param messageHelper Helper for API message handling
+	 * @param createAchivementCommandHandler Handler for processing achievement creation commands
+	 * @param uploadAchievementMediaCommandHandler Handler for processing achievement media upload commands
+	 * @param addAchievementCommentCommandHandler Handler for processing achievement comment commands
+	 * @param addAchievementCelebrationCommandHandler Handler for processing achievement celebration commands
+	 * @param updateAchievementCommandHandler Handler for processing achievement update commands
+	 * @param disableAchievementCommandHandler Handler for processing achievement disable commands
+	 * @param deleteAchievementCommandHandler Handler for processing achievement deletion commands
+	 */
+	public AchievementCmdApi(
+			ApiMessageHelper messageHelper,
+			ICreateAchivementCommandHandler createAchivementCommandHandler,
+			IUploadAchievementMediaCommandHandler uploadAchievementMediaCommandHandler,
+			IAddAchievementCommentCommandHandler addAchievementCommentCommandHandler,
+			IAddAchievementCelebrationCommandHandler addAchievementCelebrationCommandHandler,
+			IUpdateAchievementCommandHandler updateAchievementCommandHandler,
+			IDisableAchievementCommandHandler disableAchievementCommandHandler,
+			IDeleteAchievementCommandHandler deleteAchievementCommandHandler) {
+		super(messageHelper);
+		this.createAchivementCommandHandler = createAchivementCommandHandler;
+		this.uploadAchievementMediaCommandHandler = uploadAchievementMediaCommandHandler;
+		this.addAchievementCommentCommandHandler = addAchievementCommentCommandHandler;
+		this.addAchievementCelebrationCommandHandler = addAchievementCelebrationCommandHandler;
+		this.updateAchievementCommandHandler = updateAchievementCommandHandler;
+		this.disableAchievementCommandHandler = disableAchievementCommandHandler;
+		this.deleteAchievementCommandHandler = deleteAchievementCommandHandler;
+	}
 
 	@Operation(summary = "Create New Achivement", description = "Creates a new Achievement from the provided command.")
 	@PostMapping("")

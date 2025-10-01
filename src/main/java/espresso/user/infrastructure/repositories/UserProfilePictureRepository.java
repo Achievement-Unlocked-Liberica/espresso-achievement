@@ -1,42 +1,68 @@
 package espresso.user.infrastructure.repositories;
 
 import org.springframework.core.env.Environment;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import espresso.user.domain.contracts.IUserProfilePictureRepository;
 import espresso.user.domain.entities.UserProfileImage;
+import espresso.user.domain.operational.exceptionPolicy.UserException;
+import espresso.user.domain.operational.validationPolicy.UserValidator;
 
 @Repository
 public class UserProfilePictureRepository implements IUserProfilePictureRepository {
 
-    @Autowired
-    private Environment environment;
+    private final Environment environment;
+    private final UserProfilePictureS3Provider s3DataProvider;
+    private final UserProfilePicturePSQLProvider psqlProvider;
 
-    @Autowired
-    UserProfilePictureS3Provider s3DataProvider;
-
-    @Autowired
-    UserProfilePicturePSQLProvider psqlProvider;
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param environment Spring environment for configuration properties
+     * @param s3DataProvider S3 data provider for image storage operations
+     * @param psqlProvider PostgreSQL data provider for user profile picture operations
+     */
+    public UserProfilePictureRepository(
+            Environment environment,
+            UserProfilePictureS3Provider s3DataProvider,
+            UserProfilePicturePSQLProvider psqlProvider) {
+        this.environment = environment;
+        this.s3DataProvider = s3DataProvider;
+        this.psqlProvider = psqlProvider;
+    }
 
     @Override
     public UserProfileImage save(UserProfileImage userProfileImage) throws IOException {
-        // Implementation for saving the user profile image
-        String directory = environment.getProperty("user.profilePicture.directory");
+        try {
+            UserValidator.validateUserProfileImage(userProfileImage);
+            
+            // Implementation for saving the user profile image
+            String directory = environment.getProperty("user.profilePicture.directory");
+            
+            UserValidator.validateConfigurationDirectory(directory, "user.profilePicture.directory");
 
-        String objectStoragePath = s3DataProvider.uploadImage(directory, userProfileImage);
+            String objectStoragePath = s3DataProvider.uploadImage(directory, userProfileImage);
 
-        // Clear the image data to avoid sending large binary data in the response
-        userProfileImage.setImageData(null);
+            // Clear the image data to avoid sending large binary data in the response
+            userProfileImage.setImageData(null);
+            userProfileImage.setProfileImageUrl(objectStoragePath);
 
-        userProfileImage.setProfileImageUrl(objectStoragePath);
-
-        UserProfileImage savedEntity = psqlProvider.save(userProfileImage);
-
-        return savedEntity;
+            return psqlProvider.save(userProfileImage);
+            
+        } catch (UserException e) {
+            // Re-throw domain exceptions as-is
+            throw e;
+        } catch (DataIntegrityViolationException e) {
+            throw UserException.profileUpdateFailed("unknown", "Profile picture already exists or data integrity violation");
+        } catch (DataAccessException e) {
+            throw UserException.profileUpdateFailed("unknown", "Database error occurred while saving profile picture");
+        } catch (Exception e) {
+            throw UserException.profileUpdateFailed("unknown", "Unexpected error occurred while saving profile picture");
+        }
     }
 
 }

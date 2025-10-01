@@ -1,12 +1,13 @@
 package espresso.security.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+ 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import espresso.ApiMessageHelper;
 import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonCmdApi;
 import espresso.common.service.operational.ApiLogger;
@@ -22,8 +23,20 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Security Command API", description = "API for handling authentication and authorization commands.")
 public class SecurityCmdApi extends CommonCmdApi {
 
-    @Autowired
-    private ISecurityCommandHandler securityCommandHandler;
+    private final ISecurityCommandHandler securityCommandHandler;
+
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param messageHelper Helper for API message handling
+     * @param securityCommandHandler Handler for processing security commands
+     */
+    public SecurityCmdApi(
+            ApiMessageHelper messageHelper,
+            ISecurityCommandHandler securityCommandHandler) {
+        super(messageHelper);
+        this.securityCommandHandler = securityCommandHandler;
+    }
 
     @Operation(summary = "Authenticate User", description = "Authenticates user credentials and returns a JWT token.")
     @PostMapping("/auth")

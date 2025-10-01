@@ -129,7 +129,7 @@ public class Achievement extends DomainAggregate {
      * @param initializeEntity Indicates whether the entity should be initialized.
      */
     protected Achievement(boolean initializeEntity) {
-        if (initializeEntity == true) {
+        if (initializeEntity) {
             this.initializeEntity();
         }
     }
@@ -267,6 +267,21 @@ public class Achievement extends DomainAggregate {
         this.updateEntity();
 
         this.raiseMediaAdded(media);
+    }
+
+    // Converts this achievement to a DTO (Data Transfer Object) representation.
+    public AchievementKto toKto(){
+        return new AchievementKto() {
+            @Override
+            public Long getId() {
+                return Achievement.this.getId();
+            }
+            
+            @Override
+            public String getEntityKey() {
+                return Achievement.this.getEntityKey();
+            }
+        };
     }
 
     // #region Domain Events

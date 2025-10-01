@@ -4,10 +4,15 @@ import java.util.function.Function;
 
 import org.springframework.http.ResponseEntity;
 
+import espresso.ApiMessageHelper;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ServiceResponse;
 
 public class CommonQryApi extends CommonApi {
+
+    public CommonQryApi(ApiMessageHelper messageHelper) {
+        super(messageHelper);
+    }
 
     /**
      * Generic helper method to handle query processing with consistent error handling
@@ -25,6 +30,7 @@ public class CommonQryApi extends CommonApi {
         ServiceResponse<Object> apiResponse = null;
         try {
             HandlerResponse<Object> handlerResponse = handler.apply(query);
+            
             apiResponse = processHandlerResult(handlerResponse);
             
             return ResponseEntity

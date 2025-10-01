@@ -2,7 +2,7 @@ package espresso.achievement.domain.readModels;
 
 import java.util.Date;
 
-import org.springframework.format.annotation.DateTimeFormat;
+ 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -43,30 +43,25 @@ public class AchievementDetailReadModel {
      */
     private final SkillDetailReadModel[] skills;
     
-    // private final AchievementMediaDetailReadModel[] media;
-    
     /**
      * User profile information of the achievement owner.
      */
     private final UserProfileDetailReadModel userProfile;
-    // private AchievementVisibilityStatus achievementVisibility;
 
     public static AchievementDetailReadModel createMockInstance(String key) {
-        AchievementDetailReadModel mockInstance = new AchievementDetailReadModel(
-                key,
-                "mockTitle",
-                "mockDescription",
-                new Date(),
-                new SkillDetailReadModel[] {
-                        new SkillDetailReadModel("str0000", "str", "strength"),
-                        new SkillDetailReadModel("dex0000", "dex", "dexterity") },
-                new UserProfileDetailReadModel(
-                        "mockKey",
-                        "mockUserName",
-                        "mockEmail",
-                        "mockFirstName",
-                        "mockLastName"));
-
-        return mockInstance;
+    return new AchievementDetailReadModel(
+        key,
+        "mockTitle",
+        "mockDescription",
+        new Date(),
+        new SkillDetailReadModel[] {
+            new SkillDetailReadModel("str0000", "str", "strength"),
+            new SkillDetailReadModel("dex0000", "dex", "dexterity") },
+        new UserProfileDetailReadModel(
+            "mockKey",
+            "mockUserName",
+            "mockEmail",
+            "mockFirstName",
+            "mockLastName"));
     }
 }

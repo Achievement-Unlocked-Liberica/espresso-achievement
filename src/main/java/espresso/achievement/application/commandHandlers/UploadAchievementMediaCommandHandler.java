@@ -1,14 +1,11 @@
-package espresso.achievement.application.handlers;
+package espresso.achievement.application.commandHandlers;
 
-import java.io.IOException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import espresso.achievement.domain.contracts.IUploadAchievementMediaCommandHandler;
 import espresso.achievement.domain.commands.UploadAchievementMediaCommand;
 import espresso.achievement.domain.contracts.IAchievementRepository;
-import espresso.achievement.domain.contracts.IContentSafetyAIService;
 import espresso.achievement.domain.contracts.IAchievementMediaRepository;
 import espresso.user.domain.contracts.IUserRepository;
 import espresso.user.domain.entities.User;
@@ -18,26 +15,42 @@ import espresso.achievement.domain.entities.AchievementMedia;
 import espresso.common.application.handlers.CommonCommandHandler;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+import espresso.achievement.domain.operational.exceptionPolicy.AchievementHandlerExceptionPolicy;
+
+import lombok.extern.slf4j.Slf4j;
 // Validation centralized in CommonCommandHandler
 
 /**
  * Handles the upload of media files for an achievement.
  */
+@Slf4j
 @Service
 public class UploadAchievementMediaCommandHandler extends CommonCommandHandler
         implements IUploadAchievementMediaCommandHandler {
 
-    @Autowired
-    private IAchievementRepository achievementRepository;
+    private final IAchievementRepository achievementRepository;
+    private final IAchievementMediaRepository achievementMediaRepository;
+    private final IUserRepository userRepository;
+    private final AchievementHandlerExceptionPolicy exceptionPolicy;
 
-    @Autowired
-    private IAchievementMediaRepository achievementMediaRepository;
-
-    @Autowired
-    private IUserRepository userRepository;
-
-    @Autowired
-    private IContentSafetyAIService contentSafetyAIService;
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param achievementRepository Repository for achievement entity persistence operations
+     * @param achievementMediaRepository Repository for achievement media operations
+     * @param userRepository Repository for user entity queries and operations
+     * @param exceptionPolicy Centralized exception handling policy
+     */
+    public UploadAchievementMediaCommandHandler(
+            IAchievementRepository achievementRepository,
+            IAchievementMediaRepository achievementMediaRepository,
+            IUserRepository userRepository,
+            AchievementHandlerExceptionPolicy exceptionPolicy) {
+        this.achievementRepository = achievementRepository;
+        this.achievementMediaRepository = achievementMediaRepository;
+        this.userRepository = userRepository;
+        this.exceptionPolicy = exceptionPolicy;
+    }
 
     public HandlerResponse<Object> handle(UploadAchievementMediaCommand cmd) {
         try {
@@ -72,10 +85,6 @@ public class UploadAchievementMediaCommandHandler extends CommonCommandHandler
             // Process each image in the array
             for (MultipartFile image : cmd.getImages()) {
 
-                // Validate the image content safety
-                // byte[] contentToVerify = image.getBytes();
-                // contentSafetyAIService.verifyImageContent(contentToVerify);
-
                 // Create AchievementMedia entity
                 AchievementMedia media = AchievementMedia.create(
                         achievement,
@@ -92,11 +101,10 @@ public class UploadAchievementMediaCommandHandler extends CommonCommandHandler
 
             this.publishDomainEvents(achievement);
 
-            // Return the achievement instance
-            return HandlerResponse.created(achievement.getMedia());
+            return HandlerResponse.success(achievement.toKto());
 
         } catch (Exception ex) {
-            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "upload media to achievement");
         }
     }
 }

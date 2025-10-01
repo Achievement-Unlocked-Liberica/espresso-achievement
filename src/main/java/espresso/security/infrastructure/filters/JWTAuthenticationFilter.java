@@ -2,7 +2,7 @@ package espresso.security.infrastructure.filters;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
+ 
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,15 +18,43 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * JWT authentication filter that processes incoming HTTP requests to validate JWT tokens.
+ * Extends Spring Security's OncePerRequestFilter to ensure authentication is processed
+ * exactly once per request. Extracts and validates JWT tokens from Authorization headers,
+ * sets up the security context for authenticated users, and allows unauthenticated
+ * access to authentication endpoints.
+ */
 @Component
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JWTAuthToken jwtAuthToken;
+    private final JWTAuthToken jwtAuthToken;
+    private final UserDetailsService userDetailsService;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param jwtAuthToken JWT token service for token validation and claim extraction
+     * @param userDetailsService Spring Security user details service for loading user information
+     */
+    public JWTAuthenticationFilter(
+            JWTAuthToken jwtAuthToken,
+            UserDetailsService userDetailsService) {
+        this.jwtAuthToken = jwtAuthToken;
+        this.userDetailsService = userDetailsService;
+    }
 
+    /**
+     * Processes each HTTP request to validate JWT tokens and set up authentication context.
+     * Skips authentication for login endpoints, extracts tokens from Authorization headers,
+     * validates tokens, and establishes security context for authenticated requests.
+     *
+     * @param request The HTTP servlet request containing potential JWT tokens
+     * @param response The HTTP servlet response for the request
+     * @param filterChain The filter chain to continue processing the request
+     * @throws ServletException If servlet processing fails
+     * @throws IOException If I/O operations fail during request processing
+     */
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, 
                                   @NonNull FilterChain filterChain) throws ServletException, IOException {

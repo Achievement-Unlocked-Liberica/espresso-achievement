@@ -1,0 +1,183 @@
+### Variables for Add Achievement Comment Tests
+@baseUrl = http://localhost:8080
+@jwtToken = YOUR_JWT_TOKEN_HERE
+@validUserKey = ABC1234
+@invalidUserKey = XYZ9999
+@validAchievementKey = 8NctRKY
+@nonExistentAchievementKey = MISSING
+
+### AC1: Successful Comment Addition
+# Tests: Valid JWT token, existing user, existing achievement, valid comment
+# Expected: HTTP 200 OK with entity key response
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/comment
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "commentText": "Amazing achievement! Your dedication really shows in this accomplishment. Keep up the great work!"
+}
+
+### AC2.1: Missing JWT Token
+# Tests: Authentication failure - no JWT token provided
+# Expected: HTTP 401 Unauthorized
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/comment
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "commentText": "This comment should fail due to missing JWT token"
+}
+
+### AC2.2: Invalid or Expired JWT Token
+# Tests: Authentication failure - invalid JWT token
+# Expected: HTTP 401 Unauthorized
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/comment
+Authorization: Bearer INVALID_TOKEN_HERE
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "commentText": "This comment should fail due to invalid JWT token"
+}
+
+### AC3: User Not Found
+# Tests: Valid JWT but user doesn't exist in system
+# Expected: HTTP 404 Not Found with correlation ID
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/comment
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "commentText": "Valid comment but user from JWT doesn't exist"
+}
+
+### AC4: Achievement Not Found
+# Tests: Valid user but achievement doesn't exist
+# Expected: HTTP 404 Not Found with correlation ID
+POST {{baseUrl}}/api/cmd/achievement/{{nonExistentAchievementKey}}/comment
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "commentText": "Valid comment but achievement doesn't exist"
+}
+
+### AC5.1: Missing Comment Text
+# Tests: JSR-303 validation failure - missing commentText field
+# Expected: HTTP 400 Bad Request with validation error
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/comment
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+}
+
+### AC5.2: Empty Comment Text
+# Tests: JSR-303 validation failure - empty commentText
+# Expected: HTTP 400 Bad Request with validation error
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/comment
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "commentText": ""
+}
+
+### AC5.3: Whitespace Only Comment Text
+# Tests: JSR-303 validation failure - whitespace only commentText
+# Expected: HTTP 400 Bad Request with validation error
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/comment
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "commentText": "   "
+}
+
+### AC - Long Comment Text
+# Tests: Valid long comment with maximum allowed length
+# Expected: HTTP 200 OK with entity key response
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/comment
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "commentText": "This is a very detailed comment about the achievement. I want to provide comprehensive feedback about how impressive this accomplishment is. The level of dedication and skill required to complete this achievement is truly remarkable. I appreciate the effort that went into documenting and sharing this with the community. It serves as great inspiration for others who are working towards similar goals. The attention to detail and quality of work shown here demonstrates a commitment to excellence that is admirable and worth recognizing."
+}
+
+### AC - Short Comment Text
+# Tests: Valid minimal comment
+# Expected: HTTP 200 OK with entity key response
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/comment
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "commentText": "Great job!"
+}
+
+### AC - Comment with Special Characters
+# Tests: Comment containing special characters and emojis
+# Expected: HTTP 200 OK with entity key response
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/comment
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "commentText": "Awesome work! 🎉 Your achievement really stands out. Keep it up! 💪 #achievement #success @user"
+}
+
+### AC - Multiple Comments from Same User
+# Tests: User can add multiple comments to same achievement
+# Expected: HTTP 200 OK with entity key response (for each request)
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/comment
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "commentText": "This is my first comment on this achievement."
+}
+
+### 
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/comment
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "commentText": "This is my second comment on the same achievement with additional thoughts."
+}
+
+### AC - Comment on Own Achievement
+# Tests: User commenting on their own achievement
+# Expected: HTTP 200 OK with entity key response
+POST {{baseUrl}}/api/cmd/achievement/MY_OWN_ACHIEVEMENT/comment
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "commentText": "Adding a comment to my own achievement to provide additional context and details."
+}
+
+### AC - Invalid Achievement Key Format
+# Tests: Achievement key validation - invalid format
+# Expected: HTTP 400 Bad Request with validation error
+POST {{baseUrl}}/api/cmd/achievement/SHORT/comment
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "commentText": "Valid comment text but invalid achievement key format"
+}

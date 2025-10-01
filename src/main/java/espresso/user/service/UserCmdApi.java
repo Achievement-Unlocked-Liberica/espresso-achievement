@@ -1,6 +1,5 @@
 package espresso.user.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import espresso.common.domain.responses.HandlerResponse;
+import espresso.ApiMessageHelper;
 import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonCmdApi;
 import espresso.common.service.operational.ApiLogger;
@@ -27,8 +26,20 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "User Command API", description = "API for handling User commands.")
 public class UserCmdApi extends CommonCmdApi {
 
-    @Autowired
-    private IUserCommandHandler userCommandHandler;
+    private final IUserCommandHandler userCommandHandler;
+
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param messageHelper Helper for API message handling
+     * @param userCommandHandler Handler for processing user commands
+     */
+    public UserCmdApi(
+            ApiMessageHelper messageHelper,
+            IUserCommandHandler userCommandHandler) {
+        super(messageHelper);
+        this.userCommandHandler = userCommandHandler;
+    }
 
     @Operation(summary = "Create New User", description = "Creates a new User from the provided command.")
     @PostMapping("")

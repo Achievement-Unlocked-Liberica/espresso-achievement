@@ -5,9 +5,20 @@ import java.util.List;
 
 import espresso.achievement.domain.entities.Achievement;
 
+/**
+ * Repository interface for Achievement entity operations.
+ * Combines both command and query operations for achievements,
+ * providing CRUD operations and specialized query methods for achievement data.
+ */
 public interface IAchievementRepository {
 
-    // Command operations (from IAchievementCmdRepository)
+    // Command operations
+    /**
+     * Saves a new achievement to the repository.
+     * 
+     * @param achievement The achievement entity to save
+     * @return The saved Achievement entity with generated ID and timestamps
+     */
     Achievement save(Achievement achievement);
     
     /**
@@ -29,7 +40,7 @@ public interface IAchievementRepository {
      */
     void deleteWithDependencies(Achievement achievement);
 
-    // Query operations (from IAchievementQryRepository)
+    // Query operations
     /**
      * Gets the latest achievements ordered by completion date (newest first)
      * @param <T> The type of the DTO to project to (e.g., AchievementDtoSm.class)

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 import espresso.achievement.domain.contracts.ISkillRepository;
 import espresso.achievement.domain.entities.Skill;

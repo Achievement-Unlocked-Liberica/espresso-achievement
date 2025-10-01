@@ -1,9 +1,6 @@
 package espresso.user.domain.entities;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
-
-import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

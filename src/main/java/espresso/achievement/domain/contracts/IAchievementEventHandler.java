@@ -1,7 +1,5 @@
 package espresso.achievement.domain.contracts;
 
-import org.springframework.context.event.EventListener;
-
 import espresso.achievement.domain.events.AchievementCelebrationEvent;
 import espresso.achievement.domain.events.AchievementCommentEvent;
 import espresso.achievement.domain.events.AchievementEvent;

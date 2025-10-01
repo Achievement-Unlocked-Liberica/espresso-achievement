@@ -1,0 +1,217 @@
+### Variables for Add Achievement Celebration Tests
+@baseUrl = http://localhost:8080
+@jwtToken = YOUR_JWT_TOKEN_HERE
+@validUserKey = ABC1234
+@invalidUserKey = XYZ9999
+@validAchievementKey = 8NctRKY
+@nonExistentAchievementKey = MISSING
+
+### AC1: Successful Celebration Addition
+# Tests: Valid JWT token, existing user, existing achievement, valid count
+# Expected: HTTP 200 OK with entity key response
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/celebration
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "count": 3
+}
+
+### AC2.1: Missing JWT Token
+# Tests: Authentication failure - no JWT token provided
+# Expected: HTTP 401 Unauthorized
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/celebration
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "count": 5
+}
+
+### AC2.2: Invalid or Expired JWT Token
+# Tests: Authentication failure - invalid JWT token
+# Expected: HTTP 401 Unauthorized
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/celebration
+Authorization: Bearer INVALID_TOKEN_HERE
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "count": 5
+}
+
+### AC3: User Not Found
+# Tests: Valid JWT but user doesn't exist in system
+# Expected: HTTP 404 Not Found with correlation ID
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/celebration
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "count": 2
+}
+
+### AC4: Achievement Not Found
+# Tests: Valid user but achievement doesn't exist
+# Expected: HTTP 404 Not Found with correlation ID
+POST {{baseUrl}}/api/cmd/achievement/{{nonExistentAchievementKey}}/celebration
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "count": 4
+}
+
+### AC5.1: Missing Count Field
+# Tests: JSR-303 validation failure - missing count field
+# Expected: HTTP 400 Bad Request with validation error
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/celebration
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+}
+
+### AC5.2: Invalid Count Value - Negative
+# Tests: JSR-303 validation failure - negative count value
+# Expected: HTTP 400 Bad Request with validation error
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/celebration
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "count": -1
+}
+
+### AC5.2: Invalid Count Value - Zero
+# Tests: JSR-303 validation failure - zero count value
+# Expected: HTTP 400 Bad Request with validation error
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/celebration
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "count": 0
+}
+
+### AC7: Multiple Celebrations from Same User
+# Tests: User can celebrate same achievement multiple times
+# Expected: HTTP 200 OK with entity key response (for each request)
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/celebration
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "count": 2
+}
+
+### 
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/celebration
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "count": 1
+}
+
+### 
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/celebration
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "count": 5
+}
+
+### AC8: Self-Celebration
+# Tests: User celebrating their own achievement
+# Expected: HTTP 200 OK with entity key response
+POST {{baseUrl}}/api/cmd/achievement/MY_OWN_ACHIEVEMENT/celebration
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "count": 5
+}
+
+### AC - Maximum Celebration Count
+# Tests: High celebration count value
+# Expected: HTTP 200 OK with entity key response
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/celebration
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "count": 100
+}
+
+### AC - Minimum Valid Celebration Count
+# Tests: Minimum valid celebration count (1)
+# Expected: HTTP 200 OK with entity key response
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/celebration
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "count": 1
+}
+
+### AC - Celebration with Different Count Values
+# Tests: Various valid count values
+# Expected: HTTP 200 OK with entity key response
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/celebration
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "count": 7
+}
+
+### AC - Invalid Achievement Key Format
+# Tests: Achievement key validation - invalid format
+# Expected: HTTP 400 Bad Request with validation error
+POST {{baseUrl}}/api/cmd/achievement/SHORT/celebration
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "count": 3
+}
+
+### AC - Celebration with String Count (Invalid)
+# Tests: Invalid data type for count field
+# Expected: HTTP 400 Bad Request with validation error
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/celebration
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "count": "five"
+}
+
+### AC - Celebration with Decimal Count (Invalid)
+# Tests: Invalid data type for count field (should be integer)
+# Expected: HTTP 400 Bad Request with validation error
+POST {{baseUrl}}/api/cmd/achievement/{{validAchievementKey}}/celebration
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "count": 3.5
+}

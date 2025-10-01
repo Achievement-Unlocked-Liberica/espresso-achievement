@@ -1,15 +1,14 @@
 package espresso.user.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
+ 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import espresso.ApiMessageHelper;
 import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonQryApi;
 import espresso.common.service.operational.ApiLogger;
@@ -28,8 +27,20 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Users Query API", description = "Query API for Users")
 public class UserQryApi extends CommonQryApi {
 
-    @Autowired
-    private IUserQueryHandler usersQueryHandler;
+    private final IUserQueryHandler usersQueryHandler;
+
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param messageHelper Helper for API message handling
+     * @param usersQueryHandler Handler for processing user queries
+     */
+    public UserQryApi(
+            ApiMessageHelper messageHelper,
+            IUserQueryHandler usersQueryHandler) {
+        super(messageHelper);
+        this.usersQueryHandler = usersQueryHandler;
+    }
 
     @Operation(summary = "Get Single User By Key", description = "Get a single user by their entity key.")
     @GetMapping(value = "", headers = "X-API-Version=1")
@@ -61,13 +72,11 @@ public class UserQryApi extends CommonQryApi {
     @ApiResponse(responseCode = "401:UNAUTHORIZED", description = "User not authenticated.")
     @ApiResponse(responseCode = "404:NOT_FOUND", description = "User profile not found.")
     @ApiLogger("Get authenticated user profile")
-    // public ResponseEntity<ServiceResponse<Object>> getMyUserProfile(@AuthenticationPrincipal JWTAuthenticationToken jwt) {
     public ResponseEntity<ServiceResponse<Object>> getMyUserProfile() {
         // Get authentication from SecurityContext
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication instanceof JWTAuthenticationToken) {
-            JWTAuthenticationToken jwtAuth = (JWTAuthenticationToken) authentication;
+        if (authentication instanceof JWTAuthenticationToken jwtAuth) {
 
             // Create query with the user's entity key
             GetMyUserQuery query = new GetMyUserQuery(jwtAuth.getUserKey());

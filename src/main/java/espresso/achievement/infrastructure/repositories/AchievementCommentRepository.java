@@ -1,6 +1,5 @@
 package espresso.achievement.infrastructure.repositories;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
@@ -15,8 +14,16 @@ import espresso.achievement.domain.entities.AchievementComment;
 @Component
 public class AchievementCommentRepository implements IAchievementCommentRepository {
 
-    @Autowired
-    private AchievementCommentPSQLProvider achievementCommentPSQLProvider;
+    private final AchievementCommentPSQLProvider achievementCommentPSQLProvider;
+
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param achievementCommentPSQLProvider PostgreSQL data provider for achievement comment operations
+     */
+    public AchievementCommentRepository(AchievementCommentPSQLProvider achievementCommentPSQLProvider) {
+        this.achievementCommentPSQLProvider = achievementCommentPSQLProvider;
+    }
 
     /**
      * Saves an AchievementComment entity to the PostgreSQL database.
@@ -32,8 +39,6 @@ public class AchievementCommentRepository implements IAchievementCommentReposito
             throw new IllegalArgumentException("The achievement comment is null");
         }
 
-        AchievementComment savedEntity = this.achievementCommentPSQLProvider.save(achievementComment);
-
-        return savedEntity;
+        return this.achievementCommentPSQLProvider.save(achievementComment);
     }
 }

@@ -10,7 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Lob;
+
 
 import espresso.common.domain.models.ValueEntity;
 import espresso.common.domain.support.KeyGenerator;
@@ -26,6 +26,11 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+/**
+ * Represents media files (images) associated with an achievement.
+ * This entity stores metadata and references to images uploaded by users to showcase their achievements.
+ * The actual image data is stored externally (e.g., S3) and referenced via mediaUrl.
+ */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Getter
@@ -36,13 +41,23 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 @Table(name = "AchievementMedias")
 public class AchievementMedia extends ValueEntity {
 
+    /**
+     * Unique identifier for the media record.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Unique key generated for the image, combining achievement key and random key.
+     */
     @Column(name = "imageKey")
     private String imageKey;
 
+    /**
+     * The achievement that this media belongs to.
+     * Lazy-loaded to improve performance.
+     */
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "achievementId", referencedColumnName = "id")
@@ -87,6 +102,9 @@ public class AchievementMedia extends ValueEntity {
     @Column(name = "uploadTimestamp", nullable = false)
     private LocalDateTime uploadTimestamp;
 
+    /**
+     * The size of the image file in bytes.
+     */
     @Column(name = "fileSize")
     private Long fileSize;
 
@@ -125,4 +143,23 @@ public class AchievementMedia extends ValueEntity {
         return media;
     }
 
+
+    public AchievementMediaKto toKto(){
+        return new AchievementMediaKto() {
+            @Override
+            public Long getId() {
+                return AchievementMedia.this.getId();
+            }
+            
+            @Override
+            public String getImageKey() {
+                return AchievementMedia.this.getImageKey();
+            }
+
+            @Override
+            public String getMediaUrl(){
+                return AchievementMedia.this.getMediaUrl();
+            }
+        };
+    }
 }

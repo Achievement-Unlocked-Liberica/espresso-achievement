@@ -1,13 +1,10 @@
 package espresso.user.infrastructure.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import espresso.user.domain.entities.User;
-import jakarta.transaction.Transactional;
 
 @Repository
 public interface UserPSQLProvider extends JpaRepository<User, Long> {

@@ -1,6 +1,5 @@
-package espresso.achievement.application.handlers;
+package espresso.achievement.application.commandHandlers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import espresso.achievement.domain.contracts.IDisableAchievementCommandHandler;
@@ -13,20 +12,38 @@ import espresso.achievement.domain.entities.Achievement;
 import espresso.common.application.handlers.CommonCommandHandler;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
+import espresso.achievement.domain.operational.exceptionPolicy.AchievementHandlerExceptionPolicy;
+
+import lombok.extern.slf4j.Slf4j;
 // Validation centralized in CommonCommandHandler
 
 /**
  * Handles the command to disable an existing achievement.
  */
+@Slf4j
 @Service
 public class DisableAchievementCommandHandler extends CommonCommandHandler
         implements IDisableAchievementCommandHandler {
 
-    @Autowired
-    private IAchievementRepository achievementRepository;
+    private final IAchievementRepository achievementRepository;
+    private final IUserRepository userRepository;
+    private final AchievementHandlerExceptionPolicy exceptionPolicy;
 
-    @Autowired
-    private IUserRepository userRepository;
+    /**
+     * Constructor for dependency injection.
+     * 
+     * @param achievementRepository Repository for achievement entity persistence operations
+     * @param userRepository Repository for user entity queries and operations
+     * @param exceptionPolicy Centralized exception handling policy
+     */
+    public DisableAchievementCommandHandler(
+            IAchievementRepository achievementRepository,
+            IUserRepository userRepository,
+            AchievementHandlerExceptionPolicy exceptionPolicy) {
+        this.achievementRepository = achievementRepository;
+        this.userRepository = userRepository;
+        this.exceptionPolicy = exceptionPolicy;
+    }
 
     // validator provided by base class
 
@@ -80,12 +97,12 @@ public class DisableAchievementCommandHandler extends CommonCommandHandler
 
             // Save updated achievement via achievementRepository.update (since we
             // modified the entity)
-            Achievement disabledAchievement = achievementRepository.update(achievement);
+            achievementRepository.update(achievement);
 
-            return HandlerResponse.success(disabledAchievement);
+            return HandlerResponse.success(achievement.toKto());
 
         } catch (Exception ex) {
-            return HandlerResponse.error("LOCALIZE: " + ex.getMessage().toUpperCase(), ResponseType.INTERNAL_ERROR);
+            return exceptionPolicy.handleException(ex, "disable achievement");
         }
     }
 }

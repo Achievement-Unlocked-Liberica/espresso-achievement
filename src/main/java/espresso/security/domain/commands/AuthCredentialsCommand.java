@@ -1,8 +1,6 @@
 package espresso.security.domain.commands;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -10,6 +8,11 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import espresso.common.domain.commands.CommonCommand;
 
+/**
+ * Command for authenticating user credentials in the security domain.
+ * Encapsulates username and password for authentication operations.
+ * Extends CommonCommand to inherit standard command behavior and validation.
+ */
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,9 +20,17 @@ import espresso.common.domain.commands.CommonCommand;
 @EqualsAndHashCode(callSuper = true)
 public class AuthCredentialsCommand extends CommonCommand {
 
+    /**
+     * The username for authentication.
+     * Must not be blank and represents the user's login identifier.
+     */
     @NotBlank(message = "LOCALIZE: USERNAME MUST NOT BE BLANK")
     private String username;
 
+    /**
+     * The password for authentication.
+     * Must not be blank and represents the user's secret credential.
+     */
     @NotBlank(message = "LOCALIZE: PASSWORD MUST NOT BE BLANK")
     private String password;
 }
