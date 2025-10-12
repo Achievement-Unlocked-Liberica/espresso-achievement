@@ -3,6 +3,8 @@ package espresso.common.service;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +14,7 @@ import espresso.common.domain.responses.ErrorResponse;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.operational.ApiLogger;
+import espresso.security.domain.entities.JWTAuthenticationToken;
 
 import java.util.Locale;
 
@@ -136,4 +139,16 @@ public class CommonApi {
         
         return GENERAL_CONTEXT;
     }
+
+            /**
+         * Helper method to extract the authenticated user key from the security context.
+         * @return the user key from the JWT token, or null if not authenticated
+         */
+        protected String getAuthenticatedUserKey() {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication instanceof JWTAuthenticationToken jwtAuth) {
+                return jwtAuth.getUserKey();
+            }
+            return null;
+        }
 }

@@ -1,0 +1,122 @@
+### Variables for Get Achievement Detail Tests
+@baseUrl = http://localhost:8080
+@jwtToken = YOUR_JWT_TOKEN_HERE
+@validEntityKey = 8NctRKY
+@invalidEntityKey = INVALID
+@disabledEntityKey = DISABLED
+
+### AC1: Successful Achievement Detail Retrieval with Medium (MD) Size
+# Tests: Valid entity key with MD size type
+# Expected: HTTP 200 OK with achievement details in MD format
+GET {{baseUrl}}/api/qry/achievement/detail?entityKey={{validEntityKey}}&size=MD
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC2: Retrieve Achievement Detail with Small (SM) Size
+# Tests: Valid entity key with SM size type (abbreviated fields)
+# Expected: HTTP 200 OK with achievement details in SM format
+GET {{baseUrl}}/api/qry/achievement/detail?entityKey={{validEntityKey}}&size=SM
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC2: Retrieve Achievement Detail with Extra Small (XS) Size
+# Tests: Valid entity key with XS size type (minimal fields)
+# Expected: HTTP 200 OK with achievement details in XS format
+GET {{baseUrl}}/api/qry/achievement/detail?entityKey={{validEntityKey}}&size=XS
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC3: Retrieve Achievement Detail with Large (LG) Size
+# Tests: Valid entity key with LG size type (comprehensive fields with counts)
+# Expected: HTTP 200 OK with achievement details in LG format including media/comment/celebration counts
+GET {{baseUrl}}/api/qry/achievement/detail?entityKey={{validEntityKey}}&size=LG
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC4: Retrieve Achievement Detail with Extra Large (XL) Size
+# Tests: Valid entity key with XL size type (maps to LG)
+# Expected: HTTP 200 OK with achievement details in LG format
+GET {{baseUrl}}/api/qry/achievement/detail?entityKey={{validEntityKey}}&size=XL
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC5: Achievement Not Found
+# Tests: Invalid entity key that doesn't exist in system
+# Expected: HTTP 404 Not Found with error message and correlation ID
+GET {{baseUrl}}/api/qry/achievement/detail?entityKey={{invalidEntityKey}}&size=MD
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC6: Achievement Exists But Disabled
+# Tests: Valid entity key but achievement is disabled (enabled=false)
+# Expected: HTTP 404 Not Found (disabled achievements filtered out)
+GET {{baseUrl}}/api/qry/achievement/detail?entityKey={{disabledEntityKey}}&size=MD
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC7: Authentication Failure - Missing JWT Token
+# Tests: Request without JWT token
+# Expected: HTTP 401 Unauthorized
+GET {{baseUrl}}/api/qry/achievement/detail?entityKey={{validEntityKey}}&size=MD
+X-API-Version: 1.0
+
+### AC8: Authentication Failure - Invalid JWT Token
+# Tests: Request with invalid JWT token
+# Expected: HTTP 401 Unauthorized
+GET {{baseUrl}}/api/qry/achievement/detail?entityKey={{validEntityKey}}&size=MD
+Authorization: Bearer INVALID_TOKEN_123
+X-API-Version: 1.0
+
+### AC9: Validation Failure - Missing Required entityKey Parameter
+# Tests: Request without entityKey parameter
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/detail?size=MD
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC10: Validation Failure - entityKey Too Short
+# Tests: entityKey with less than 7 characters
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/detail?entityKey=ABC&size=MD
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC10: Validation Failure - entityKey Too Long
+# Tests: entityKey with more than 7 characters
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/detail?entityKey=ABCDEFGH12&size=MD
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC10: Validation Failure - entityKey Empty String
+# Tests: entityKey with empty string
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/detail?entityKey=&size=MD
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC11: Default Size Type When Not Specified
+# Tests: Valid entity key without size parameter (should default to MD)
+# Expected: HTTP 200 OK with achievement details in MD format
+GET {{baseUrl}}/api/qry/achievement/detail?entityKey={{validEntityKey}}
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### Additional: Invalid Size Type Parameter
+# Tests: Invalid size type value
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/detail?entityKey={{validEntityKey}}&size=INVALID
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### Additional: Test with Different Valid Entity Keys
+# Tests: Multiple different valid entity keys to verify behavior consistency
+# Expected: HTTP 200 OK for each valid key
+GET {{baseUrl}}/api/qry/achievement/detail?entityKey=7XpQmNz&size=MD
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+###
+GET {{baseUrl}}/api/qry/achievement/detail?entityKey=2YwRtLp&size=LG
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0

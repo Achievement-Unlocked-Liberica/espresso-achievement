@@ -58,4 +58,15 @@ public interface IAchievementRepository {
      * @return
      */
     <T> T getAchievementByKey(Class<T> dtoType, String entityKey);
+
+    /**
+     * Gets achievements for a specific user ordered by completion date (newest first)
+     * @param <T> The type of the DTO to project to (e.g., AchievementDtoSm.class)
+     * @param dtoType The DTO class to project to (e.g., AchievementDtoSm.class)
+     * @param userKey The user key to retrieve achievements for
+     * @param limit Maximum number of results to return
+     * @param fromDate Optional date filter to get achievements from this date onwards
+     * @return List of achievements for the user projected to the specified DTO type
+     */
+    <T> List<T> getAchievementsByUserKey(Class<T> dtoType, String userKey, Integer limit, OffsetDateTime fromDate);
 }

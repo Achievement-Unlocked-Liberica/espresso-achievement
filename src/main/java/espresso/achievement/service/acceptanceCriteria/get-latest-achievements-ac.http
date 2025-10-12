@@ -1,0 +1,142 @@
+### Variables for Get Latest Achievements Tests
+@baseUrl = http://localhost:8080
+@jwtToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5IjoiTFdvc0g5WCIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiQWttZW5vcyIsImxhc3ROYW1lIjoiU2hhZG93aG9ybiIsImlhdCI6MTc2MDI0NDA5NSwiZXhwIjoxNzYwMzMwNDk1fQ.e1gZBU9cG9ZZRS6lZLE5obtb8RZh_i1CU7Wv9aSaVTQr0Pa7_bJWE4z55sOsKNVw
+
+### AC1: Latest Achievements Retrieval without Size Parameter (Required)
+# Tests: Valid JWT token, missing required 'size' query parameter
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/latest
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC2: Retrieve Latest Achievements with Small (SM) Size Type
+# Tests: Small DTO projection with abbreviated fields
+# Expected: HTTP 200 OK with achievements in SM format
+GET {{baseUrl}}/api/qry/achievement/latest?size=sm
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC2: Retrieve Latest Achievements with Extra Small (XS) Size Type
+# Tests: Extra small DTO projection with minimal fields
+# Expected: HTTP 200 OK with achievements in XS format
+GET {{baseUrl}}/api/qry/achievement/latest?size=xs
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC2: Retrieve Latest Achievements with Medium (MD) Size Type (explicit)
+# Tests: Medium DTO projection with standard fields
+# Expected: HTTP 200 OK with achievements in MD format
+GET {{baseUrl}}/api/qry/achievement/latest?size=md
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC3: Retrieve Latest Achievements with Large (LG) Size Type
+# Tests: Large DTO projection with comprehensive fields including counts
+# Expected: HTTP 200 OK with achievements in LG format
+GET {{baseUrl}}/api/qry/achievement/latest?size=lg
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC3: Retrieve Latest Achievements with Extra Large (XL) Size Type
+# Tests: Extra large DTO projection with all available fields
+# Expected: HTTP 200 OK with achievements in XL format
+GET {{baseUrl}}/api/qry/achievement/latest?size=xl
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC4: Retrieve Latest Achievements with Custom Limit (5)
+# Tests: Limit parameter to retrieve only 5 achievements
+# Expected: HTTP 200 OK with maximum 5 achievements
+GET {{baseUrl}}/api/qry/achievement/latest?limit=5
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC4: Retrieve Latest Achievements with Custom Limit (20)
+# Tests: Limit parameter to retrieve 20 achievements
+# Expected: HTTP 200 OK with maximum 20 achievements
+GET {{baseUrl}}/api/qry/achievement/latest?limit=20
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC4: Retrieve Latest Achievements with Limit 1
+# Tests: Single achievement retrieval
+# Expected: HTTP 200 OK with exactly 1 achievement
+GET {{baseUrl}}/api/qry/achievement/latest?limit=1
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC5: Retrieve Latest Achievements with Date Filter (Recent)
+# Tests: Date filter to get achievements from January 10, 2025 onwards
+# Expected: HTTP 200 OK with filtered achievements
+GET {{baseUrl}}/api/qry/achievement/latest?fromDate=2025-01-10T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC5: Retrieve Latest Achievements with Date Filter (Last Month)
+# Tests: Date filter to get achievements from last month
+# Expected: HTTP 200 OK with filtered achievements from last month
+GET {{baseUrl}}/api/qry/achievement/latest?fromDate=2024-12-01T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC6: Retrieve Latest Achievements with Combined Parameters (LG + Limit + Date)
+# Tests: All parameters combined - LG size, limit 20, date filter
+# Expected: HTTP 200 OK with up to 20 achievements in LG format from specified date
+GET {{baseUrl}}/api/qry/achievement/latest?size=lg&limit=20&fromDate=2025-01-01T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC6: Retrieve Latest Achievements with Combined Parameters (SM + Limit + Date)
+# Tests: All parameters combined - SM size, limit 5, date filter
+# Expected: HTTP 200 OK with up to 5 achievements in SM format from specified date
+GET {{baseUrl}}/api/qry/achievement/latest?size=sm&limit=5&fromDate=2024-12-15T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC7: No Achievements Found (Empty Result with Future Date Filter)
+# Tests: Query with date filter that returns no results
+# Expected: HTTP 200 OK with empty array
+GET {{baseUrl}}/api/qry/achievement/latest?fromDate=2025-12-31T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC8: Authentication Failure - Missing JWT Token
+# Tests: Request without JWT token
+# Expected: HTTP 401 Unauthorized
+GET {{baseUrl}}/api/qry/achievement/latest
+X-API-Version: 1.0
+
+### AC9: Authentication Failure - Invalid JWT Token
+# Tests: Request with invalid JWT token
+# Expected: HTTP 401 Unauthorized
+GET {{baseUrl}}/api/qry/achievement/latest
+Authorization: Bearer INVALID_TOKEN_123
+X-API-Version: 1.0
+
+### AC10: Validation Failure - Future Date Filter
+# Tests: Date filter with future date (should fail validation)
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/latest?fromDate=2026-12-31T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC11: Validation Failure - Negative Limit Value
+# Tests: Invalid negative limit value
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/latest?limit=-5
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC11: Validation Failure - Zero Limit Value
+# Tests: Invalid zero limit value
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/latest?limit=0
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC: Invalid Size Type Parameter
+# Tests: Invalid size type value
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/latest?size=INVALID
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0

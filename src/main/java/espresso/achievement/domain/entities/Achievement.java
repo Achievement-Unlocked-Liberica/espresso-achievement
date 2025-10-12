@@ -44,7 +44,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "Achievements", indexes = {
         @Index(name = "idx_achievement_registered_at_desc", columnList = "registeredAt DESC"),
         @Index(name = "idx_achievement_id_pkey", columnList = "id", unique = true),
-        @Index(name = "idx_achievement_entitykey_ukey", columnList = "entityKey", unique = true)
+        @Index(name = "idx_achievement_entitykey_ukey", columnList = "entityKey", unique = true),
+        @Index(name = "idx_achievement_userid_fkey", columnList = "userId", unique = false)
 })
 // @Table(name = "achievements", indexes = {@Index(name = "achievement_idx",
 // columnList = "key", unique = true)})

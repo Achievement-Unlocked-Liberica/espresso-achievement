@@ -47,6 +47,35 @@ public interface AchievementPSQLProvider extends JpaRepository<Achievement, Long
     <T> List<T> findLatestAchievements(Class<T> type, Limit limit, OffsetDateTime fromDate);
 
     /**
+     * Gets achievements for a specific user ordered by completion date (newest first)
+     * @param <T> The type of the DTO to project to (e.g., AchievementDtoSm.class)
+     * @param type The DTO class to project to (e.g., AchievementDtoSm.class)
+     * @param userKey The user key to retrieve achievements for
+     * @param limit Maximum number of results to return
+     * @return List of achievements for the user projected to the specified DTO type
+     */
+    @Query("SELECT a FROM Achievement a " +
+           "JOIN User u ON u.id = a.user.id " +
+           "WHERE a.enabled = true AND u.entityKey = :userKey " +
+           "ORDER BY a.registeredAt DESC")
+    <T> List<T> findAchievementsByUserKey(Class<T> type, String userKey, Limit limit);
+
+    /**
+     * Gets achievements for a specific user ordered by completion date (newest first) with date filter
+     * @param <T> The type of the DTO to project to (e.g., AchievementDtoSm.class)
+     * @param type The DTO class to project to (e.g., AchievementDtoSm.class)
+     * @param userKey The user key to retrieve achievements for
+     * @param limit Maximum number of results to return
+     * @param fromDate The date from which to retrieve achievements
+     * @return List of achievements for the user projected to the specified DTO type
+     */
+    @Query("SELECT a FROM Achievement a " +
+           "JOIN User u ON u.id = a.user.id " +
+           "WHERE a.enabled = true AND u.entityKey = :userKey AND a.registeredAt > :fromDate " +
+           "ORDER BY a.registeredAt DESC")
+    <T> List<T> findAchievementsByUserKey(Class<T> type, String userKey, Limit limit, OffsetDateTime fromDate);
+
+    /**
      * Updates an achievement in the database matching the id, achievementKey, and userKey.
      * This method leverages JPA's built-in save method which performs an update if the entity has an ID.
      * 

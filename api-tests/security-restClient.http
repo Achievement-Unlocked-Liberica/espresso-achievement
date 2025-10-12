@@ -3,7 +3,7 @@
 # Base URL
 @baseUrl = http://localhost:8080
 
-### Register New User
+### Register New User 1
 # @name register
 POST {{baseUrl}}/api/cmd/security/register
 Content-Type: application/json
@@ -14,13 +14,25 @@ Content-Type: application/json
   "email": "pedrof@example.com"
 }
 
+
+### Register New User 2
+# @name register
+POST {{baseUrl}}/api/cmd/security/register
+Content-Type: application/json
+
+{
+  "username": "gaelf",
+  "password": "NewPass123@",
+  "email": "gaelf@example.com"
+}
+
 ### Authenticate User - Login (Get JWT Token)
 # @name login
 POST {{baseUrl}}/api/cmd/security/auth
 Content-Type: application/json
 
 {
-  "username": "pedrof",
+  "username": "gaelf",
   "password": "NewPass123@"
 }
 

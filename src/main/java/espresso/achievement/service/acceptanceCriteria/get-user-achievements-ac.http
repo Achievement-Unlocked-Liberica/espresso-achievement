@@ -1,0 +1,227 @@
+### Variables for Get User Achievements Tests
+@baseUrl = http://localhost:8080
+@jwtToken = JWT_TOKEN_HERE
+@authenticatedUserKey = 1234ABC
+@targetUserKey = 1234XYZ
+@nonExistentUserKey = INVALID
+@newUserKey = NEW9999
+
+### AC1: Successful Retrieval of Another User's Public Achievements
+# Tests: Valid JWT token, retrieve another user's public achievements only
+# Expected: HTTP 200 OK with list of public achievements (private achievements excluded)
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC2: Retrieve User's Own Achievements via User Endpoint
+# Tests: Authenticated user requesting their own achievements (should return ALL including private)
+# Expected: HTTP 200 OK with all achievements (both public and private)
+# Note: Use your own userKey extracted from JWT token
+GET {{baseUrl}}/api/qry/achievement/user/{{authenticatedUserKey}}
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC3: Retrieve User Achievements with Small (SM) Size Type
+# Tests: Small DTO projection with abbreviated fields
+# Expected: HTTP 200 OK with user's public achievements in SM format
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}?size=sm
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC3: Retrieve User Achievements with Extra Small (XS) Size Type
+# Tests: Extra small DTO projection with minimal fields
+# Expected: HTTP 200 OK with user's public achievements in XS format
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}?size=xs
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC3: Retrieve User Achievements with Medium (MD) Size Type (explicit)
+# Tests: Medium DTO projection with standard fields
+# Expected: HTTP 200 OK with user's public achievements in MD format
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}?size=md
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC4: Retrieve User Achievements with Large (LG) Size Type
+# Tests: Large DTO projection with comprehensive fields and counts
+# Expected: HTTP 200 OK with user's public achievements in LG format
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}?size=lg
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC4: Retrieve User Achievements with Extra Large (XL) Size Type
+# Tests: Extra large DTO projection (maps to LG)
+# Expected: HTTP 200 OK with user's public achievements in LG format
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}?size=xl
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC5: Retrieve User Achievements with Custom Limit (5)
+# Tests: Limit parameter to retrieve only 5 achievements
+# Expected: HTTP 200 OK with maximum 5 public achievements
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}?limit=5
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC5: Retrieve User Achievements with Custom Limit (20)
+# Tests: Limit parameter to retrieve 20 achievements
+# Expected: HTTP 200 OK with maximum 20 public achievements
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}?limit=20
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC5: Retrieve User Achievements with Limit 1
+# Tests: Single achievement retrieval
+# Expected: HTTP 200 OK with exactly 1 public achievement
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}?limit=1
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC6: Retrieve User Achievements with Date Filter (Recent)
+# Tests: Date filter to get user's achievements from January 10, 2025 onwards
+# Expected: HTTP 200 OK with filtered public achievements
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}?fromDate=2025-01-10T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC6: Retrieve User Achievements with Date Filter (Last Month)
+# Tests: Date filter to get user's achievements from last month
+# Expected: HTTP 200 OK with filtered public achievements from last month
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}?fromDate=2024-12-01T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC7: Retrieve User Achievements with Combined Parameters (LG + Limit + Date)
+# Tests: All parameters combined - LG size, limit 20, date filter
+# Expected: HTTP 200 OK with up to 20 public achievements in LG format from specified date
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}?size=lg&limit=20&fromDate=2025-01-01T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC7: Retrieve User Achievements with Combined Parameters (SM + Limit + Date)
+# Tests: All parameters combined - SM size, limit 5, date filter
+# Expected: HTTP 200 OK with up to 5 public achievements in SM format from specified date
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}?size=sm&limit=5&fromDate=2024-12-15T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC8: User Exists But Has No Public Achievements
+# Tests: User exists but has only private achievements (or no achievements)
+# Expected: HTTP 200 OK with empty array
+GET {{baseUrl}}/api/qry/achievement/user/{{newUserKey}}
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC8: Date Filter Returns No Results (Empty Array)
+# Tests: Date filter that excludes all achievements
+# Expected: HTTP 200 OK with empty array
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}?fromDate=2025-12-31T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC9: User Does Not Exist
+# Tests: Non-existent user key
+# Expected: HTTP 200 OK with empty array (not an error)
+GET {{baseUrl}}/api/qry/achievement/user/{{nonExistentUserKey}}
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC10: Authentication Failure - Missing JWT Token
+# Tests: Request without JWT token
+# Expected: HTTP 401 Unauthorized
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}
+X-API-Version: 1.0
+
+### AC11: Authentication Failure - Invalid JWT Token
+# Tests: Request with invalid JWT token
+# Expected: HTTP 401 Unauthorized
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}
+Authorization: Bearer INVALID_TOKEN_123
+X-API-Version: 1.0
+
+### AC11: Authentication Failure - Malformed JWT Token
+# Tests: Request with malformed JWT token
+# Expected: HTTP 401 Unauthorized
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}
+Authorization: Bearer not.a.valid.jwt
+X-API-Version: 1.0
+
+### AC12: Validation Failure - requestedUserKey Too Short
+# Tests: UserKey with less than 7 characters
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/user/ABC
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC13: Validation Failure - requestedUserKey Too Long
+# Tests: UserKey with more than 7 characters
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/user/ABCDEFGHIJ
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC12: Validation Failure - requestedUserKey Empty String
+# Tests: Empty userKey in path
+# Expected: HTTP 400 Bad Request or 404 Not Found
+GET {{baseUrl}}/api/qry/achievement/user/
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC12: Validation Failure - requestedUserKey with Special Characters
+# Tests: UserKey with invalid special characters
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/user/ABC@#$%
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC14: Validation Failure - Future Date Filter
+# Tests: Date filter with future date (should fail validation)
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}?fromDate=2026-12-31T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC14: Validation Failure - Invalid Date Format
+# Tests: Invalid date format
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}?fromDate=invalid-date
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### Additional: Validation Failure - Negative Limit Value
+# Tests: Invalid negative limit value
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}?limit=-5
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### Additional: Validation Failure - Zero Limit Value
+# Tests: Invalid zero limit value
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}?limit=0
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### Additional: Invalid Size Type Parameter
+# Tests: Invalid size type value
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/user/{{targetUserKey}}?size=INVALID
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### Additional: Test Multiple Different User Keys
+# Tests: Verify behavior consistency across different valid user keys
+# Expected: HTTP 200 OK for each valid user key
+GET {{baseUrl}}/api/qry/achievement/user/7XpQmNz?size=sm
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+###
+GET {{baseUrl}}/api/qry/achievement/user/2YwRtLp?size=md
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+###
+GET {{baseUrl}}/api/qry/achievement/user/9KpLmWx?size=lg
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
