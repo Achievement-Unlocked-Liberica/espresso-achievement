@@ -11,23 +11,33 @@ import espresso.achievement.domain.entities.AchievementDtoMd;
 import espresso.achievement.domain.entities.AchievementDtoSm;
 import espresso.achievement.domain.queries.GetAchievementDetailQuery;
 import espresso.achievement.domain.queries.GetLatestAchievementsQuery;
+import espresso.achievement.domain.queries.GetMyAchievementsQuery;
+import espresso.achievement.domain.queries.GetUserAchievementsQuery;
 import espresso.common.domain.queries.QuerySizeType;
 import espresso.common.domain.responses.HandlerResponse;
 import espresso.common.domain.responses.ResponseType;
 import espresso.common.application.handlers.CommonQueryHandler;
+import espresso.security.domain.entities.JWTAuthenticationToken;
+import espresso.user.domain.contracts.IUserRepository;
+import espresso.user.domain.entities.UserKto;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
 public class AchievementQueryHandler extends CommonQueryHandler implements IAchievementQueryHandler {
 
     private final IAchievementRepository achievementRepository;
+        private final IUserRepository userRepository;
 
     /**
      * Constructor for dependency injection.
      * 
      * @param achievementRepository Repository for achievement entity queries and operations
      */
-    public AchievementQueryHandler(IAchievementRepository achievementRepository) {
+    public AchievementQueryHandler(IAchievementRepository achievementRepository, IUserRepository userRepository) {
         this.achievementRepository = achievementRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -80,6 +90,70 @@ public class AchievementQueryHandler extends CommonQueryHandler implements IAchi
 
     }
 
+    @Override
+    public HandlerResponse<Object> handle(GetMyAchievementsQuery qry) {
+
+        HandlerResponse<Object> response;
+
+        try {
+            // Validate the query
+            var validationResult = validateQuery(qry);
+            if (validationResult != null)
+                return validationResult;
+
+            // Get the profile of the user that is creating the achievemnet
+            UserKto userKto = userRepository.findByKey(qry.getUserKey(), UserKto.class);
+
+            if (userKto == null) {
+                return HandlerResponse.error("User not found", ResponseType.NOT_FOUND);
+            }
+
+            // Get the achievements from repository for the authenticated user
+            List<?> achievementDtos = achievementRepository.getAchievementsByUserKey(getDtoSize(qry.getSize()),
+                    qry.getUserKey(), qry.getLimit(), qry.getFromDate());
+
+            response = achievementDtos != null
+                    ? HandlerResponse.success(achievementDtos)
+                    : HandlerResponse.error(null, ResponseType.NOT_FOUND);
+
+            return response;
+        } catch (Exception ex) {
+            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+        }
+    }
+
+    @Override
+    public HandlerResponse<Object> handle(GetUserAchievementsQuery qry) {
+
+        HandlerResponse<Object> response;
+
+        try {
+            // Validate the query
+            var validationResult = validateQuery(qry);
+            if (validationResult != null)
+                return validationResult;
+
+            // Get the profile of the user that is creating the achievemnet
+            UserKto userKto = userRepository.findByKey(qry.getRequestedUserKey(), UserKto.class);
+
+            if (userKto == null) {
+                return HandlerResponse.error("User not found", ResponseType.NOT_FOUND);
+            }
+
+            // Get the achievements from repository for the specified user
+            List<?> achievementDtos = achievementRepository.getAchievementsByUserKey(getDtoSize(qry.getSize()),
+                    qry.getRequestedUserKey(), qry.getLimit(), qry.getFromDate());
+
+            response = achievementDtos != null
+                    ? HandlerResponse.success(achievementDtos)
+                    : HandlerResponse.error(null, ResponseType.NOT_FOUND);
+
+            return response;
+        } catch (Exception ex) {
+            return HandlerResponse.error(ex.getMessage(), ResponseType.INTERNAL_ERROR);
+        }
+    }
+
     /**
      * Maps QuerySizeType to the appropriate Achievement DTO class
      * 
@@ -98,4 +172,5 @@ public class AchievementQueryHandler extends CommonQueryHandler implements IAchi
                 return AchievementDtoSm.class;
         }
     }
+
 }

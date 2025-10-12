@@ -166,4 +166,26 @@ public class AchievementRepository implements IAchievementRepository {
             throw AchievementException.creationFailed("Unexpected error occurred while retrieving achievement by key: " + entityKey);
         }
     }
+
+    @Override
+    public <T> List<T> getAchievementsByUserKey(Class<T> dtoType, String userKey, Integer limit, OffsetDateTime fromDate) {
+        try {
+            AchievementValidator.validateDtoType(dtoType);
+            AchievementValidator.validateEntityKey(userKey);  // Reuse entity key validation for userKey
+            limit = AchievementValidator.validateAndNormalizeLimit(limit);
+
+            // Get achievements for the specified user, filtered by date if provided
+            return fromDate == null
+                    ? achievementPSQLProvider.findAchievementsByUserKey(dtoType, userKey, Limit.of(limit))
+                    : achievementPSQLProvider.findAchievementsByUserKey(dtoType, userKey, Limit.of(limit), fromDate);
+
+        } catch (AchievementException e) {
+            // Re-throw domain exceptions as-is
+            throw e;
+        } catch (DataAccessException e) {
+            throw AchievementException.creationFailed("Database error while retrieving achievements for user: " + userKey);
+        } catch (Exception e) {
+            throw AchievementException.creationFailed("Unexpected error occurred while retrieving achievements for user: " + userKey);
+        }
+    }
 }

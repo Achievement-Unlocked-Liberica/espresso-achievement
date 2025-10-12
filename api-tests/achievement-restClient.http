@@ -5,7 +5,7 @@ X-API-Version: 1
 
 ### Create a new Achievement
 
-@authToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwZWRyb2YiLCJ1c2VyS2V5IjoidHdXcnlXTSIsImVtYWlsIjoicGVkcm9mQGV4YW1wbGUuY29tIiwiZmlyc3ROYW1lIjoiVGhyb2siLCJsYXN0TmFtZSI6IkJvbmUiLCJpYXQiOjE3NTkyMDgwMjAsImV4cCI6MTc1OTI5NDQyMH0.QlW60fwQxcqYOjKJIkCrDJn7uQc3j5s68zqeKEmnKl489Mh9k9dusFI65n8aCQOg
+@authToken = JWT_TOKEN_HERE
 
 POST http://localhost:8080/api/cmd/achievement HTTP/1.1
 Content-Type: application/json
@@ -14,11 +14,11 @@ X-API-Version: 1
 Authorization: Bearer {{authToken}}
 
 {
-  "title": "Master of HTTP Testing",
-  "description": "Testing HTTP endpoints with precision and expertise.",
-  "completedDate": "2024-12-01",
-  "skills": ["int", "cha", "luc"],
-  "isPublic": true
+  "title": "Started New Job as Software Engineer",
+  "description": "Successfully joined a new company as a software engineer, adapting to new technologies, collaborating with a new team, and contributing to impactful projects.",
+  "completedDate": "2024-07-16",
+  "skills": ["int", "wis", "cha"],
+  "isPublic": false
 }
 
 ### Get achievement details by entityKey

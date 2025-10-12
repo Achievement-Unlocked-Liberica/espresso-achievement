@@ -1,0 +1,187 @@
+### Variables for Get My Achievements Tests
+@baseUrl = http://localhost:8080
+@jwtToken = JWT_TOKEN_HERE
+@expiredJwtToken = EXPIRED_JWT_TOKEN_HERE
+
+### AC1: Successful Retrieval of My Achievements with Default Parameters
+# Tests: Valid JWT token, default size (MD), default limit (10), no date filter
+# Expected: HTTP 200 OK with list of user's own achievements in MD format
+GET {{baseUrl}}/api/qry/achievement/my
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC2: Retrieve My Achievements with Small (SM) Size Type
+# Tests: Small DTO projection with abbreviated fields
+# Expected: HTTP 200 OK with user's achievements in SM format
+GET {{baseUrl}}/api/qry/achievement/my?size=sm
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC2: Retrieve My Achievements with Extra Small (XS) Size Type
+# Tests: Extra small DTO projection with minimal fields
+# Expected: HTTP 200 OK with user's achievements in XS format
+GET {{baseUrl}}/api/qry/achievement/my?size=xs
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC2: Retrieve My Achievements with Medium (MD) Size Type (explicit)
+# Tests: Medium DTO projection with standard fields
+# Expected: HTTP 200 OK with user's achievements in MD format
+GET {{baseUrl}}/api/qry/achievement/my?size=md
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC3: Retrieve My Achievements with Large (LG) Size Type
+# Tests: Large DTO projection with comprehensive fields and counts
+# Expected: HTTP 200 OK with user's achievements in LG format including media/comment/celebration counts
+GET {{baseUrl}}/api/qry/achievement/my?size=lg
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC3: Retrieve My Achievements with Extra Large (XL) Size Type
+# Tests: Extra large DTO projection (maps to LG)
+# Expected: HTTP 200 OK with user's achievements in LG format
+GET {{baseUrl}}/api/qry/achievement/my?size=xl
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC4: Retrieve My Achievements with Custom Limit (5)
+# Tests: Limit parameter to retrieve only 5 of user's achievements
+# Expected: HTTP 200 OK with maximum 5 achievements
+GET {{baseUrl}}/api/qry/achievement/my?limit=5
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC4: Retrieve My Achievements with Custom Limit (20)
+# Tests: Limit parameter to retrieve 20 of user's achievements
+# Expected: HTTP 200 OK with maximum 20 achievements
+GET {{baseUrl}}/api/qry/achievement/my?limit=20
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC4: Retrieve My Achievements with Limit 1
+# Tests: Single achievement retrieval
+# Expected: HTTP 200 OK with exactly 1 achievement
+GET {{baseUrl}}/api/qry/achievement/my?limit=1
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC5: Retrieve My Achievements with Date Filter (Recent)
+# Tests: Date filter to get user's achievements from January 10, 2025 onwards
+# Expected: HTTP 200 OK with filtered achievements
+GET {{baseUrl}}/api/qry/achievement/my?fromDate=2025-01-10T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC5: Retrieve My Achievements with Date Filter (Last Month)
+# Tests: Date filter to get user's achievements from last month
+# Expected: HTTP 200 OK with filtered achievements from last month
+GET {{baseUrl}}/api/qry/achievement/my?fromDate=2024-12-01T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC5: Retrieve My Achievements with Date Filter (Last Week)
+# Tests: Date filter to get user's achievements from last week
+# Expected: HTTP 200 OK with filtered achievements from last week
+GET {{baseUrl}}/api/qry/achievement/my?fromDate=2025-01-01T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC6: Retrieve My Achievements with Combined Parameters (LG + Limit + Date)
+# Tests: All parameters combined - LG size, limit 20, date filter
+# Expected: HTTP 200 OK with up to 20 user achievements in LG format from specified date
+GET {{baseUrl}}/api/qry/achievement/my?size=lg&limit=20&fromDate=2025-01-01T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC6: Retrieve My Achievements with Combined Parameters (SM + Limit + Date)
+# Tests: All parameters combined - SM size, limit 5, date filter
+# Expected: HTTP 200 OK with up to 5 user achievements in SM format from specified date
+GET {{baseUrl}}/api/qry/achievement/my?size=sm&limit=5&fromDate=2024-12-15T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC7: User Has No Achievements (Empty Result)
+# Tests: Valid JWT but user has no achievements yet (for new users)
+# Expected: HTTP 200 OK with empty array
+# Note: Use a JWT token for a new user with no achievements
+GET {{baseUrl}}/api/qry/achievement/my
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC7: No Achievements Match Date Filter (Empty Result)
+# Tests: Date filter that returns no results
+# Expected: HTTP 200 OK with empty array
+GET {{baseUrl}}/api/qry/achievement/my?fromDate=2025-12-31T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC8: Include Both Public and Private Achievements
+# Tests: Retrieves all user's achievements regardless of isPublic status
+# Expected: HTTP 200 OK with both public (isPublic=true) and private (isPublic=false) achievements
+# Note: Response should include achievements with varying isPublic values
+GET {{baseUrl}}/api/qry/achievement/my?size=lg
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC9: Authentication Failure - Missing JWT Token
+# Tests: Request without JWT token
+# Expected: HTTP 401 Unauthorized
+GET {{baseUrl}}/api/qry/achievement/my
+X-API-Version: 1.0
+
+### AC10: Authentication Failure - Invalid JWT Token
+# Tests: Request with invalid JWT token
+# Expected: HTTP 401 Unauthorized
+GET {{baseUrl}}/api/qry/achievement/my
+Authorization: Bearer INVALID_TOKEN_123
+X-API-Version: 1.0
+
+### AC10: Authentication Failure - Malformed JWT Token
+# Tests: Request with malformed JWT token
+# Expected: HTTP 401 Unauthorized
+GET {{baseUrl}}/api/qry/achievement/my
+Authorization: Bearer not.a.valid.jwt
+X-API-Version: 1.0
+
+### AC11: Authentication Failure - Expired JWT Token
+# Tests: Request with expired JWT token
+# Expected: HTTP 401 Unauthorized with token expired message
+GET {{baseUrl}}/api/qry/achievement/my
+Authorization: Bearer {{expiredJwtToken}}
+X-API-Version: 1.0
+
+### AC12: Validation Failure - Future Date Filter
+# Tests: Date filter with future date (should fail validation)
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/my?fromDate=2026-12-31T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC12: Validation Failure - Invalid Date Format
+# Tests: Invalid date format
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/my?fromDate=invalid-date
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### Additional: Validation Failure - Negative Limit Value
+# Tests: Invalid negative limit value
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/my?limit=-5
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### Additional: Validation Failure - Zero Limit Value
+# Tests: Invalid zero limit value
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/my?limit=0
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### Additional: Invalid Size Type Parameter
+# Tests: Invalid size type value
+# Expected: HTTP 400 Bad Request with validation error
+GET {{baseUrl}}/api/qry/achievement/my?size=INVALID
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
