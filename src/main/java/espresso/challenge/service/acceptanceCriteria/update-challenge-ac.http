@@ -1,0 +1,274 @@
+@baseUrl = http://localhost:8080
+@jwtToken = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJBQkNEMTIzIiwiaWF0IjoxNzM3NzI4NDI0LCJleHAiOjE3Mzc4MTQ4MjR9.XxYzAbc123
+@validChallengeKey = 8NctRKY
+@invalidChallengeKey = INVALID
+@otherUserToken = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJYWVpVOTk5IiwiaWF0IjoxNzM3NzI4NDI0LCJleHAiOjE3Mzc4MTQ4MjR9.DifferentToken
+
+### AC1 - Successful Challenge Update
+# Tests: Successfully update a challenge with valid data
+# Expected: HTTP 200 OK with entity key response
+PUT {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Enhanced Multi File Upload System Challenge",
+  "description": "Successfully implement and optimize multi file upload for challenge media with advanced validation and error handling.",
+  "skills": ["int", "wis", "con", "dex"],
+  "isPublic": false
+}
+
+### AC2.1 - Missing JWT Token
+# Tests: Update challenge without authentication
+# Expected: HTTP 401 Unauthorized
+PUT {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Updated Challenge",
+  "description": "This should fail due to missing authentication",
+  "skills": ["str", "dex"]
+}
+
+### AC2.2 - Invalid JWT Token
+# Tests: Update challenge with invalid JWT token
+# Expected: HTTP 401 Unauthorized
+PUT {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Authorization: Bearer invalid.jwt.token
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Updated Challenge",
+  "description": "This should fail due to invalid token",
+  "skills": ["str", "dex"]
+}
+
+### AC3 - User Not Found
+# Tests: Update challenge when user does not exist
+# Expected: HTTP 404 Not Found with "User not found" error
+# Note: Use a JWT token with non-existent userKey for testing
+PUT {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Updated Challenge",
+  "description": "Testing user not found scenario",
+  "skills": ["str", "dex"]
+}
+
+### AC4 - Challenge Not Found
+# Tests: Update non-existent challenge
+# Expected: HTTP 404 Not Found with "LOCALIZE: CHALLENGE NOT FOUND" error
+PUT {{baseUrl}}/api/cmd/challenge/{{invalidChallengeKey}}
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Updated Challenge",
+  "description": "Testing challenge not found scenario",
+  "skills": ["str", "dex"]
+}
+
+### AC5 - Unauthorized Access (Not Challenge Owner)
+# Tests: Update challenge owned by different user
+# Expected: HTTP 401 Unauthorized with "LOCALIZE: USER IS NOT AUTHORIZED TO UPDATE THIS CHALLENGE"
+PUT {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Authorization: Bearer {{otherUserToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Unauthorized Update Attempt",
+  "description": "This should fail because user is not the challenge owner",
+  "skills": ["str", "dex"]
+}
+
+### AC6.1 - Missing Title
+# Tests: JSR-303 validation failure - missing title
+# Expected: HTTP 400 Bad Request with "LOCALIZE: A TITLE MUST BE PROVIDED"
+PUT {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "description": "Testing missing title validation",
+  "skills": ["str", "dex"]
+}
+
+### AC6.2 - Title Too Long
+# Tests: JSR-303 validation failure - title exceeds 200 characters
+# Expected: HTTP 400 Bad Request with title length validation error
+PUT {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "This is an extremely long title that exceeds the maximum allowed length of 200 characters and will be rejected by validation because it violates the @Size constraint annotation defined on the title field in UpdateChallengeCommand class which enforces maximum 200 character limit for challenge titles",
+  "description": "Valid description",
+  "skills": ["str", "dex"]
+}
+
+### AC6.3 - Missing Description
+# Tests: JSR-303 validation failure - missing description
+# Expected: HTTP 400 Bad Request with "LOCALIZE: A DESCRIPTION MUST BE PROVIDED"
+PUT {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Updated Challenge",
+  "skills": ["str", "dex"]
+}
+
+### AC6.4 - Description Too Long
+# Tests: JSR-303 validation failure - description exceeds 1000 characters
+# Expected: HTTP 400 Bad Request with description length validation error
+PUT {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Updated Challenge",
+  "description": "This is an extremely long description that exceeds the maximum allowed length of 1000 characters. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+  "skills": ["str", "dex"]
+}
+
+### AC6.5 - Empty Skills Array
+# Tests: JSR-303 validation failure - empty skills array
+# Expected: HTTP 400 Bad Request with "LOCALIZE: AT LEAST ONE SKILL MUST BE PROVIDED"
+PUT {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Updated Challenge",
+  "description": "Testing empty skills validation",
+  "skills": []
+}
+
+### AC6.6 - Too Many Skills
+# Tests: JSR-303 validation failure - more than 7 skills
+# Expected: HTTP 400 Bad Request with skills count validation error
+PUT {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Updated Challenge",
+  "description": "Testing too many skills validation",
+  "skills": ["str", "dex", "con", "wis", "int", "cha", "luc", "extra"]
+}
+
+### AC7.1 - Invalid Skill Value
+# Tests: Custom validation failure - invalid skill
+# Expected: HTTP 400 Bad Request with "skills[0]: LOCALIZE: INVALID SKILL 'magic'. ALLOWED SKILLS ARE: str, dex, con, wis, int, cha, luc"
+PUT {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Updated Challenge",
+  "description": "Testing invalid skill validation",
+  "skills": ["magic", "str"]
+}
+
+### AC7.1 - Multiple Invalid Skills
+# Tests: Custom validation failure - multiple invalid skills
+# Expected: HTTP 400 Bad Request with multiple skill validation errors
+PUT {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Updated Challenge",
+  "description": "Testing multiple invalid skills",
+  "skills": ["magic", "wizardry", "str"]
+}
+
+### AC - Successful Update with All Skills
+# Tests: Update with all allowed skills
+# Expected: HTTP 200 OK with entity key response
+PUT {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "All Skills Updated Challenge",
+  "description": "Updated challenge testing all allowed skills: str, dex, con, wis, int, cha, luc",
+  "skills": ["str", "dex", "con", "wis", "int", "cha", "luc"],
+  "isPublic": true
+}
+
+### AC - Update with Case Sensitivity and Whitespace
+# Tests: Skills normalization during update
+# Expected: HTTP 200 OK with entity key response
+PUT {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Case and Whitespace Test Update",
+  "description": "Testing skill normalization during update",
+  "skills": [" STR ", "  dex", "INT  "],
+  "isPublic": false
+}
+
+### AC - Minimal Update Request
+# Tests: Minimum required fields for successful update
+# Expected: HTTP 200 OK with entity key response
+PUT {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Minimal Update",
+  "description": "This is the minimal valid update with required fields only",
+  "skills": ["str"]
+}
+
+### AC - Update with Public Visibility
+# Tests: Update challenge to make it public
+# Expected: HTTP 200 OK with entity key response
+PUT {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Public Challenge Update",
+  "description": "Updated challenge with public visibility enabled",
+  "skills": ["str", "dex", "int"],
+  "isPublic": true
+}
+
+### AC - Update with Private Visibility
+# Tests: Update challenge to make it private
+# Expected: HTTP 200 OK with entity key response
+PUT {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Private Challenge Update",
+  "description": "Updated challenge with private visibility (not public)",
+  "skills": ["wis", "int", "cha"],
+  "isPublic": false
+}

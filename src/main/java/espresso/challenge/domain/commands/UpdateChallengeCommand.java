@@ -1,0 +1,95 @@
+package espresso.challenge.domain.commands;
+
+import espresso.challenge.domain.constants.ChallengeConstants;
+import espresso.common.domain.commands.CommonCommand;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
+import java.util.HashSet;
+import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.validation.constraints.*;
+
+/**
+ * Command for updating an existing challenge.
+ * Contains the necessary data for updating challenge title, description,
+ * skills, and visibility.
+ */
+@Getter
+@Setter
+@Schema(description = "command for updating a challenge")
+public class UpdateChallengeCommand extends CommonCommand {
+
+    /**
+     * The 7-character alphanumeric key of the user who owns the challenge
+     */
+    @JsonIgnore
+    @Schema(hidden = true)
+    @NotBlank(message = "LOCALIZE: A USER KEY MUST BE PROVIDED")
+    @Size(min = 7, max = 7, message = "LOCALIZE: ENTITY KEY MUST BE EXACTLY 7 CHARACTERS")
+    private String userKey;
+
+    /**
+     * The 7-character alphanumeric key of the challenge to update
+     */
+    @JsonIgnore
+    @Schema(hidden = true)
+    @NotBlank(message = "LOCALIZE: CHALLENGE KEY MUST BE PROVIDED")
+    @Size(min = 7, max = 7, message = "LOCALIZE: CHALLENGE KEY MUST BE EXACTLY 7 CHARACTERS")
+    private String challengeKey;
+
+    /**
+     * The updated title of the challenge
+     */
+    @NotBlank(message = "LOCALIZE: A TITLE MUST BE PROVIDED")
+    @Size(max = 200, message = "LOCALIZE: TITLE MUST NOT BE GREATER THAN 200 CHARACTERS")
+    private String title;
+
+    /**
+     * The updated description of the challenge
+     */
+    @NotBlank(message = "LOCALIZE: A DESCRIPTION MUST BE PROVIDED")
+    @Size(max = 1000, message = "LOCALIZE: DESCRIPTION MUST NOT BE GREATER THAN 1000 CHARACTERS")
+    private String description;
+
+    /**
+     * Array of skill abbreviations associated with the challenge
+     */
+    @Size(min = 1, max = 7, message = "LOCALIZE: AT LEAST ONE SKILL MUST BE PROVIDED")
+    private String[] skills;
+
+    /**
+     * Whether the challenge is publicly visible
+     */
+    private Boolean isPublic = true;
+
+    /**
+     * Validates the command data including parent validation and custom skill
+     * validation.
+     * 
+     * @return Set of validation error messages, empty if valid
+     */
+    @Override
+    public Set<String> validateCustom() {
+        // Create a new mutable set to collect custom validation errors
+        Set<String> errors = new HashSet<>();
+
+        // Validate skills if present
+        if (skills != null && skills.length > 0) {
+            for (int i = 0; i < skills.length; i++) {
+                String skill = skills[i];
+                if (skill != null && !skill.trim().isEmpty()) {
+                    String normalizedSkill = skill.trim().toLowerCase();
+                    if (!ChallengeConstants.ALLOWED_SKILLS.contains(normalizedSkill)) {
+                        errors.add(
+                                "skills[" + i + "]:" + String.format(ChallengeConstants.ERROR_INVALID_SKILL, skill));
+                    }
+                }
+            }
+        }
+
+        return errors;
+    }
+}
