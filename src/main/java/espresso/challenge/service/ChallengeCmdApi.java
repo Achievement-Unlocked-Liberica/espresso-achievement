@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -18,10 +20,12 @@ import espresso.challenge.domain.commands.CreateChallengeCommand;
 import espresso.challenge.domain.commands.UpdateChallengeCommand;
 import espresso.challenge.domain.commands.DisableChallengeCommand;
 import espresso.challenge.domain.commands.DeleteChallengeCommand;
+import espresso.challenge.domain.commands.UploadChallengeMediaCommand;
 import espresso.challenge.domain.contracts.ICreateChallengeCommandHandler;
 import espresso.challenge.domain.contracts.IUpdateChallengeCommandHandler;
 import espresso.challenge.domain.contracts.IDisableChallengeCommandHandler;
 import espresso.challenge.domain.contracts.IDeleteChallengeCommandHandler;
+import espresso.challenge.domain.contracts.IUploadChallengeMediaCommandHandler;
 import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonCmdApi;
 import espresso.common.service.operational.ApiLogger;
@@ -37,6 +41,7 @@ import espresso.common.service.operational.ApiLogger;
 public class ChallengeCmdApi extends CommonCmdApi {
 
 	private final ICreateChallengeCommandHandler createChallengeCommandHandler;
+	private final IUploadChallengeMediaCommandHandler uploadChallengeMediaCommandHandler;
 	private final IUpdateChallengeCommandHandler updateChallengeCommandHandler;
 	private final IDisableChallengeCommandHandler disableChallengeCommandHandler;
 	private final IDeleteChallengeCommandHandler deleteChallengeCommandHandler;
@@ -46,6 +51,7 @@ public class ChallengeCmdApi extends CommonCmdApi {
 	 * 
 	 * @param messageHelper Helper for API message handling
 	 * @param createChallengeCommandHandler Handler for processing challenge creation commands
+	 * @param uploadChallengeMediaCommandHandler Handler for processing challenge media upload commands
 	 * @param updateChallengeCommandHandler Handler for processing challenge update commands
 	 * @param disableChallengeCommandHandler Handler for processing challenge disable commands
 	 * @param deleteChallengeCommandHandler Handler for processing challenge deletion commands
@@ -53,11 +59,13 @@ public class ChallengeCmdApi extends CommonCmdApi {
 	public ChallengeCmdApi(
 			ApiMessageHelper messageHelper,
 			ICreateChallengeCommandHandler createChallengeCommandHandler,
+			IUploadChallengeMediaCommandHandler uploadChallengeMediaCommandHandler,
 			IUpdateChallengeCommandHandler updateChallengeCommandHandler,
 			IDisableChallengeCommandHandler disableChallengeCommandHandler,
 			IDeleteChallengeCommandHandler deleteChallengeCommandHandler) {
 		super(messageHelper);
 		this.createChallengeCommandHandler = createChallengeCommandHandler;
+		this.uploadChallengeMediaCommandHandler = uploadChallengeMediaCommandHandler;
 		this.updateChallengeCommandHandler = updateChallengeCommandHandler;
 		this.disableChallengeCommandHandler = disableChallengeCommandHandler;
 		this.deleteChallengeCommandHandler = deleteChallengeCommandHandler;
@@ -76,6 +84,25 @@ public class ChallengeCmdApi extends CommonCmdApi {
 		command.setUserKey(userKey);
 
 		return executeCommand(command, createChallengeCommandHandler::handle);
+	}
+
+	@Operation(summary = "Upload Challenge Media", description = "Uploads media files for an existing Challenge.")
+	@PostMapping("/{key}/media")
+	@ApiResponse(responseCode = "201:CREATED", description = "Media uploaded successfully.")
+	@ApiResponse(responseCode = "400:BAD_REQUEST", description = "Validation error in the request.")
+	@ApiResponse(responseCode = "404:NOT_FOUND", description = "Challenge not found.")
+	@ApiResponse(responseCode = "401:UNAUTHORIZED", description = "User not authorized to upload media for this challenge.")
+	@ApiResponse(responseCode = "500:INTERNAL_SERVER_ERROR", description = "An internal error occurred.")
+	@ApiLogger("Upload challenge media")
+	public ResponseEntity<ServiceResponse<Object>> uploadChallengeMedia(
+			@RequestParam("images") MultipartFile[] images,
+			@PathVariable String key) {
+
+		String userKey = getAuthenticatedUserKey();
+
+		UploadChallengeMediaCommand command = new UploadChallengeMediaCommand(key, userKey, images);
+
+		return executeCommand(command, uploadChallengeMediaCommandHandler::handle);
 	}
 
 	@Operation(summary = "Update Challenge", description = "Updates an existing Challenge with the provided data.")

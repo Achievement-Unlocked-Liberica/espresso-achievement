@@ -1,5 +1,6 @@
 package espresso.challenge.domain.entities;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -7,10 +8,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import espresso.challenge.domain.events.ChallengeEvent;
+import espresso.challenge.domain.events.ChallengeMediaEvent;
 import espresso.common.domain.events.EventActionTypes;
 import espresso.common.domain.models.DomainAggregate;
 import espresso.common.domain.support.StringListConverter;
 import espresso.user.domain.entities.User;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -20,6 +23,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -83,6 +87,14 @@ public class Challenge extends DomainAggregate {
      */
     @Enumerated(EnumType.STRING)
     private ChallengeVisibilityStatus challengeVisibility;
+
+    /**
+     * List of media files (images) associated with this challenge.
+     * Lazy-loaded to improve performance.
+     */
+    @JsonManagedReference
+    @OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ChallengeMedia> media;
 
     /*
      * The constructor is package-private to prevent the creation of a challenge
@@ -183,6 +195,24 @@ public class Challenge extends DomainAggregate {
         this.raiseChallengeDeleted();
     }
 
+    /**
+     * Adds media to this challenge.
+     * This method adds the media to the internal list and raises a media added event.
+     * 
+     * @param media The media being added to this challenge
+     */
+    public void addMedia(ChallengeMedia media) {
+        if (this.media == null) {
+            this.media = new ArrayList<>();
+        }
+
+        this.media.add(media);
+
+        this.updateEntity();
+
+        this.raiseMediaAdded(media);
+    }
+
     // Converts this challenge to a KTO (Key Transfer Object) representation.
     public ChallengeKto toKto(){
         return new ChallengeKto() {
@@ -246,6 +276,19 @@ public class Challenge extends DomainAggregate {
                         description,
                         fulfillmentDate,
                         skills.toArray(new String[0])));
+    }
+
+    private void raiseMediaAdded(ChallengeMedia media) {
+        this.domainEvents.add(
+                ChallengeMediaEvent.create(
+                        EventActionTypes.CREATED,
+                        media.getChallenge().getEntityKey(),
+                        media.getChallenge().getUser().getEntityKey(),
+                        media.getImageKey(),
+                        media.getMediaUrl(),
+                        media.getOriginalImageName(),
+                        media.getContentType(),
+                        media.getFileSize()));
     }
 
     // #endregion Domain Events

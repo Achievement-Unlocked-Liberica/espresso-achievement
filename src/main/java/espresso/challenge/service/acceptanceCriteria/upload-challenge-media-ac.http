@@ -1,0 +1,341 @@
+### Variables for Upload Challenge Media Tests
+@baseUrl = http://localhost:8080
+@jwtToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJnYWVsZiIsInVzZXJLZXkiOiJRNjZtc0p0IiwiZW1haWwiOiJnYWVsZkBleGFtcGxlLmNvbSIsImZpcnN0TmFtZSI6IkZlbnRoaXIiLCJsYXN0TmFtZSI6IkFzaHdpbmciLCJpYXQiOjE3NjAzMjgxNTgsImV4cCI6MTc2MDQxNDU1OH0.HY8W7U0XhMPhLyoqIAuRDS6cIj3i5MSppB-k4v_MI8vdOgfOiKSxabKOe8Bw3Vqv
+@validUserKey = ABC1234
+@invalidUserKey = XYZ9999
+@validChallengeKey = g1d5qll
+@nonExistentChallengeKey = MISSING
+@otherUserChallengeKey = OTHER123
+
+### AC1: Successful Media Upload (Single Image)
+# Tests: Valid JWT token, user owns challenge, valid image file
+# Expected: HTTP 200 OK with entity key response
+# Note: Replace [binary image data] with actual image file in multipart request
+POST {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}/media
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundary123
+
+--boundary123
+Content-Disposition: form-data; name="images"; filename="challenge_screenshot.png"
+Content-Type: image/png
+
+< D:\Documents\Pictures\tua64yb.jpg
+--boundary123--
+
+### AC1: Successful Media Upload (Multiple Images)
+# Tests: Valid JWT token, user owns challenge, multiple valid image files
+# Expected: HTTP 200 OK with entity key response
+POST {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}/media
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundary456
+
+--boundary456
+Content-Disposition: form-data; name="images"; filename="screenshot1.png"
+Content-Type: image/png
+
+[Upload first PNG image file here]
+--boundary456
+Content-Disposition: form-data; name="images"; filename="progress_chart.jpg"
+Content-Type: image/jpeg
+
+[Upload JPEG image file here]
+--boundary456--
+
+### AC1: Successful Media Upload (WebP Format)
+# Tests: Valid JWT token, user owns challenge, WebP image format
+# Expected: HTTP 200 OK with entity key response
+POST {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}/media
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundaryWebP
+
+--boundaryWebP
+Content-Disposition: form-data; name="images"; filename="modern_image.webp"
+Content-Type: image/webp
+
+[Upload WebP image file here]
+--boundaryWebP--
+
+### AC2.1: Missing JWT Token
+# Tests: Authentication failure - no JWT token provided
+# Expected: HTTP 401 Unauthorized
+POST {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}/media
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundary789
+
+--boundary789
+Content-Disposition: form-data; name="images"; filename="test.png"
+Content-Type: image/png
+
+[Upload PNG image file here]
+--boundary789--
+
+### AC2.2: Invalid or Expired JWT Token
+# Tests: Authentication failure - invalid JWT token
+# Expected: HTTP 401 Unauthorized
+POST {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}/media
+Authorization: Bearer INVALID_TOKEN_HERE
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundaryInvalid
+
+--boundaryInvalid
+Content-Disposition: form-data; name="images"; filename="test.png"
+Content-Type: image/png
+
+[Upload PNG image file here]
+--boundaryInvalid--
+
+### AC3: User Not Found
+# Tests: Valid JWT but user doesn't exist in system
+# Expected: HTTP 404 Not Found with correlation ID
+POST {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}/media
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundaryUser
+
+--boundaryUser
+Content-Disposition: form-data; name="images"; filename="test.png"
+Content-Type: image/png
+
+[Upload PNG image file here]
+--boundaryUser--
+
+### AC4: Challenge Not Found
+# Tests: Valid user but challenge doesn't exist
+# Expected: HTTP 404 Not Found with correlation ID
+POST {{baseUrl}}/api/cmd/challenge/{{nonExistentChallengeKey}}/media
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundaryChallenge
+
+--boundaryChallenge
+Content-Disposition: form-data; name="images"; filename="test.png"
+Content-Type: image/png
+
+[Upload PNG image file here]
+--boundaryChallenge--
+
+### AC5: Unauthorized Access (Not Owner)
+# Tests: Valid user tries to upload media to another user's challenge
+# Expected: HTTP 401 Unauthorized with correlation ID
+POST {{baseUrl}}/api/cmd/challenge/{{otherUserChallengeKey}}/media
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundaryUnauth
+
+--boundaryUnauth
+Content-Disposition: form-data; name="images"; filename="test.png"
+Content-Type: image/png
+
+[Upload PNG image file here]
+--boundaryUnauth--
+
+### AC6.1: Empty Image Upload
+# Tests: No image files provided in request
+# Expected: HTTP 400 Bad Request - "CHALLENGE MEDIA CANNOT BE EMPTY"
+POST {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}/media
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundaryEmpty
+
+--boundaryEmpty--
+
+### AC6.2: File Size Validation (>10MB)
+# Tests: Image file exceeds maximum size limit
+# Expected: HTTP 400 Bad Request - "CHALLENGE MEDIA EXCEEDS MAXIMUM SIZE OF 10MB"
+# Note: Upload an image file larger than 10MB
+POST {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}/media
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundaryLarge
+
+--boundaryLarge
+Content-Disposition: form-data; name="images"; filename="huge_image.png"
+Content-Type: image/png
+
+[Upload an image file > 10MB here]
+--boundaryLarge--
+
+### AC6.3: Invalid Content Type (PDF)
+# Tests: Non-image file type (PDF)
+# Expected: HTTP 400 Bad Request - "INVALID FILE TYPE"
+POST {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}/media
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundaryPDF
+
+--boundaryPDF
+Content-Disposition: form-data; name="images"; filename="document.pdf"
+Content-Type: application/pdf
+
+[Upload a PDF file here]
+--boundaryPDF--
+
+### AC6.3: Invalid Content Type (Text)
+# Tests: Non-image file type (text)
+# Expected: HTTP 400 Bad Request - "INVALID FILE TYPE"
+POST {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}/media
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundaryText
+
+--boundaryText
+Content-Disposition: form-data; name="images"; filename="notes.txt"
+Content-Type: text/plain
+
+[Upload a text file here]
+--boundaryText--
+
+### AC6.4: Image Dimensions Too Small (<200x200)
+# Tests: Image with dimensions less than minimum (200x200 pixels)
+# Expected: HTTP 400 Bad Request - "IMAGE DIMENSIONS TOO SMALL"
+# Note: Upload a small image (e.g., 100x100 pixels)
+POST {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}/media
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundarySmall
+
+--boundarySmall
+Content-Disposition: form-data; name="images"; filename="tiny_image.png"
+Content-Type: image/png
+
+[Upload a 100x100 pixel image here]
+--boundarySmall--
+
+### AC6.5: Image Dimensions Too Large (>3000x3000)
+# Tests: Image with dimensions greater than maximum (3000x3000 pixels)
+# Expected: HTTP 400 Bad Request - "IMAGE DIMENSIONS TOO LARGE"
+# Note: Upload a large image (e.g., 4000x4000 pixels)
+POST {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}/media
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundaryHuge
+
+--boundaryHuge
+Content-Disposition: form-data; name="images"; filename="massive_image.png"
+Content-Type: image/png
+
+[Upload a 4000x4000 pixel image here]
+--boundaryHuge--
+
+### AC6.6: Invalid Filename Characters
+# Tests: Filename with special characters not allowed
+# Expected: HTTP 400 Bad Request - "INVALID FILENAME"
+POST {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}/media
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundaryInvalidName
+
+--boundaryInvalidName
+Content-Disposition: form-data; name="images"; filename="image@#$%.png"
+Content-Type: image/png
+
+[Upload PNG image with invalid filename characters]
+--boundaryInvalidName--
+
+### AC7: Multiple File Processing (3 Images)
+# Tests: Upload multiple valid images in single request
+# Expected: HTTP 200 OK with all images processed and saved
+POST {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}/media
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundaryMulti
+
+--boundaryMulti
+Content-Disposition: form-data; name="images"; filename="image1.png"
+Content-Type: image/png
+
+[Upload first PNG image]
+--boundaryMulti
+Content-Disposition: form-data; name="images"; filename="image2.jpg"
+Content-Type: image/jpeg
+
+[Upload second JPEG image]
+--boundaryMulti
+Content-Disposition: form-data; name="images"; filename="image3.gif"
+Content-Type: image/gif
+
+[Upload third GIF image]
+--boundaryMulti--
+
+### AC7: Multiple File Processing (Mixed Valid/Invalid)
+# Tests: Mix of valid and invalid files (should reject entire request)
+# Expected: HTTP 400 Bad Request for first validation failure
+POST {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}/media
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundaryMixed
+
+--boundaryMixed
+Content-Disposition: form-data; name="images"; filename="valid_image.png"
+Content-Type: image/png
+
+[Upload valid PNG image]
+--boundaryMixed
+Content-Disposition: form-data; name="images"; filename="invalid.txt"
+Content-Type: text/plain
+
+[Upload invalid text file]
+--boundaryMixed--
+
+### Success Case: Valid GIF Image
+# Tests: GIF format support
+# Expected: HTTP 200 OK
+POST {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}/media
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundaryGIF
+
+--boundaryGIF
+Content-Disposition: form-data; name="images"; filename="animated.gif"
+Content-Type: image/gif
+
+[Upload GIF image file here]
+--boundaryGIF--
+
+### Edge Case: Exactly 10MB File
+# Tests: File at exact maximum size limit
+# Expected: HTTP 200 OK (should accept at exactly 10MB)
+POST {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}/media
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundaryExact
+
+--boundaryExact
+Content-Disposition: form-data; name="images"; filename="exactly_10mb.png"
+Content-Type: image/png
+
+[Upload exactly 10MB PNG image]
+--boundaryExact--
+
+### Edge Case: 200x200 Pixel Image (Minimum Allowed)
+# Tests: Image at exact minimum dimension limit
+# Expected: HTTP 200 OK (should accept at exactly 200x200)
+POST {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}/media
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundaryMin
+
+--boundaryMin
+Content-Disposition: form-data; name="images"; filename="min_size.png"
+Content-Type: image/png
+
+[Upload 200x200 pixel PNG image]
+--boundaryMin--
+
+### Edge Case: 3000x3000 Pixel Image (Maximum Allowed)
+# Tests: Image at exact maximum dimension limit
+# Expected: HTTP 200 OK (should accept at exactly 3000x3000)
+POST {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}/media
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+Content-Type: multipart/form-data; boundary=boundaryMax
+
+--boundaryMax
+Content-Disposition: form-data; name="images"; filename="max_size.png"
+Content-Type: image/png
+
+[Upload 3000x3000 pixel PNG image]
+--boundaryMax--

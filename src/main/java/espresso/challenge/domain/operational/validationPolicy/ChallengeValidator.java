@@ -1,6 +1,7 @@
 package espresso.challenge.domain.operational.validationPolicy;
 
 import espresso.challenge.domain.entities.Challenge;
+import espresso.challenge.domain.entities.ChallengeMedia;
 import espresso.challenge.domain.operational.exceptionPolicy.ChallengeException;
 
 /**
@@ -59,6 +60,41 @@ public class ChallengeValidator {
 
         if (challenge.getId() == null) {
             throw ChallengeException.invalidChallenge("Challenge ID cannot be null for update operation");
+        }
+    }
+
+    /**
+     * Validates a ChallengeMedia entity for persistence operations.
+     * Checks that the media and its associated challenge are not null.
+     *
+     * @param challengeMedia The challenge media to validate
+     * @throws ChallengeException if validation fails
+     */
+    public static void validateChallengeMedia(ChallengeMedia challengeMedia) {
+        if (challengeMedia == null) {
+            throw ChallengeException.invalidChallenge("Challenge media cannot be null");
+        }
+        
+        Challenge challenge = challengeMedia.getChallenge();
+        if (challenge == null) {
+            throw ChallengeException.invalidChallenge("Challenge in challenge media cannot be null");
+        }
+    }
+
+    /**
+     * Validates ChallengeMedia for S3 upload operations.
+     * Checks media entity and image data.
+     *
+     * @param challengeMedia The challenge media to validate
+     * @throws ChallengeException if validation fails
+     */
+    public static void validateChallengeMediaForUpload(ChallengeMedia challengeMedia) {
+        if (challengeMedia == null) {
+            throw ChallengeException.invalidChallenge("Challenge media cannot be null");
+        }
+        
+        if (challengeMedia.getImageData() == null || challengeMedia.getImageData().length == 0) {
+            throw ChallengeException.invalidChallenge("Challenge media image data cannot be null or empty");
         }
     }
 }

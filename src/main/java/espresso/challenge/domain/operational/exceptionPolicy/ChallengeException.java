@@ -84,4 +84,12 @@ public class ChallengeException extends RuntimeException {
             "validate_challenge"
         );
     }
+
+    public static ChallengeException mediaProcessingFailed(String mediaType, String reason) {
+        return new ChallengeException(
+            "Challenge media processing failed for " + mediaType + ": " + reason,
+            "CHALLENGE_MEDIA_PROCESSING_FAILED",
+            "upload_challenge_media"
+        );
+    }
 }
