@@ -21,6 +21,9 @@ import espresso.challenge.domain.commands.UpdateChallengeCommand;
 import espresso.challenge.domain.commands.DisableChallengeCommand;
 import espresso.challenge.domain.commands.DeleteChallengeCommand;
 import espresso.challenge.domain.commands.UploadChallengeMediaCommand;
+import espresso.challenge.domain.commands.AddChallengeCommentCommand;
+import espresso.challenge.domain.commandhandlers.IAddChallengeCommentCommandHandler;
+import espresso.challenge.domain.entities.ChallengeComment;
 import espresso.challenge.domain.contracts.ICreateChallengeCommandHandler;
 import espresso.challenge.domain.contracts.IUpdateChallengeCommandHandler;
 import espresso.challenge.domain.contracts.IDisableChallengeCommandHandler;
@@ -42,6 +45,7 @@ public class ChallengeCmdApi extends CommonCmdApi {
 
 	private final ICreateChallengeCommandHandler createChallengeCommandHandler;
 	private final IUploadChallengeMediaCommandHandler uploadChallengeMediaCommandHandler;
+	private final IAddChallengeCommentCommandHandler addChallengeCommentCommandHandler;
 	private final IUpdateChallengeCommandHandler updateChallengeCommandHandler;
 	private final IDisableChallengeCommandHandler disableChallengeCommandHandler;
 	private final IDeleteChallengeCommandHandler deleteChallengeCommandHandler;
@@ -52,6 +56,7 @@ public class ChallengeCmdApi extends CommonCmdApi {
 	 * @param messageHelper Helper for API message handling
 	 * @param createChallengeCommandHandler Handler for processing challenge creation commands
 	 * @param uploadChallengeMediaCommandHandler Handler for processing challenge media upload commands
+	 * @param addChallengeCommentCommandHandler Handler for processing challenge comment addition commands
 	 * @param updateChallengeCommandHandler Handler for processing challenge update commands
 	 * @param disableChallengeCommandHandler Handler for processing challenge disable commands
 	 * @param deleteChallengeCommandHandler Handler for processing challenge deletion commands
@@ -60,12 +65,14 @@ public class ChallengeCmdApi extends CommonCmdApi {
 			ApiMessageHelper messageHelper,
 			ICreateChallengeCommandHandler createChallengeCommandHandler,
 			IUploadChallengeMediaCommandHandler uploadChallengeMediaCommandHandler,
+			IAddChallengeCommentCommandHandler addChallengeCommentCommandHandler,
 			IUpdateChallengeCommandHandler updateChallengeCommandHandler,
 			IDisableChallengeCommandHandler disableChallengeCommandHandler,
 			IDeleteChallengeCommandHandler deleteChallengeCommandHandler) {
 		super(messageHelper);
 		this.createChallengeCommandHandler = createChallengeCommandHandler;
 		this.uploadChallengeMediaCommandHandler = uploadChallengeMediaCommandHandler;
+		this.addChallengeCommentCommandHandler = addChallengeCommentCommandHandler;
 		this.updateChallengeCommandHandler = updateChallengeCommandHandler;
 		this.disableChallengeCommandHandler = disableChallengeCommandHandler;
 		this.deleteChallengeCommandHandler = deleteChallengeCommandHandler;
@@ -103,6 +110,28 @@ public class ChallengeCmdApi extends CommonCmdApi {
 		UploadChallengeMediaCommand command = new UploadChallengeMediaCommand(key, userKey, images);
 
 		return executeCommand(command, uploadChallengeMediaCommandHandler::handle);
+	}
+
+	@Operation(summary = "Add Comment to Challenge", description = "Adds a comment to an existing Challenge.")
+	@PostMapping("/{key}/comments")
+	@ApiResponse(responseCode = "201:CREATED", description = "Comment added successfully.")
+	@ApiResponse(responseCode = "400:BAD_REQUEST", description = "Validation error in the request.")
+	@ApiResponse(responseCode = "404:NOT_FOUND", description = "Challenge or user not found.")
+	@ApiResponse(responseCode = "401:UNAUTHORIZED", description = "User not authorized.")
+	@ApiResponse(responseCode = "500:INTERNAL_SERVER_ERROR", description = "An internal error occurred.")
+	@ApiLogger("Add comment to challenge")
+	public ResponseEntity<ServiceResponse<Object>> addComment(
+			@PathVariable String key,
+			@RequestBody AddChallengeCommentCommand command) {
+
+		String userKey = getAuthenticatedUserKey();
+
+		command.withUserKey(userKey).withChallengeKey(key);
+
+		ChallengeComment comment = addChallengeCommentCommandHandler.execute(command);
+
+		return ResponseEntity.status(201)
+				.body(ServiceResponse.success(org.springframework.http.HttpStatus.CREATED, comment, null));
 	}
 
 	@Operation(summary = "Update Challenge", description = "Updates an existing Challenge with the provided data.")

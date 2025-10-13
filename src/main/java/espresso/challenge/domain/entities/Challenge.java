@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import espresso.challenge.domain.events.ChallengeEvent;
 import espresso.challenge.domain.events.ChallengeMediaEvent;
+import espresso.challenge.domain.events.ChallengeCommentEvent;
 import espresso.common.domain.events.EventActionTypes;
 import espresso.common.domain.models.DomainAggregate;
 import espresso.common.domain.support.StringListConverter;
@@ -95,6 +96,14 @@ public class Challenge extends DomainAggregate {
     @JsonManagedReference
     @OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ChallengeMedia> media;
+
+    /**
+     * List of comments associated with this challenge.
+     * Lazy-loaded to improve performance.
+     */
+    @JsonManagedReference
+    @OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ChallengeComment> comments;
 
     /*
      * The constructor is package-private to prevent the creation of a challenge
@@ -213,6 +222,24 @@ public class Challenge extends DomainAggregate {
         this.raiseMediaAdded(media);
     }
 
+    /**
+     * Adds a comment to this challenge.
+     * This method adds the comment to the internal list and raises a comment added event.
+     * 
+     * @param comment The comment being added to this challenge
+     */
+    public void addComment(ChallengeComment comment) {
+        if (this.comments == null) {
+            this.comments = new ArrayList<>();
+        }
+
+        this.comments.add(comment);
+
+        this.updateEntity();
+
+        this.raiseCommentAdded(comment);
+    }
+
     // Converts this challenge to a KTO (Key Transfer Object) representation.
     public ChallengeKto toKto(){
         return new ChallengeKto() {
@@ -289,6 +316,15 @@ public class Challenge extends DomainAggregate {
                         media.getOriginalImageName(),
                         media.getContentType(),
                         media.getFileSize()));
+    }
+
+    private void raiseCommentAdded(ChallengeComment comment) {
+        this.domainEvents.add(
+                ChallengeCommentEvent.create(
+                        EventActionTypes.CREATED,
+                        comment.getChallenge().getEntityKey(),
+                        comment.getUser().getEntityKey(),
+                        comment.getText()));
     }
 
     // #endregion Domain Events
