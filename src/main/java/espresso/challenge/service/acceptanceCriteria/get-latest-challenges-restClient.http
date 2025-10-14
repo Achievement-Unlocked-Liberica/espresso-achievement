@@ -1,0 +1,224 @@
+### Get Latest Challenges - REST Client Tests
+### Base URL
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### Variables (update these with actual values)
+@jwtToken = YOUR_JWT_TOKEN_HERE
+
+###############################################################################
+### TEST 1: Get Latest Challenges - Default Parameters (SM size, limit 10)
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/latest?size=sm
+Content-Type: {{contentType}}
+
+### Expected Response:
+# HTTP 200 OK
+# Returns up to 10 challenges in small DTO format
+# Fields: entityKey, title, description, fulfillmentDate, skills
+# Ordered by registeredAt DESC
+
+###############################################################################
+### TEST 2: Get Latest Challenges - Small Size with Limit 5
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/latest?size=sm&limit=5
+Content-Type: {{contentType}}
+
+### Expected Response:
+# HTTP 200 OK
+# Returns exactly 5 challenges (if available)
+# Small DTO format
+
+###############################################################################
+### TEST 3: Get Latest Challenges - Medium Size
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/latest?size=md&limit=10
+Content-Type: {{contentType}}
+
+### Expected Response:
+# HTTP 200 OK
+# Returns up to 10 challenges in medium DTO format
+# Additional fields: user (UserDtoSm), challengeVisibility, media
+
+###############################################################################
+### TEST 4: Get Latest Challenges - Large Size
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/latest?size=lg&limit=10
+Content-Type: {{contentType}}
+
+### Expected Response:
+# HTTP 200 OK
+# Returns up to 10 challenges in large DTO format
+# Full details with UserDtoLg, complete media list
+
+###############################################################################
+### TEST 5: Get Latest Challenges - XL Size (maps to LG)
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/latest?size=xl&limit=10
+Content-Type: {{contentType}}
+
+### Expected Response:
+# HTTP 200 OK
+# Returns challenges using ChallengeDtoLg (xl maps to lg)
+
+###############################################################################
+### TEST 6: Get Latest Challenges - XS Size (maps to SM)
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/latest?size=xs&limit=10
+Content-Type: {{contentType}}
+
+### Expected Response:
+# HTTP 200 OK
+# Returns challenges using ChallengeDtoSm (xs maps to sm)
+
+###############################################################################
+### TEST 7: Get Latest Challenges - With FromDate Filter
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/latest?size=md&limit=10&fromDate=2025-01-01T00:00:00Z
+Content-Type: {{contentType}}
+
+### Expected Response:
+# HTTP 200 OK
+# Returns only challenges registered after 2025-01-01
+# Still ordered by registeredAt DESC
+
+###############################################################################
+### TEST 8: Get Latest Challenges - Recent Date Filter
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/latest?size=sm&limit=20&fromDate=2025-10-01T00:00:00Z
+Content-Type: {{contentType}}
+
+### Expected Response:
+# HTTP 200 OK
+# Returns challenges from October 2025 onwards
+# Up to 20 results
+
+###############################################################################
+### TEST 9: Get Latest Challenges - No Limit (should default to 10)
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/latest?size=sm
+Content-Type: {{contentType}}
+
+### Expected Response:
+# HTTP 200 OK
+# Returns maximum 10 challenges (default limit)
+
+###############################################################################
+### TEST 10: Get Latest Challenges - Large Limit
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/latest?size=sm&limit=100
+Content-Type: {{contentType}}
+
+### Expected Response:
+# HTTP 200 OK
+# Returns up to 100 challenges (if available)
+
+###############################################################################
+### TEST 11: NEGATIVE - Future FromDate (should fail validation)
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/latest?size=sm&limit=10&fromDate=2026-12-31T00:00:00Z
+Content-Type: {{contentType}}
+
+### Expected Response:
+# HTTP 400 BAD_REQUEST
+# Error message: "fromDate must not be in the future"
+
+###############################################################################
+### TEST 12: NEGATIVE - Invalid Size Parameter
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/latest?size=invalid&limit=10
+Content-Type: {{contentType}}
+
+### Expected Response:
+# HTTP 400 BAD_REQUEST
+# Error message about invalid size value
+
+###############################################################################
+### TEST 13: NEGATIVE - Invalid Limit (negative number)
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/latest?size=sm&limit=-5
+Content-Type: {{contentType}}
+
+### Expected Response:
+# HTTP 200 OK (limit normalized to default 10)
+# Or HTTP 400 BAD_REQUEST if validation enforced
+
+###############################################################################
+### TEST 14: NEGATIVE - Invalid Limit (zero)
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/latest?size=sm&limit=0
+Content-Type: {{contentType}}
+
+### Expected Response:
+# HTTP 200 OK (limit normalized to default 10)
+# Or HTTP 400 BAD_REQUEST if validation enforced
+
+###############################################################################
+### TEST 15: NEGATIVE - Missing Required Size Parameter
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/latest?limit=10
+Content-Type: {{contentType}}
+
+### Expected Response:
+# HTTP 400 BAD_REQUEST
+# Error message: "size must not be null"
+
+###############################################################################
+### TEST 16: Edge Case - No Challenges Available
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/latest?size=sm&limit=10&fromDate=2030-01-01T00:00:00Z
+Content-Type: {{contentType}}
+
+### Expected Response:
+# HTTP 404 NOT_FOUND
+# Or HTTP 200 OK with empty data array
+
+###############################################################################
+### TEST 17: Pagination Test - First Page
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/latest?size=sm&limit=5
+Content-Type: {{contentType}}
+
+### Note: Save the registeredAt of the 5th challenge, use it for next request
+
+###############################################################################
+### TEST 18: Pagination Test - Second Page
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/latest?size=sm&limit=5&fromDate=2025-10-10T12:00:00Z
+Content-Type: {{contentType}}
+
+### Replace fromDate with registeredAt from last challenge of previous page
+### This simulates cursor-based pagination
+
+###############################################################################
+### TEST 19: Authentication Test - With JWT Token (if required)
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/latest?size=md&limit=10
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+### Expected Response:
+# HTTP 200 OK
+# Returns challenges (may include private challenges based on auth)
+
+###############################################################################
+### TEST 20: Performance Test - Large Result Set
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/latest?size=xs&limit=1000
+Content-Type: {{contentType}}
+
+### Expected Response:
+# HTTP 200 OK
+# Monitor response time
+# Should complete within acceptable timeframe
+# Consider pagination for very large datasets
+
+###############################################################################
+### Notes:
+# - Update @jwtToken variable with a valid JWT token for authenticated tests
+# - Update fromDate values based on your test data
+# - Verify that challenge data matches expected DTO structure
+# - Check that ordering is correct (newest first)
+# - Validate that only enabled challenges are returned
+# - Test with empty database to verify NOT_FOUND handling
+###############################################################################

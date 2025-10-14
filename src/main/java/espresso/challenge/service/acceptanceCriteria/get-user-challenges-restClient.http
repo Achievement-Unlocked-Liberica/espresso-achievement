@@ -1,0 +1,177 @@
+### Get User Challenges - REST Client Tests
+@baseUrl = http://localhost:8080
+@contentType = application/json
+@jwtToken = YOUR_JWT_TOKEN_HERE
+@targetUserKey = usr1234
+@myUserKey = usr5678
+
+###############################################################################
+### TEST 1: Get User Challenges - Another User (MD size)
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/user/{{targetUserKey}}?size=md
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Expected: HTTP 200 OK with target user's challenges
+
+###############################################################################
+### TEST 2: Get User Challenges - Small Size, Limit 5
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/user/{{targetUserKey}}?size=sm&limit=5
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Expected: HTTP 200 OK with 5 challenges in small format
+
+###############################################################################
+### TEST 3: Get User Challenges - Large Size
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/user/{{targetUserKey}}?size=lg&limit=10
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Expected: HTTP 200 OK with full challenge details
+
+###############################################################################
+### TEST 4: Get My Own Challenges via User Endpoint
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/user/{{myUserKey}}?size=md
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Expected: HTTP 200 OK with my own challenges
+### Note: Replace {{myUserKey}} with your user key from JWT
+
+###############################################################################
+### TEST 5: Get User Challenges - With FromDate Filter
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/user/{{targetUserKey}}?size=md&limit=20&fromDate=2025-01-01T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Expected: HTTP 200 OK with challenges after Jan 1, 2025
+
+###############################################################################
+### TEST 6: NEGATIVE - No Authentication
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/user/{{targetUserKey}}?size=md
+Content-Type: {{contentType}}
+
+### Expected: HTTP 401 UNAUTHORIZED
+
+###############################################################################
+### TEST 7: NEGATIVE - Invalid JWT Token
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/user/{{targetUserKey}}?size=md
+Authorization: Bearer invalid_token_here
+Content-Type: {{contentType}}
+
+### Expected: HTTP 401 UNAUTHORIZED
+
+###############################################################################
+### TEST 8: NEGATIVE - Invalid User Key (too short)
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/user/usr12?size=md
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Expected: HTTP 400 BAD_REQUEST - user key must be 7 characters
+
+###############################################################################
+### TEST 9: NEGATIVE - Invalid User Key (too long)
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/user/usr12345678?size=md
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Expected: HTTP 400 BAD_REQUEST - user key must be 7 characters
+
+###############################################################################
+### TEST 10: NEGATIVE - Non-existent User
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/user/invalid?size=md
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Expected: HTTP 404 NOT_FOUND - User not found
+
+###############################################################################
+### TEST 11: NEGATIVE - Future FromDate
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/user/{{targetUserKey}}?size=md&fromDate=2026-12-31T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Expected: HTTP 400 BAD_REQUEST - fromDate in future
+
+###############################################################################
+### TEST 12: NEGATIVE - Missing Size Parameter
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/user/{{targetUserKey}}?limit=10
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Expected: HTTP 400 BAD_REQUEST - size required
+
+###############################################################################
+### TEST 13: Pagination - First Page
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/user/{{targetUserKey}}?size=sm&limit=5
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Save registeredAt of 5th challenge for next request
+
+###############################################################################
+### TEST 14: Pagination - Second Page
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/user/{{targetUserKey}}?size=sm&limit=5&fromDate=2025-10-10T12:00:00Z
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Use registeredAt from previous page's last challenge
+
+###############################################################################
+### TEST 15: All Sizes - XS
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/user/{{targetUserKey}}?size=xs&limit=10
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+###############################################################################
+### TEST 16: All Sizes - XL
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/user/{{targetUserKey}}?size=xl&limit=10
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+###############################################################################
+### TEST 17: Large Limit
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/user/{{targetUserKey}}?size=sm&limit=100
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+###############################################################################
+### TEST 18: Zero Limit (should normalize to 10)
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/user/{{targetUserKey}}?size=sm&limit=0
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+###############################################################################
+### TEST 19: Negative Limit (should normalize to 10)
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/user/{{targetUserKey}}?size=sm&limit=-5
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+###############################################################################
+### TEST 20: User With No Challenges
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/user/emptyusr?size=md
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Expected: HTTP 404 NOT_FOUND or empty array
+### Note: Use a valid user key that has no challenges

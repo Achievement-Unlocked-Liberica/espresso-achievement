@@ -1,5 +1,8 @@
 package espresso.challenge.infrastructure.repositories;
 
+import java.time.OffsetDateTime;
+import java.util.List;
+
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -125,6 +128,45 @@ public class ChallengeRepository implements IChallengeRepository {
     public <T> T getChallengeByKey(Class<T> dtoType, String entityKey) {
         try {
             return challengePSQLProvider.findChallengeByKey(dtoType, entityKey);
+        } catch (Exception e) {
+            // Log and return null on error to match achievement pattern
+            return null;
+        }
+    }
+
+    @Override
+    public <T> List<T> getLatestChallenges(Class<T> dtoType, Integer limit, OffsetDateTime fromDate) {
+        try {
+            // Normalize limit to 10 if not provided or invalid
+            if (limit == null || limit <= 0) {
+                limit = 10;
+            }
+
+            // If fromDate is null, get all latest challenges
+            // If fromDate is provided, filter challenges from that date
+            return fromDate == null
+                    ? challengePSQLProvider.findLatestChallenges(dtoType, org.springframework.data.domain.Limit.of(limit))
+                    : challengePSQLProvider.findLatestChallenges(dtoType, org.springframework.data.domain.Limit.of(limit), fromDate);
+
+        } catch (Exception e) {
+            // Log and return null on error to match achievement pattern
+            return null;
+        }
+    }
+
+    @Override
+    public <T> List<T> getChallengesByUserKey(Class<T> dtoType, String userKey, Integer limit, OffsetDateTime fromDate) {
+        try {
+            // Normalize limit to 10 if not provided or invalid
+            if (limit == null || limit <= 0) {
+                limit = 10;
+            }
+
+            // Get challenges for the specified user, filtered by date if provided
+            return fromDate == null
+                    ? challengePSQLProvider.findChallengesByUserKey(dtoType, userKey, org.springframework.data.domain.Limit.of(limit))
+                    : challengePSQLProvider.findChallengesByUserKey(dtoType, userKey, org.springframework.data.domain.Limit.of(limit), fromDate);
+
         } catch (Exception e) {
             // Log and return null on error to match achievement pattern
             return null;

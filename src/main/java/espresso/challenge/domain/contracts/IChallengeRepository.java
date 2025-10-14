@@ -1,5 +1,8 @@
 package espresso.challenge.domain.contracts;
 
+import java.time.OffsetDateTime;
+import java.util.List;
+
 import espresso.challenge.domain.entities.Challenge;
 
 /**
@@ -47,5 +50,24 @@ public interface IChallengeRepository {
      */
     <T> T getChallengeByKey(Class<T> dtoType, String entityKey);
 
-    // Additional query operations can be added here as needed
+    /**
+     * Gets the latest challenges ordered by registered date (newest first)
+     * @param <T> The type of the DTO to project to (e.g., ChallengeDtoSm.class)
+     * @param dtoType The DTO class to project to (e.g., ChallengeDtoSm.class)
+     * @param limit Maximum number of results to return
+     * @param fromDate Optional date filter to get challenges from this date onwards
+     * @return List of challenges projected to the specified DTO type
+     */
+    <T> List<T> getLatestChallenges(Class<T> dtoType, Integer limit, OffsetDateTime fromDate);
+
+    /**
+     * Gets challenges for a specific user ordered by registered date (newest first)
+     * @param <T> The type of the DTO to project to (e.g., ChallengeDtoSm.class)
+     * @param dtoType The DTO class to project to (e.g., ChallengeDtoSm.class)
+     * @param userKey The user key to retrieve challenges for
+     * @param limit Maximum number of results to return
+     * @param fromDate Optional date filter to get challenges from this date onwards
+     * @return List of challenges for the user projected to the specified DTO type
+     */
+    <T> List<T> getChallengesByUserKey(Class<T> dtoType, String userKey, Integer limit, OffsetDateTime fromDate);
 }

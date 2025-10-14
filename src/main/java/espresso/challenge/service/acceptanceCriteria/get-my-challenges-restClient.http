@@ -1,0 +1,128 @@
+### Get My Challenges - REST Client Tests
+@baseUrl = http://localhost:8080
+@contentType = application/json
+@jwtToken = YOUR_JWT_TOKEN_HERE
+
+###############################################################################
+### TEST 1: Get My Challenges - Default (MD size, limit 10)
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/my?size=md
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Expected: HTTP 200 OK with up to 10 of my challenges
+
+###############################################################################
+### TEST 2: Get My Challenges - Small Size, Limit 5
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/my?size=sm&limit=5
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Expected: HTTP 200 OK with 5 challenges in small format
+
+###############################################################################
+### TEST 3: Get My Challenges - Large Size
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/my?size=lg&limit=10
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Expected: HTTP 200 OK with full challenge details
+
+###############################################################################
+### TEST 4: Get My Challenges - With FromDate Filter
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/my?size=md&limit=20&fromDate=2025-01-01T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Expected: HTTP 200 OK with challenges after Jan 1, 2025
+
+###############################################################################
+### TEST 5: NEGATIVE - No Authentication
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/my?size=md
+Content-Type: {{contentType}}
+
+### Expected: HTTP 401 UNAUTHORIZED
+
+###############################################################################
+### TEST 6: NEGATIVE - Invalid JWT Token
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/my?size=md
+Authorization: Bearer invalid_token_here
+Content-Type: {{contentType}}
+
+### Expected: HTTP 401 UNAUTHORIZED
+
+###############################################################################
+### TEST 7: NEGATIVE - Future FromDate
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/my?size=md&fromDate=2026-12-31T00:00:00Z
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Expected: HTTP 400 BAD_REQUEST - fromDate in future
+
+###############################################################################
+### TEST 8: NEGATIVE - Missing Size Parameter
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/my?limit=10
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Expected: HTTP 400 BAD_REQUEST - size required
+
+###############################################################################
+### TEST 9: Pagination - First Page
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/my?size=sm&limit=5
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Save registeredAt of 5th challenge for next request
+
+###############################################################################
+### TEST 10: Pagination - Second Page
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/my?size=sm&limit=5&fromDate=2025-10-10T12:00:00Z
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+### Use registeredAt from previous page's last challenge
+
+###############################################################################
+### TEST 11: All Sizes - XS
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/my?size=xs&limit=10
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+###############################################################################
+### TEST 12: All Sizes - XL
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/my?size=xl&limit=10
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+###############################################################################
+### TEST 13: Large Limit
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/my?size=sm&limit=100
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+###############################################################################
+### TEST 14: Zero Limit (should normalize to 10)
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/my?size=sm&limit=0
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
+
+###############################################################################
+### TEST 15: Negative Limit (should normalize to 10)
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/my?size=sm&limit=-5
+Authorization: Bearer {{jwtToken}}
+Content-Type: {{contentType}}
