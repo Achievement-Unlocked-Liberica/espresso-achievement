@@ -1,0 +1,312 @@
+### Add Challenge Encouragement - REST Client Tests
+### Prerequisites: 
+### 1. Server running at http://localhost:8080
+### 2. Valid JWT token with authenticated user
+### 3. Valid challenge key (e.g., from create challenge response)
+
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### Variables - UPDATE THESE BEFORE TESTING
+@jwtToken = YOUR_JWT_TOKEN_HERE
+@challengeKey = CH-12345
+
+### ========================================
+### TEST 1: Successfully Add Encouragement (Count: 5)
+### Expected: 201 CREATED with success response
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/encouragement
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "count": 5
+}
+
+### ========================================
+### TEST 2: Add Encouragement - Minimum Valid Count (1)
+### Expected: 201 CREATED
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/encouragement
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "count": 1
+}
+
+### ========================================
+### TEST 3: Add Encouragement - Maximum Valid Count (9)
+### Expected: 201 CREATED
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/encouragement
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "count": 9
+}
+
+### ========================================
+### TEST 4: Add Encouragement - Count Zero (Below Minimum)
+### Expected: 400 BAD_REQUEST - Count must be greater than zero
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/encouragement
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "count": 0
+}
+
+### ========================================
+### TEST 5: Add Encouragement - Count 10 (Above Maximum)
+### Expected: 400 BAD_REQUEST - Count must be less than 10
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/encouragement
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "count": 10
+}
+
+### ========================================
+### TEST 6: Add Encouragement - Count 100 (Far Above Maximum)
+### Expected: 400 BAD_REQUEST - Count must be less than 10
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/encouragement
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "count": 100
+}
+
+### ========================================
+### TEST 7: Add Encouragement - Negative Count
+### Expected: 400 BAD_REQUEST - Count must be greater than zero
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/encouragement
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "count": -5
+}
+
+### ========================================
+### TEST 8: Add Encouragement - Null Count
+### Expected: 400 BAD_REQUEST - Count must be provided
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/encouragement
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "count": null
+}
+
+### ========================================
+### TEST 9: Add Encouragement - Missing Count Field
+### Expected: 400 BAD_REQUEST - Count must be provided
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/encouragement
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+}
+
+### ========================================
+### TEST 10: Add Encouragement - Invalid Challenge Key
+### Expected: 404 NOT_FOUND - Challenge not found
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/INVALID-KEY/encouragement
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "count": 5
+}
+
+### ========================================
+### TEST 11: Add Encouragement - No Authentication
+### Expected: 401 UNAUTHORIZED - Missing JWT token
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/encouragement
+Content-Type: {{contentType}}
+
+{
+  "count": 5
+}
+
+### ========================================
+### TEST 12: Add Encouragement - Invalid JWT Token
+### Expected: 401 UNAUTHORIZED - Invalid JWT token
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/encouragement
+Content-Type: {{contentType}}
+Authorization: Bearer INVALID_TOKEN_HERE
+
+{
+  "count": 5
+}
+
+### ========================================
+### TEST 13: Add Encouragement - Expired JWT Token
+### Expected: 401 UNAUTHORIZED - Expired JWT token
+### Note: Replace with an expired token for testing
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/encouragement
+Content-Type: {{contentType}}
+Authorization: Bearer EXPIRED_TOKEN_HERE
+
+{
+  "count": 5
+}
+
+### ========================================
+### TEST 14: Add Multiple Encouragements to Same Challenge
+### Expected: 201 CREATED for each request
+### Note: Run this test multiple times to verify multiple encouragements work
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/encouragement
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "count": 3
+}
+
+### ========================================
+### TEST 15: Security Test - Attempt to Override userKey
+### Expected: 201 CREATED - userKey from JWT should be used, not from body
+### Note: The userKey in the body should be ignored
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/encouragement
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "count": 5,
+  "userKey": "HACKER1"
+}
+
+### ========================================
+### TEST 16: Security Test - Attempt to Override challengeKey
+### Expected: 201 CREATED - challengeKey from path should be used, not from body
+### Note: The challengeKey in the body should be ignored
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/encouragement
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "count": 5,
+  "challengeKey": "OTHER99"
+}
+
+### ========================================
+### TEST 17: Add Encouragement - Count as String (Type Mismatch)
+### Expected: 400 BAD_REQUEST - Type mismatch error
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/encouragement
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "count": "five"
+}
+
+### ========================================
+### TEST 18: Add Encouragement - Count as Decimal
+### Expected: 201 CREATED (should accept and truncate to integer) or 400 BAD_REQUEST
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/encouragement
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "count": 5.5
+}
+
+### ========================================
+### TEST 19: Add Encouragement - Empty Request Body
+### Expected: 400 BAD_REQUEST - Count must be provided
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/encouragement
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+### ========================================
+### TEST 20: Add Encouragement - Malformed JSON
+### Expected: 400 BAD_REQUEST - Invalid JSON format
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/encouragement
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "count": 5,
+  invalid json
+}
+
+### ========================================
+### INTEGRATION TESTS
+### ========================================
+
+### TEST 21: Full Workflow - Create Challenge, Then Add Encouragement
+### Step 1: Create a challenge (requires separate test file)
+### Step 2: Use the returned challengeKey in the encouragement request
+### Expected: 201 CREATED for both operations
+### ========================================
+
+### TEST 22: Verify Encouragement Persisted (Query Challenge Detail)
+### Run this after successful encouragement creation
+### Expected: Challenge detail should show the encouragement in the encouragements list
+### Note: Requires GET challenge detail endpoint
+### ========================================
+# GET {{baseUrl}}/api/qry/challenge/{{challengeKey}}
+# Authorization: Bearer {{jwtToken}}
+
+### ========================================
+### PERFORMANCE TESTS
+### ========================================
+
+### TEST 23: Concurrent Encouragement Requests
+### Run multiple requests simultaneously to test concurrency
+### Expected: All requests should succeed without conflicts
+### Note: Use load testing tool for better simulation
+### ========================================
+
+### ========================================
+### NOTES FOR TESTING
+### ========================================
+# 1. Update @jwtToken variable with a valid JWT token before testing
+# 2. Update @challengeKey with an existing challenge key
+# 3. Ensure server is running at http://localhost:8080
+# 4. Some tests are expected to fail (negative tests)
+# 5. Check server logs for domain events published
+# 6. Verify database state after successful operations
+# 7. Test security scenarios (TEST 15-16) to ensure field hiding works
+# 8. For integration tests, coordinate with other API endpoints
+# 9. Monitor database for ChallengeEncouragements table entries
+# 10. Check that challenge.updatedAt timestamp is refreshed
+
+### ========================================
+### VALIDATION CHECKLIST
+### ========================================
+# [ ] Count validation: 1-9 range enforced
+# [ ] Null/missing count rejected
+# [ ] Invalid challenge key returns 404
+# [ ] Missing authentication returns 401
+# [ ] Invalid token returns 401
+# [ ] UserKey from JWT used (not from body)
+# [ ] ChallengeKey from path used (not from body)
+# [ ] Multiple encouragements supported
+# [ ] Domain events published
+# [ ] Challenge entity updated
+# [ ] Encouragement persisted correctly
+# [ ] Response codes match specification
+# [ ] Error messages are descriptive

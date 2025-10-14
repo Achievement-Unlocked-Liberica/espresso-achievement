@@ -22,6 +22,7 @@ import espresso.challenge.domain.commands.DisableChallengeCommand;
 import espresso.challenge.domain.commands.DeleteChallengeCommand;
 import espresso.challenge.domain.commands.UploadChallengeMediaCommand;
 import espresso.challenge.domain.commands.AddChallengeCommentCommand;
+import espresso.challenge.domain.commands.AddChallengeEncouragementCommand;
 import espresso.challenge.domain.commandhandlers.IAddChallengeCommentCommandHandler;
 import espresso.challenge.domain.entities.ChallengeComment;
 import espresso.challenge.domain.contracts.ICreateChallengeCommandHandler;
@@ -29,6 +30,7 @@ import espresso.challenge.domain.contracts.IUpdateChallengeCommandHandler;
 import espresso.challenge.domain.contracts.IDisableChallengeCommandHandler;
 import espresso.challenge.domain.contracts.IDeleteChallengeCommandHandler;
 import espresso.challenge.domain.contracts.IUploadChallengeMediaCommandHandler;
+import espresso.challenge.domain.contracts.IAddChallengeEncouragementCommandHandler;
 import espresso.common.domain.responses.ServiceResponse;
 import espresso.common.service.CommonCmdApi;
 import espresso.common.service.operational.ApiLogger;
@@ -46,6 +48,7 @@ public class ChallengeCmdApi extends CommonCmdApi {
 	private final ICreateChallengeCommandHandler createChallengeCommandHandler;
 	private final IUploadChallengeMediaCommandHandler uploadChallengeMediaCommandHandler;
 	private final IAddChallengeCommentCommandHandler addChallengeCommentCommandHandler;
+	private final IAddChallengeEncouragementCommandHandler addChallengeEncouragementCommandHandler;
 	private final IUpdateChallengeCommandHandler updateChallengeCommandHandler;
 	private final IDisableChallengeCommandHandler disableChallengeCommandHandler;
 	private final IDeleteChallengeCommandHandler deleteChallengeCommandHandler;
@@ -57,6 +60,7 @@ public class ChallengeCmdApi extends CommonCmdApi {
 	 * @param createChallengeCommandHandler Handler for processing challenge creation commands
 	 * @param uploadChallengeMediaCommandHandler Handler for processing challenge media upload commands
 	 * @param addChallengeCommentCommandHandler Handler for processing challenge comment addition commands
+	 * @param addChallengeEncouragementCommandHandler Handler for processing challenge encouragement commands
 	 * @param updateChallengeCommandHandler Handler for processing challenge update commands
 	 * @param disableChallengeCommandHandler Handler for processing challenge disable commands
 	 * @param deleteChallengeCommandHandler Handler for processing challenge deletion commands
@@ -66,6 +70,7 @@ public class ChallengeCmdApi extends CommonCmdApi {
 			ICreateChallengeCommandHandler createChallengeCommandHandler,
 			IUploadChallengeMediaCommandHandler uploadChallengeMediaCommandHandler,
 			IAddChallengeCommentCommandHandler addChallengeCommentCommandHandler,
+			IAddChallengeEncouragementCommandHandler addChallengeEncouragementCommandHandler,
 			IUpdateChallengeCommandHandler updateChallengeCommandHandler,
 			IDisableChallengeCommandHandler disableChallengeCommandHandler,
 			IDeleteChallengeCommandHandler deleteChallengeCommandHandler) {
@@ -73,6 +78,7 @@ public class ChallengeCmdApi extends CommonCmdApi {
 		this.createChallengeCommandHandler = createChallengeCommandHandler;
 		this.uploadChallengeMediaCommandHandler = uploadChallengeMediaCommandHandler;
 		this.addChallengeCommentCommandHandler = addChallengeCommentCommandHandler;
+		this.addChallengeEncouragementCommandHandler = addChallengeEncouragementCommandHandler;
 		this.updateChallengeCommandHandler = updateChallengeCommandHandler;
 		this.disableChallengeCommandHandler = disableChallengeCommandHandler;
 		this.deleteChallengeCommandHandler = deleteChallengeCommandHandler;
@@ -132,6 +138,26 @@ public class ChallengeCmdApi extends CommonCmdApi {
 
 		return ResponseEntity.status(201)
 				.body(ServiceResponse.success(org.springframework.http.HttpStatus.CREATED, comment, null));
+	}
+
+	@Operation(summary = "Add Encouragement to Challenge", description = "Adds an encouragement to an existing Challenge to motivate the challenge owner.")
+	@PostMapping("/{key}/encouragement")
+	@ApiResponse(responseCode = "201:CREATED", description = "Encouragement added successfully.")
+	@ApiResponse(responseCode = "400:BAD_REQUEST", description = "Validation error in the request.")
+	@ApiResponse(responseCode = "404:NOT_FOUND", description = "Challenge or user not found.")
+	@ApiResponse(responseCode = "401:UNAUTHORIZED", description = "User not authorized.")
+	@ApiResponse(responseCode = "500:INTERNAL_SERVER_ERROR", description = "An internal error occurred.")
+	@ApiLogger("Add encouragement to challenge")
+	public ResponseEntity<ServiceResponse<Object>> addEncouragement(
+			@PathVariable String key,
+			@RequestBody AddChallengeEncouragementCommand command) {
+
+		String userKey = getAuthenticatedUserKey();
+
+		command.setUserKey(userKey);
+		command.setChallengeKey(key);
+
+		return executeCommand(command, addChallengeEncouragementCommandHandler::handle);
 	}
 
 	@Operation(summary = "Update Challenge", description = "Updates an existing Challenge with the provided data.")

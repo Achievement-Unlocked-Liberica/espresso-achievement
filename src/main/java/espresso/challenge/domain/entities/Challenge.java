@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import espresso.challenge.domain.events.ChallengeEvent;
 import espresso.challenge.domain.events.ChallengeMediaEvent;
 import espresso.challenge.domain.events.ChallengeCommentEvent;
+import espresso.challenge.domain.events.ChallengeEncouragementEvent;
 import espresso.common.domain.events.EventActionTypes;
 import espresso.common.domain.models.DomainAggregate;
 import espresso.common.domain.support.StringListConverter;
@@ -104,6 +105,14 @@ public class Challenge extends DomainAggregate {
     @JsonManagedReference
     @OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<ChallengeComment> comments;
+
+    /**
+     * List of encouragements associated with this challenge.
+     * Lazy-loaded to improve performance.
+     */
+    @JsonManagedReference
+    @OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<ChallengeEncouragement> encouragements;
 
     /*
      * The constructor is package-private to prevent the creation of a challenge
@@ -240,6 +249,24 @@ public class Challenge extends DomainAggregate {
         this.raiseCommentAdded(comment);
     }
 
+    /**
+     * Adds an encouragement to this challenge from another user.
+     * This method adds the encouragement to the internal list.
+     * 
+     * @param encouragement The encouragement being added to this challenge
+     */
+    public void addEncouragement(ChallengeEncouragement encouragement) {
+        if (this.encouragements == null) {
+            this.encouragements = new ArrayList<>();
+        }
+
+        this.encouragements.add(encouragement);
+
+        this.updateEntity();
+
+        this.raiseEncouragementAdded(encouragement);
+    }
+
     // Converts this challenge to a KTO (Key Transfer Object) representation.
     public ChallengeKto toKto(){
         return new ChallengeKto() {
@@ -325,6 +352,15 @@ public class Challenge extends DomainAggregate {
                         comment.getChallenge().getEntityKey(),
                         comment.getUser().getEntityKey(),
                         comment.getText()));
+    }
+
+    private void raiseEncouragementAdded(ChallengeEncouragement encouragement) {
+        this.domainEvents.add(
+                ChallengeEncouragementEvent.create(
+                        EventActionTypes.CREATED,
+                        encouragement.getChallengeKey(),
+                        encouragement.getUserKey(),
+                        encouragement.getCount()));
     }
 
     // #endregion Domain Events
