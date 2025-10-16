@@ -1,0 +1,91 @@
+### Variables for Delete Challenge Tests
+@baseUrl = http://localhost:8080
+@jwtToken = YOUR_JWT_TOKEN_HERE
+@validUserKey = ABC1234
+@invalidUserKey = XYZ9999
+@validChallengeKey = 8NctRKY
+@nonExistentChallengeKey = MISSING
+@otherUserChallengeKey = OTHER123
+
+### AC1: Successful Challenge Deletion
+# Tests: Valid JWT token, user owns challenge, challenge exists
+# Expected: HTTP 200 OK with entity key response
+DELETE {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC2: Challenge Not Found (No Content Response)
+# Tests: Valid user but challenge doesn't exist
+# Expected: HTTP 204 No Content
+DELETE {{baseUrl}}/api/cmd/challenge/{{nonExistentChallengeKey}}
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC3.1: Missing JWT Token
+# Tests: Authentication failure - no JWT token provided
+# Expected: HTTP 401 Unauthorized
+DELETE {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+X-API-Version: 1.0
+
+### AC3.2: Invalid or Expired JWT Token
+# Tests: Authentication failure - invalid JWT token
+# Expected: HTTP 401 Unauthorized
+DELETE {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Authorization: Bearer INVALID_TOKEN_HERE
+X-API-Version: 1.0
+
+### AC4: User Not Found
+# Tests: Valid JWT but user doesn't exist in system
+# Expected: HTTP 404 Not Found with correlation ID
+DELETE {{baseUrl}}/api/cmd/challenge/{{validChallengeKey}}
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC5: Unauthorized Access (Not Owner)
+# Tests: User doesn't own the challenge being deleted
+# Expected: HTTP 401 Unauthorized with correlation ID
+DELETE {{baseUrl}}/api/cmd/challenge/{{otherUserChallengeKey}}
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC - Test Cascade Deletion with Comments and Media
+# Tests: Challenge with associated comments, participations and media files
+# Expected: HTTP 200 OK - all dependencies deleted in proper order
+DELETE {{baseUrl}}/api/cmd/challenge/CHALLENGE_WITH_DEPENDENCIES
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC - Invalid Challenge Key Format (Too Short)
+# Tests: Challenge key validation - less than 7 characters
+# Expected: HTTP 400 Bad Request with validation error
+DELETE {{baseUrl}}/api/cmd/challenge/SHORT
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC - Invalid Challenge Key Format (Too Long)
+# Tests: Challenge key validation - more than 7 characters
+# Expected: HTTP 400 Bad Request with validation error
+DELETE {{baseUrl}}/api/cmd/challenge/TOOLONG123
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC - Delete Public Challenge
+# Tests: Deletion of a public challenge
+# Expected: HTTP 200 OK - challenge and all dependencies removed
+DELETE {{baseUrl}}/api/cmd/challenge/PUBLIC_CHALLENGE
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC - Delete Private Challenge
+# Tests: Deletion of a private challenge
+# Expected: HTTP 200 OK - challenge and all dependencies removed
+DELETE {{baseUrl}}/api/cmd/challenge/PRIVATE_CHALLENGE
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0
+
+### AC - Delete Challenge with Future Fulfillment Date
+# Tests: Deletion of a challenge with fulfillment date in the future
+# Expected: HTTP 200 OK - challenge deleted regardless of fulfillment date
+DELETE {{baseUrl}}/api/cmd/challenge/FUTURE_CHALLENGE
+Authorization: Bearer {{jwtToken}}
+X-API-Version: 1.0

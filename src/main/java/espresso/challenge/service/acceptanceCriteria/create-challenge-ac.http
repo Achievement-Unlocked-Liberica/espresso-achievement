@@ -1,0 +1,352 @@
+### Variables for Create Challenge Tests
+@baseUrl = http://localhost:8080
+@jwtToken = eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJnYWVsZiIsInVzZXJLZXkiOiJRNjZtc0p0IiwiZW1haWwiOiJnYWVsZkBleGFtcGxlLmNvbSIsImZpcnN0TmFtZSI6IkZlbnRoaXIiLCJsYXN0TmFtZSI6IkFzaHdpbmciLCJpYXQiOjE3NjAyNTIyNTIsImV4cCI6MTc2MDMzODY1Mn0.7fqXRY5xLtvj0LSLrYXG4JSANbPvksSCXQYaTvIfWPlWCV7vwo2-NPerXz0xjtUb
+@validUserKey = ABC1234
+@invalidUserKey = XYZ9999
+
+### AC1: Successful Challenge Creation
+# Tests: Valid JWT token, existing user, valid challenge data
+# Expected: HTTP 201 Created with entity key response
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Complete Advanced Spring Security Course",
+  "description": "Successfully complete the advanced Spring Security course and implement all security patterns.",
+  "fulfillmentDate": "2025-12-31",
+  "skills": ["int", "wis", "luc"],
+  "isPublic": true
+}
+
+### AC2.1: Missing JWT Token
+# Tests: Authentication failure - no JWT token provided
+# Expected: HTTP 401 Unauthorized
+POST {{baseUrl}}/api/cmd/challenge
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Test Challenge",
+  "description": "This request should fail due to missing JWT token",
+  "fulfillmentDate": "2025-12-31",
+  "skills": ["str"]
+}
+
+### AC2.2: Invalid JWT Token
+# Tests: Authentication failure - invalid JWT token
+# Expected: HTTP 401 Unauthorized
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer INVALID_TOKEN_HERE
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Test Challenge",
+  "description": "This request should fail due to invalid JWT token",
+  "fulfillmentDate": "2025-12-31",
+  "skills": ["str"]
+}
+
+### AC3: User Not Found
+# Tests: Valid JWT but user doesn't exist in system
+# Expected: HTTP 404 Not Found with correlation ID
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Test Challenge",
+  "description": "Valid challenge data but user from JWT doesn't exist",
+  "fulfillmentDate": "2025-12-31",
+  "skills": ["int"]
+}
+
+### AC4.1: Missing Required Fields - Title
+# Tests: JSR-303 validation failure - missing title
+# Expected: HTTP 400 Bad Request with validation error
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "description": "Missing title field",
+  "fulfillmentDate": "2025-12-31",
+  "skills": ["int"]
+}
+
+### AC4.2: Empty Required Fields
+# Tests: JSR-303 validation failure - empty title and description
+# Expected: HTTP 400 Bad Request with validation errors
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "",
+  "description": "   ",
+  "fulfillmentDate": "2025-12-31",
+  "skills": ["int"]
+}
+
+### AC4.3: Field Length Validation - Title Too Long
+# Tests: JSR-303 validation failure - title exceeds 200 characters
+# Expected: HTTP 400 Bad Request with length validation error
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "This is a very long title that exceeds the maximum allowed length of 200 characters and should trigger a validation error because it contains way too many characters and goes beyond the specified limit making it invalid for the system to process properly",
+  "description": "Valid description",
+  "fulfillmentDate": "2025-12-31",
+  "skills": ["int"]
+}
+
+### AC4.3: Field Length Validation - Description Too Long
+# Tests: JSR-303 validation failure - description exceeds 1000 characters
+# Expected: HTTP 400 Bad Request with length validation error
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Valid Title",
+  "description": "This is an extremely long description that exceeds the maximum allowed length of 1000 characters for challenge descriptions. It contains way too many words and characters, going far beyond what should be acceptable for a description field. The purpose is to test the validation system and ensure it properly rejects descriptions that are too lengthy. This description continues to add more and more text to ensure we definitely exceed the 1000 character limit imposed by the system validation rules. We need to make sure this triggers the appropriate validation error message and returns the correct HTTP status code. This description is intentionally verbose and repetitive to guarantee we surpass the character limit and test the field length validation functionality of the challenge creation endpoint. The system should reject this request and return a proper validation error message indicating that the description field exceeds the maximum allowed length of 1000 characters.",
+  "fulfillmentDate": "2025-12-31",
+  "skills": ["int"]
+}
+
+### AC5.1: Past Fulfillment Date
+# Tests: Date validation failure - past date not allowed
+# Expected: HTTP 400 Bad Request with date validation error
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Past Challenge",
+  "description": "This challenge has a past fulfillment date",
+  "fulfillmentDate": "2024-01-01",
+  "skills": ["int"]
+}
+
+### AC5.2: Invalid Date Format
+# Tests: Date format validation failure - incorrect format
+# Expected: HTTP 400 Bad Request with date format error
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Test Challenge",
+  "description": "Test description",
+  "fulfillmentDate": "12/31/2025",
+  "skills": ["int"]
+}
+
+### AC6.1: Invalid Skills
+# Tests: Custom validation failure - skills not in allowed list
+# Expected: HTTP 400 Bad Request with skill validation error
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Test Challenge",
+  "description": "Test description",
+  "fulfillmentDate": "2025-12-31",
+  "skills": ["magic", "invalid", "str"]
+}
+
+### AC6.2: Too Many Skills
+# Tests: JSR-303 validation failure - more than 7 skills
+# Expected: HTTP 400 Bad Request with skills count validation error
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Test Challenge",
+  "description": "Test description", 
+  "fulfillmentDate": "2025-12-31",
+  "skills": ["str", "dex", "con", "wis", "int", "cha", "luc", "extra"]
+}
+
+### AC6.3: No Skills Provided
+# Tests: JSR-303 validation failure - empty skills array
+# Expected: HTTP 400 Bad Request with skills required error
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Test Challenge",
+  "description": "Test description",
+  "fulfillmentDate": "2025-12-31", 
+  "skills": []
+}
+
+### AC7.1: Explicit Public Setting
+# Tests: Challenge visibility - explicitly set to public
+# Expected: HTTP 201 Created with entity key response
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Public Challenge",
+  "description": "This challenge is public",
+  "fulfillmentDate": "2025-12-31",
+  "skills": ["str"],
+  "isPublic": true
+}
+
+### AC7.2: Explicit Private Setting
+# Tests: Challenge visibility - explicitly set to private
+# Expected: HTTP 201 Created with entity key response
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Private Challenge", 
+  "description": "This challenge is private",
+  "fulfillmentDate": "2025-12-31",
+  "skills": ["wis"],
+  "isPublic": false
+}
+
+### AC7.3: Default Visibility (isPublic not specified)
+# Tests: Challenge visibility - default behavior when isPublic omitted
+# Expected: HTTP 201 Created with entity key response (defaults to public)
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Default Challenge",
+  "description": "This challenge uses default visibility",
+  "fulfillmentDate": "2025-12-31", 
+  "skills": ["int"]
+}
+
+### AC9.1: Skills Case Sensitivity
+# Tests: Edge case - mixed case skills should be normalized
+# Expected: HTTP 201 Created with entity key response
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Case Test Challenge",
+  "description": "Testing case sensitivity", 
+  "fulfillmentDate": "2025-12-31",
+  "skills": ["STR", "Dex", "INT"]
+}
+
+### AC9.2: Skills with Whitespace
+# Tests: Edge case - skills with surrounding whitespace should be trimmed
+# Expected: HTTP 201 Created with entity key response
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Whitespace Test Challenge",
+  "description": "Testing whitespace handling",
+  "fulfillmentDate": "2025-12-31", 
+  "skills": [" str ", "  dex", "int  "]
+}
+
+### AC - Valid Skills Test
+# Tests: All allowed skills to verify validation
+# Expected: HTTP 201 Created with entity key response
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "All Skills Challenge",
+  "description": "Testing all allowed skills: str, dex, con, wis, int, cha, luc",
+  "fulfillmentDate": "2025-12-31",
+  "skills": ["str", "dex", "con", "wis", "int", "cha", "luc"]
+}
+
+### AC - Minimal Valid Request
+# Tests: Minimum required fields for successful creation
+# Expected: HTTP 201 Created with entity key response
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Minimal Challenge",
+  "description": "This is the minimal valid challenge with required fields only",
+  "fulfillmentDate": "2025-12-31",
+  "skills": ["str"]
+}
+
+### AC - Today's Date as Fulfillment Date
+# Tests: Boundary condition - today's date should be valid (@FutureOrPresent)
+# Expected: HTTP 201 Created with entity key response
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Today Challenge",
+  "description": "Challenge with today's date as fulfillment date",
+  "fulfillmentDate": "2025-10-11",
+  "skills": ["con"]
+}
+
+### AC - Far Future Date
+# Tests: Future date validation - distant future date should be valid
+# Expected: HTTP 201 Created with entity key response
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Long Term Challenge",
+  "description": "Challenge with far future fulfillment date",
+  "fulfillmentDate": "2030-12-31",
+  "skills": ["wis", "int"]
+}
+
+### AC - Complex Challenge Scenario
+# Tests: Complex realistic challenge with multiple skills
+# Expected: HTTP 201 Created with entity key response
+POST {{baseUrl}}/api/cmd/challenge
+Authorization: Bearer {{jwtToken}}
+Content-Type: application/json
+X-API-Version: 1.0
+
+{
+  "title": "Complete Full Stack Development Bootcamp",
+  "description": "Master full stack development including frontend (React, Vue), backend (Spring Boot, Node.js), databases (PostgreSQL, MongoDB), cloud deployment (AWS, Azure), and DevOps practices (Docker, Kubernetes, CI/CD).",
+  "fulfillmentDate": "2026-06-30",
+  "skills": ["int", "wis", "con", "dex"],
+  "isPublic": true
+}

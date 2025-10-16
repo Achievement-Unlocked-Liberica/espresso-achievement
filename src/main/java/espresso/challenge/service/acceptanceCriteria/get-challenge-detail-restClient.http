@@ -1,0 +1,84 @@
+### Get Challenge Detail - REST Client Tests
+@baseUrl = http://localhost:8080
+@contentType = application/json
+@challengeKey = abc1234
+
+###############################################################################
+### TEST 1: Get Challenge Detail - Small Size
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/detail?entityKey={{challengeKey}}&size=sm
+Content-Type: {{contentType}}
+
+### Expected: HTTP 200 OK with minimal challenge details
+
+###############################################################################
+### TEST 2: Get Challenge Detail - Medium Size
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/detail?entityKey={{challengeKey}}&size=md
+Content-Type: {{contentType}}
+
+### Expected: HTTP 200 OK with user and media included
+
+###############################################################################
+### TEST 3: Get Challenge Detail - Large Size
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/detail?entityKey={{challengeKey}}&size=lg
+Content-Type: {{contentType}}
+
+### Expected: HTTP 200 OK with full details
+
+###############################################################################
+### TEST 4: NEGATIVE - Invalid Entity Key (too short)
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/detail?entityKey=abc12&size=sm
+Content-Type: {{contentType}}
+
+### Expected: HTTP 400 BAD_REQUEST - key must be 7 characters
+
+###############################################################################
+### TEST 5: NEGATIVE - Invalid Entity Key (too long)
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/detail?entityKey=abc12345678&size=sm
+Content-Type: {{contentType}}
+
+### Expected: HTTP 400 BAD_REQUEST - key must be 7 characters
+
+###############################################################################
+### TEST 6: NEGATIVE - Non-existent Challenge
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/detail?entityKey=invalid&size=sm
+Content-Type: {{contentType}}
+
+### Expected: HTTP 404 NOT_FOUND
+
+###############################################################################
+### TEST 7: NEGATIVE - Missing Entity Key
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/detail?size=sm
+Content-Type: {{contentType}}
+
+### Expected: HTTP 400 BAD_REQUEST - entityKey required
+
+###############################################################################
+### TEST 8: NEGATIVE - Missing Size Parameter
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/detail?entityKey={{challengeKey}}
+Content-Type: {{contentType}}
+
+### Expected: HTTP 400 BAD_REQUEST - size required
+
+###############################################################################
+### TEST 9: All DTO Sizes - XS (maps to SM)
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/detail?entityKey={{challengeKey}}&size=xs
+Content-Type: {{contentType}}
+
+### Expected: HTTP 200 OK with SM format
+
+###############################################################################
+### TEST 10: All DTO Sizes - XL (maps to LG)
+###############################################################################
+GET {{baseUrl}}/api/qry/challenge/detail?entityKey={{challengeKey}}&size=xl
+Content-Type: {{contentType}}
+
+### Expected: HTTP 200 OK with LG format

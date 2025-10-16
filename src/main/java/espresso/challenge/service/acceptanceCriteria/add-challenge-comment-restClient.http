@@ -1,0 +1,240 @@
+### Add Challenge Comment - REST Client Tests
+### Prerequisites: 
+### 1. Server running at http://localhost:8080
+### 2. Valid JWT token with authenticated user
+### 3. Valid challenge key (e.g., from create challenge response)
+
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### Variables - UPDATE THESE BEFORE TESTING
+@jwtToken = YOUR_JWT_TOKEN_HERE
+@challengeKey = CH-12345
+@validUserKey = USR-ABC
+
+### ========================================
+### TEST 1: Successfully Add Comment
+### Expected: 201 CREATED with comment details
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "commentText": "This is a great challenge! Really helped me improve my Java skills."
+}
+
+### ========================================
+### TEST 2: Add Comment with Maximum Length (200 characters)
+### Expected: 201 CREATED
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "commentText": "This challenge was incredibly helpful! I learned so much about Spring Boot and microservices architecture. The examples were clear and the progression was well-structured. Thank you!"
+}
+
+### ========================================
+### TEST 3: Add Comment - Empty Text
+### Expected: 400 BAD_REQUEST - Comment text is required
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "commentText": ""
+}
+
+### ========================================
+### TEST 4: Add Comment - Text Too Long (> 200 chars)
+### Expected: 400 BAD_REQUEST - Comment text cannot exceed 200 characters
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "commentText": "This is a very long comment that exceeds the maximum allowed length of 200 characters. This is intentionally made long to test the validation logic. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris."
+}
+
+### ========================================
+### TEST 5: Add Comment - Null Text
+### Expected: 400 BAD_REQUEST - Comment text is required
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "commentText": null
+}
+
+### ========================================
+### TEST 6: Add Comment - Whitespace Only
+### Expected: 400 BAD_REQUEST - Comment text is required
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "commentText": "   "
+}
+
+### ========================================
+### TEST 7: Add Comment - Invalid Challenge Key
+### Expected: 404 NOT_FOUND - Challenge not found
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/INVALID-KEY/comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "commentText": "This comment should fail because the challenge doesn't exist."
+}
+
+### ========================================
+### TEST 8: Add Comment - No Authentication
+### Expected: 401 UNAUTHORIZED - Missing or invalid JWT token
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/comments
+Content-Type: {{contentType}}
+
+{
+  "commentText": "This should fail due to missing authentication."
+}
+
+### ========================================
+### TEST 9: Add Comment - Invalid JWT Token
+### Expected: 401 UNAUTHORIZED - Invalid JWT token
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/comments
+Content-Type: {{contentType}}
+Authorization: Bearer INVALID_TOKEN_HERE
+
+{
+  "commentText": "This should fail due to invalid token."
+}
+
+### ========================================
+### TEST 10: Add Multiple Comments to Same Challenge
+### Expected: 201 CREATED for each comment
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "commentText": "First comment on this challenge."
+}
+
+###
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "commentText": "Second comment on the same challenge."
+}
+
+###
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "commentText": "Third comment to test multiple comments functionality."
+}
+
+### ========================================
+### TEST 11: Add Comment with Special Characters
+### Expected: 201 CREATED
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "commentText": "Great challenge! 🎉 Loved the @mentions and #hashtags. Works with $pecial char$ & symbols!"
+}
+
+### ========================================
+### TEST 12: Add Comment with Unicode Characters
+### Expected: 201 CREATED
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "commentText": "¡Excelente desafío! 非常好的挑战 Très bon défi! Отличное задание!"
+}
+
+### ========================================
+### TEST 13: Add Comment with Newlines and Tabs
+### Expected: 201 CREATED (newlines/tabs preserved)
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "commentText": "This comment has\nnewlines\tand\ttabs in it."
+}
+
+### ========================================
+### TEST 14: Add Comment with HTML/Script Tags (XSS Test)
+### Expected: 201 CREATED (should be stored as-is, sanitization on display)
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "commentText": "<script>alert('XSS')</script> This should be sanitized on display."
+}
+
+### ========================================
+### TEST 15: Add Comment with SQL Injection Attempt
+### Expected: 201 CREATED (parameterized queries prevent injection)
+### ========================================
+POST {{baseUrl}}/api/cmd/challenge/{{challengeKey}}/comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{jwtToken}}
+
+{
+  "commentText": "'; DROP TABLE ChallengeComments; -- This should be safely stored."
+}
+
+### ========================================
+### EXPECTED RESPONSE FORMAT
+### ========================================
+### Successful response (201 CREATED):
+# {
+#   "status": "CREATED",
+#   "data": {
+#     "id": 1,
+#     "text": "This is a great challenge!",
+#     "challenge": { ... },
+#     "user": { ... },
+#     "createdAt": "2025-01-15T10:30:00Z",
+#     "updatedAt": "2025-01-15T10:30:00Z",
+#     "sentiment": {
+#       "positive": 0.0,
+#       "neutral": 1.0,
+#       "negative": 0.0
+#     },
+#     "language": "en",
+#     "status": "PENDING"
+#   }
+# }
+
+### Error response (400/401/404/500):
+# {
+#   "status": "BAD_REQUEST" | "UNAUTHORIZED" | "NOT_FOUND" | "INTERNAL_SERVER_ERROR",
+#   "message": "Error description",
+#   "timestamp": "2025-01-15T10:30:00Z"
+# }

@@ -1,4 +1,4 @@
-package espresso.achievement.domain.commands;
+package espresso.challenge.domain.commands;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -22,10 +22,10 @@ import lombok.ToString;
 import espresso.common.domain.commands.CommonCommand;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import espresso.achievement.domain.constants.AchievementConstants;
+import espresso.challenge.domain.constants.ChallengeConstants;
 
 /**
- * Command for uploading media files to an existing achievement.
+ * Command for uploading media files to an existing challenge.
  * Contains validation for image file types, sizes, dimensions, and filenames.
  */
 @Getter
@@ -33,17 +33,17 @@ import espresso.achievement.domain.constants.AchievementConstants;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public class UploadAchievementMediaCommand extends CommonCommand {
+public class UploadChallengeMediaCommand extends CommonCommand {
 
     /**
-     * The 7-character alphanumeric key of the achievement to upload media to.
+     * The 7-character alphanumeric key of the challenge to upload media to.
      * This value is obtained from the URL path parameter.
      */
     @JsonIgnore
     @Schema(hidden = true)
-    @NotBlank(message = "LOCALIZE: ACHIEVEMENT KEY IS REQUIRED")
+    @NotBlank(message = "LOCALIZE: CHALLENGE KEY IS REQUIRED")
     @Size(min = 7, max = 7, message = "LOCALIZE: ENTITY KEY MUST BE EXACTLY 7 CHARACTERS")
-    private String achievementKey;
+    private String challengeKey;
 
     /**
      * The 7-character alphanumeric key of the user uploading the media.
@@ -74,7 +74,7 @@ public class UploadAchievementMediaCommand extends CommonCommand {
 
         // Check if images array exists and is not empty
         if (images == null || images.length == 0) {
-            errors.add("images:" + AchievementConstants.ERROR_EMPTY_IMAGE);
+            errors.add("images:" + ChallengeConstants.ERROR_EMPTY_IMAGE);
             return errors; // Return early as we can't validate further without images
         }
 
@@ -85,19 +85,19 @@ public class UploadAchievementMediaCommand extends CommonCommand {
 
             // Check if individual image exists
             if (image == null || image.isEmpty()) {
-                errors.add(fieldPrefix + AchievementConstants.ERROR_EMPTY_IMAGE);
+                errors.add(fieldPrefix + ChallengeConstants.ERROR_EMPTY_IMAGE);
                 continue;
             }
 
             // Validate file size
-            if (image.getSize() > AchievementConstants.MAX_FILE_SIZE_BYTES) {
-                errors.add(fieldPrefix + AchievementConstants.ERROR_FILE_SIZE);
+            if (image.getSize() > ChallengeConstants.MAX_FILE_SIZE_BYTES) {
+                errors.add(fieldPrefix + ChallengeConstants.ERROR_FILE_SIZE);
             }
 
             // Validate file content type (MIME type)
             String contentType = image.getContentType();
-            if (contentType == null || !AchievementConstants.ALLOWED_CONTENT_TYPES.contains(contentType)) {
-                errors.add(fieldPrefix + AchievementConstants.ERROR_FILE_TYPE);
+            if (contentType == null || !ChallengeConstants.ALLOWED_CONTENT_TYPES.contains(contentType)) {
+                errors.add(fieldPrefix + ChallengeConstants.ERROR_FILE_TYPE);
             }
 
             // Validate image dimensions
@@ -105,7 +105,7 @@ public class UploadAchievementMediaCommand extends CommonCommand {
                 BufferedImage bufferedImage = ImageIO.read(image.getInputStream());
                 // Check if it's actually a valid image
                 if (bufferedImage == null) {
-                    errors.add(fieldPrefix + AchievementConstants.ERROR_INVALID_IMAGE);
+                    errors.add(fieldPrefix + ChallengeConstants.ERROR_INVALID_IMAGE);
                     continue; // Continue to next image
                 }
 
@@ -113,23 +113,21 @@ public class UploadAchievementMediaCommand extends CommonCommand {
                 int width = bufferedImage.getWidth();
                 int height = bufferedImage.getHeight();
 
-                if (width < AchievementConstants.MIN_IMAGE_DIMENSION
-                        || height < AchievementConstants.MIN_IMAGE_DIMENSION) {
-                    errors.add(fieldPrefix + AchievementConstants.ERROR_IMAGE_TOO_SMALL);
+                if (width < ChallengeConstants.MIN_IMAGE_DIMENSION || height < ChallengeConstants.MIN_IMAGE_DIMENSION) {
+                    errors.add(fieldPrefix + ChallengeConstants.ERROR_IMAGE_TOO_SMALL);
                 }
 
-                if (width > AchievementConstants.MAX_IMAGE_DIMENSION
-                        || height > AchievementConstants.MAX_IMAGE_DIMENSION) {
-                    errors.add(fieldPrefix + AchievementConstants.ERROR_IMAGE_TOO_LARGE);
+                if (width > ChallengeConstants.MAX_IMAGE_DIMENSION || height > ChallengeConstants.MAX_IMAGE_DIMENSION) {
+                    errors.add(fieldPrefix + ChallengeConstants.ERROR_IMAGE_TOO_LARGE);
                 }
             } catch (IOException e) {
-                errors.add(fieldPrefix + String.format(AchievementConstants.ERROR_PROCESSING_IMAGE, e.getMessage()));
+                errors.add(fieldPrefix + String.format(ChallengeConstants.ERROR_PROCESSING_IMAGE, e.getMessage()));
             }
 
             // Validate filename
             String originalFilename = image.getOriginalFilename();
-            if (originalFilename != null && !originalFilename.matches(AchievementConstants.FILENAME_REGEX_PATTERN)) {
-                errors.add(fieldPrefix + AchievementConstants.ERROR_INVALID_FILENAME);
+            if (originalFilename != null && !originalFilename.matches(ChallengeConstants.FILENAME_REGEX_PATTERN)) {
+                errors.add(fieldPrefix + ChallengeConstants.ERROR_INVALID_FILENAME);
             }
         }
 
