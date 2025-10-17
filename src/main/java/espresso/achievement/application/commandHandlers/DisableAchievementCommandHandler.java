@@ -80,16 +80,16 @@ public class DisableAchievementCommandHandler extends CommonCommandHandler
                 return HandlerResponse.error("LOCALIZE: ACHIEVEMENT NOT FOUND", ResponseType.NOT_FOUND);
             }
 
-            // Verify that the user is authorized to delete this achievement (user must own
+            // Verify that the user is authorized to disable this achievement (user must own
             // the achievement)
             if (!achievement.isCreator(User.fromKto(userKto))) {
-                return HandlerResponse.error("LOCALIZE: USER IS NOT AUTHORIZED TO DELETE THIS ACHIEVEMENT",
+                return HandlerResponse.error("LOCALIZE: USER IS NOT AUTHORIZED TO DISABLE THIS ACHIEVEMENT",
                         ResponseType.UNAUTHORIZED);
             }
 
-            // Check if achievement is already disabled
+            // Check if achievement is already disabled - return success for idempotency
             if (!achievement.isEnabled()) {
-                return HandlerResponse.noContent();
+                return HandlerResponse.success(achievement.toKto());
             }
 
             // Call disable method on achievement to update the entity

@@ -198,7 +198,7 @@ public class AchievementCmdApi extends CommonCmdApi {
 	public ResponseEntity<ServiceResponse<Object>> disableAchievement(@PathVariable String key) {
 		String userKey = getAuthenticatedUserKey();
 
-		DisableAchievementCommand command = new DisableAchievementCommand(key, userKey);
+		DisableAchievementCommand command = new DisableAchievementCommand(userKey, key);
 
 		return executeCommand(command, disableAchievementCommandHandler::handle);
 	}
