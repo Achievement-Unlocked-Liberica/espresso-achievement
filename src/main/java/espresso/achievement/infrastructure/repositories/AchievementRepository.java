@@ -69,7 +69,7 @@ public class AchievementRepository implements IAchievementRepository {
         try {
             AchievementValidator.validateForUpdate(achievement);
 
-            return this.achievementPSQLProvider.updateAchievement(achievement);
+            return this.achievementPSQLProvider.save(achievement);
 
         } catch (AchievementException e) {
             // Re-throw domain exceptions as-is
@@ -151,11 +151,7 @@ public class AchievementRepository implements IAchievementRepository {
             AchievementValidator.validateDtoType(dtoType);
             AchievementValidator.validateEntityKey(entityKey);
 
-            T entity = achievementPSQLProvider.findAchievementByKey(dtoType, entityKey);
-            
-            AchievementValidator.validateQueryResult(entity, entityKey);
-            
-            return entity;
+            return achievementPSQLProvider.findAchievementByKey(dtoType, entityKey);
 
         } catch (AchievementException e) {
             // Re-throw domain exceptions as-is

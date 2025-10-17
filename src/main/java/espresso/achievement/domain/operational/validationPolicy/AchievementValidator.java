@@ -140,20 +140,6 @@ public class AchievementValidator {
     }
 
     /**
-     * Validates that a query result entity is not null.
-     * Throws not found exception if the entity is null.
-     *
-     * @param entity The entity result to validate
-     * @param entityKey The key that was searched for (for error context)
-     * @throws AchievementException if entity is null
-     */
-    public static void validateQueryResult(Object entity, String entityKey) {
-        if (entity == null) {
-            throw AchievementException.notFound(entityKey);
-        }
-    }
-
-    /**
      * Validates configuration values (like endpoints, API keys, directories).
      * Checks that the value is not null or empty.
      *

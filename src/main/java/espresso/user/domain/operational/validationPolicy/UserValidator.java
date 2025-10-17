@@ -90,20 +90,6 @@ public class UserValidator {
     }
 
     /**
-     * Validates that a query result is not null.
-     * Throws not found exception if the result is null.
-     *
-     * @param result The query result to validate
-     * @param searchKey The key that was searched for (for error context)
-     * @throws UserException if result is null
-     */
-    public static void validateQueryResult(Object result, String searchKey) {
-        if (result == null) {
-            throw UserException.notFound(searchKey);
-        }
-    }
-
-    /**
      * Validates a UserProfileImage entity for persistence operations.
      * Checks that the profile image is not null.
      *

@@ -47,7 +47,7 @@ As a player who has created achievements, I want to update my existing achieveme
   "data": {
     "entityKey": "8NctRKY"
   },
-  "responseType": "SUCCESS"
+  "httpStatus": "OK"
 }
 ```
 
@@ -76,15 +76,15 @@ As a player who has created achievements, I want to update my existing achieveme
 **Then** the system should:
 - Extract userKey from JWT token
 - Attempt user lookup via IUserRepository.findByKey("XYZ9999")
-- Return HandlerResponse.error("User not found", ResponseType.NOT_FOUND)
+- Repository returns null (instead of throwing exception)
+- Handler detects null user and returns HandlerResponse.error("User not found", ResponseType.NOT_FOUND)
 - Return HTTP 404 Not Found
-- Return error response with correlation ID:
+- Return error response:
 ```json
 {
   "success": false,
-  "error": "User not found",
-  "correlationId": "correlation-uuid-123",
-  "timestamp": "2025-09-26T10:30:00Z"
+  "data": "User not found",
+  "httpStatus": "NOT_FOUND"
 }
 ```
 - Take no action (no achievement updated)
@@ -101,13 +101,12 @@ As a player who has created achievements, I want to update my existing achieveme
 - Find achievement is null
 - Return HandlerResponse.error("LOCALIZE: ACHIEVEMENT NOT FOUND", ResponseType.NOT_FOUND)
 - Return HTTP 404 Not Found
-- Return error response with correlation ID:
+- Return error response:
 ```json
 {
   "success": false,
-  "error": "LOCALIZE: ACHIEVEMENT NOT FOUND",
-  "correlationId": "correlation-uuid-123",
-  "timestamp": "2025-09-26T10:30:00Z"
+  "data": "LOCALIZE: ACHIEVEMENT NOT FOUND",
+  "httpStatus": "NOT_FOUND"
 }
 ```
 - Take no action (no achievement updated)
@@ -124,13 +123,12 @@ As a player who has created achievements, I want to update my existing achieveme
 - Check achievement.isCreator(User.fromKto(userKto)) returns false
 - Return HandlerResponse.error("LOCALIZE: USER IS NOT AUTHORIZED TO DELETE THIS ACHIEVEMENT", ResponseType.UNAUTHORIZED)
 - Return HTTP 401 Unauthorized
-- Return error response with correlation ID:
+- Return error response:
 ```json
 {
   "success": false,
-  "error": "LOCALIZE: USER IS NOT AUTHORIZED TO DELETE THIS ACHIEVEMENT",
-  "correlationId": "correlation-uuid-123",
-  "timestamp": "2025-09-26T10:30:00Z"
+  "data": "LOCALIZE: USER IS NOT AUTHORIZED TO DELETE THIS ACHIEVEMENT",
+  "httpStatus": "UNAUTHORIZED"
 }
 ```
 - Take no action (no achievement updated)
@@ -152,13 +150,12 @@ As a player who has created achievements, I want to update my existing achieveme
 - Validate request via CommonCommand.validateCommand()
 - Detect missing title field via @NotBlank annotation
 - Return HTTP 400 Bad Request
-- Return validation error response with correlation ID:
+- Return validation error response:
 ```json
 {
   "success": false,
-  "error": "LOCALIZE: A TITLE MUST BE PROVIDED",
-  "correlationId": "correlation-uuid-123",
-  "timestamp": "2025-09-26T10:30:00Z"
+  "data": "LOCALIZE: A TITLE MUST BE PROVIDED",
+  "httpStatus": "BAD_REQUEST"
 }
 ```
 - Take no action (no achievement updated)
@@ -201,9 +198,8 @@ As a player who has created achievements, I want to update my existing achieveme
 ```json
 {
   "success": false,
-  "error": "skills[0]: LOCALIZE: INVALID SKILL 'magic'. ALLOWED SKILLS ARE: str, dex, con, wis, int, cha, luc",
-  "correlationId": "correlation-uuid-123",
-  "timestamp": "2025-09-26T10:30:00Z"
+  "data": "skills[0]: LOCALIZE: INVALID SKILL 'magic'. ALLOWED SKILLS ARE: str, dex, con, wis, int, cha, luc",
+  "httpStatus": "BAD_REQUEST"
 }
 ```
 - Take no action (no achievement updated)
@@ -231,10 +227,10 @@ As a player who has created achievements, I want to update my existing achieveme
 **When** the PUT request is made to `/api/cmd/achievement/8NctRKY`
 **Then** the system should:
 - Catch exception in AchievementHandlerExceptionPolicy.handleException()
-- Return HTTP 500 Internal Server Error
-- Return error response with correlation ID for traceability
+- Return HTTP 400 Bad Request (for domain-level errors)
+- Return error response for traceability
 - Ensure data integrity is maintained (no partial updates)
-- Log error details with correlation ID
+- Log error details
 
 ## Implementation Details
 
@@ -296,7 +292,7 @@ As a player who has created achievements, I want to update my existing achieveme
   "data": {
     "entityKey": "8NctRKY"
   },
-  "responseType": "SUCCESS"
+  "httpStatus": "OK"
 }
 ```
 
@@ -304,9 +300,8 @@ As a player who has created achievements, I want to update my existing achieveme
 ```json
 {
   "success": false,
-  "error": "Error message text",
-  "correlationId": "uuid-correlation-id",
-  "timestamp": "2025-09-26T10:30:00Z"
+  "data": "Error message text",
+  "httpStatus": "NOT_FOUND"
 }
 ```
 
@@ -342,6 +337,6 @@ As a player who has created achievements, I want to update my existing achieveme
   "data": {
     "entityKey": "8NctRKY"
   },
-  "responseType": "SUCCESS"
+  "httpStatus": "OK"
 }
 ```

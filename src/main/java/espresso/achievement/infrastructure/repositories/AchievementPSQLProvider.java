@@ -76,17 +76,6 @@ public interface AchievementPSQLProvider extends JpaRepository<Achievement, Long
     <T> List<T> findAchievementsByUserKey(Class<T> type, String userKey, Limit limit, OffsetDateTime fromDate);
 
     /**
-     * Updates an achievement in the database matching the id, achievementKey, and userKey.
-     * This method leverages JPA's built-in save method which performs an update if the entity has an ID.
-     * 
-     * @param achievement The achievement entity to update
-     * @return The updated achievement entity
-     */
-    default Achievement updateAchievement(Achievement achievement) {
-        return save(achievement);
-    }
-
-    /**
      * Deletes an achievement and all its associated dependencies in the correct order to maintain referential integrity.
      * The deletion order is:
      * 1. Delete all comments associated with the achievement
