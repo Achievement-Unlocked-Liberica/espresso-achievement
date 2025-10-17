@@ -225,7 +225,7 @@ public class AchievementCmdApi extends CommonCmdApi {
 	public ResponseEntity<ServiceResponse<Object>> deleteAchievement(@PathVariable String key) {
 		String userKey = getAuthenticatedUserKey();
 
-		DeleteAchievementCommand command = new DeleteAchievementCommand(key, userKey);
+		DeleteAchievementCommand command = new DeleteAchievementCommand(userKey, key);
 
 		return executeCommand(command, deleteAchievementCommandHandler::handle);
 	}

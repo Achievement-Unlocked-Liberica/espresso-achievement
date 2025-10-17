@@ -35,11 +35,11 @@ As a player, I want to delete my achievements, so that I can permanently remove 
   "data": {
     "entityKey": "8NctRKY"
   },
-  "responseType": "SUCCESS"
+  "httpStatus": "OK"
 }
 ```
 
-### AC2: Achievement Not Found (No Content Response)
+### AC2: Achievement Not Found
 **Given** a valid JWT token with userKey "ABC1234"
 **And** a user exists with key "ABC1234"
 **And** no achievement exists with key "MISSING"
@@ -49,8 +49,16 @@ As a player, I want to delete my achievements, so that I can permanently remove 
 - Look up user successfully
 - Attempt achievement lookup via IAchievementRepository.getAchievementByKey("MISSING")
 - Find achievement is null
-- Return HandlerResponse.noContent()
-- Return HTTP 204 No Content
+- Return HandlerResponse.error("achievement.not.found", ResponseType.NOT_FOUND)
+- Return HTTP 404 Not Found
+- Return error response:
+```json
+{
+  "success": false,
+  "data": "achievement.not.found",
+  "httpStatus": "NOT_FOUND"
+}
+```
 - Take no action (no deletion performed)
 
 ### AC3: Authentication Failures
@@ -80,13 +88,12 @@ As a player, I want to delete my achievements, so that I can permanently remove 
 - Attempt user lookup via IUserRepository.findByKey("XYZ9999", UserKto.class)
 - Return HandlerResponse.error("User not found", ResponseType.NOT_FOUND)
 - Return HTTP 404 Not Found
-- Return error response with correlation ID:
+- Return error response:
 ```json
 {
   "success": false,
-  "error": "User not found",
-  "correlationId": "correlation-uuid-123",
-  "timestamp": "2025-09-26T10:30:00Z"
+  "data": "User not found",
+  "httpStatus": "NOT_FOUND"
 }
 ```
 - Take no action (no deletion performed)
@@ -103,13 +110,12 @@ As a player, I want to delete my achievements, so that I can permanently remove 
 - Check achievement.isCreator(User.fromKto(userKto)) returns false
 - Return HandlerResponse.error("LOCALIZE: USER IS NOT AUTHORIZED TO DELETE THIS ACHIEVEMENT", ResponseType.UNAUTHORIZED)
 - Return HTTP 401 Unauthorized
-- Return error response with correlation ID:
+- Return error response:
 ```json
 {
   "success": false,
-  "error": "LOCALIZE: USER IS NOT AUTHORIZED TO DELETE THIS ACHIEVEMENT",
-  "correlationId": "correlation-uuid-123",
-  "timestamp": "2025-09-26T10:30:00Z"
+  "data": "LOCALIZE: USER IS NOT AUTHORIZED TO DELETE THIS ACHIEVEMENT",
+  "httpStatus": "UNAUTHORIZED"
 }
 ```
 - Take no action (no deletion performed)
@@ -141,10 +147,10 @@ As a player, I want to delete my achievements, so that I can permanently remove 
 **When** the DELETE request is made to `/api/cmd/achievement/8NctRKY`
 **Then** the system should:
 - Catch exception in AchievementHandlerExceptionPolicy.handleException()
-- Return HTTP 500 Internal Server Error
-- Return error response with correlation ID for traceability
+- Return HTTP 400 Bad Request
+- Return error response with friendly error message
 - Roll back any partial changes to maintain data integrity
-- Log error details with correlation ID
+- Log error details for traceability
 
 ### AC8: Proper Deletion Order and Domain Events
 **Given** a valid deletion request for achievement with associated data
@@ -168,7 +174,7 @@ As a player, I want to delete my achievements, so that I can permanently remove 
 - **Base Class**: extends CommonCommandHandler<DeleteAchievementCommand>
 - **Dependencies**: IAchievementRepository, IUserRepository, AchievementHandlerExceptionPolicy
 - **Validation**: Inherits validateCommand() from CommonCommandHandler
-- **Response**: HandlerResponse.success(achievement.toKto()) for success, HandlerResponse.noContent() for not found
+- **Response**: HandlerResponse.success(achievement.toKto()) for success, HandlerResponse.error("achievement.not.found", ResponseType.NOT_FOUND) for not found
 
 ### Command Model: DeleteAchievementCommand
 - **Base Class**: extends CommonCommand
@@ -212,16 +218,16 @@ As a player, I want to delete my achievements, so that I can permanently remove 
   "data": {
     "entityKey": "8NctRKY"
   },
-  "responseType": "SUCCESS"
+  "httpStatus": "OK"
 }
 ```
 
-### No Content Response (HTTP 204 No Content)
+### Not Found Response (HTTP 404 Not Found)
 ```json
 {
-  "success": true,
-  "data": null,
-  "responseType": "NO_CONTENT"
+  "success": false,
+  "data": "achievement.not.found",
+  "httpStatus": "NOT_FOUND"
 }
 ```
 
@@ -229,9 +235,8 @@ As a player, I want to delete my achievements, so that I can permanently remove 
 ```json
 {
   "success": false,
-  "error": "Error message text",
-  "correlationId": "uuid-correlation-id",
-  "timestamp": "2025-09-26T10:30:00Z"
+  "data": "Error message text",
+  "httpStatus": "BAD_REQUEST"
 }
 ```
 
@@ -239,15 +244,14 @@ As a player, I want to delete my achievements, so that I can permanently remove 
 
 ### Success Codes
 - **200 OK**: Achievement deleted successfully, returns entity key
-- **204 No Content**: Achievement not found, no action taken
 
 ### Client Error Codes (4xx)
-- **400 Bad Request**: JSR-303 validation failures (invalid key format)
+- **400 Bad Request**: JSR-303 validation failures (invalid key format), database errors
 - **401 Unauthorized**: Missing/invalid JWT token, user not authorized to delete achievement
-- **404 Not Found**: User not found
+- **404 Not Found**: User not found, achievement not found
 
 ### Server Error Codes (5xx)
-- **500 Internal Server Error**: Database errors, unexpected system exceptions
+- **500 Internal Server Error**: Unexpected system exceptions
 
 ## Security & Traceability
 
@@ -260,8 +264,3 @@ As a player, I want to delete my achievements, so that I can permanently remove 
 - Proper dependency order prevents constraint violations
 - Database transactions ensure atomicity
 - Domain events raised before deletion for cleanup
-
-### Correlation Tracking
-- Correlation ID included in all error responses
-- End-to-end request tracing for debugging
-- Audit logging for compliance

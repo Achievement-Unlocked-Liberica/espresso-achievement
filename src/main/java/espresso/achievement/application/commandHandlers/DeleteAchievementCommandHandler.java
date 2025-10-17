@@ -70,14 +70,13 @@ public class DeleteAchievementCommandHandler extends CommonCommandHandler implem
                 return HandlerResponse.error("User not found", ResponseType.NOT_FOUND);
             }
 
-            // Retrieve achievement by achievementKey - return No Content if missing (per
-            // prompt requirement)
+            // Retrieve achievement by achievementKey - return error if missing (per updated AC requirement)
             Achievement achievement = achievementRepository.getAchievementByKey(
                     Achievement.class,
                     cmd.getAchievementKey());
 
             if (achievement == null) {
-                return HandlerResponse.noContent();
+                return HandlerResponse.error("achievement.not.found", ResponseType.NOT_FOUND);
             }
 
             // Verify that the user is authorized to delete this achievement (user must own the achievement)
