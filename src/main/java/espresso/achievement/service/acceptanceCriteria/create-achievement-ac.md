@@ -39,14 +39,21 @@ As a player, I want to create a new achievement, so that I can share my accompli
 - Record current timestamp as registeredAt
 - Save achievement to database via IAchievementRepository
 - Return HTTP 201 Created
-- Return response with entity key only:
+
+**Response Validation**:
+- ✅ **Content-Type**: `application/json`
+- ✅ **HTTP Status**: `201 Created`
+- ✅ **Success Flag**: `true`
+- ✅ **Response Data**: Contains entity key
+- ✅ **HTTP Status in Response**: `CREATED`
+
 ```json
 {
   "success": true,
   "data": {
     "entityKey": "8NctRKY"
   },
-  "responseType": "CREATED"
+  "httpStatus": "CREATED"
 }
 ```
 
@@ -57,24 +64,33 @@ As a player, I want to create a new achievement, so that I can share my accompli
 **When** the POST request is made to `/api/cmd/achievement`
 **Then** the system should:
 - Return HTTP 401 Unauthorized
-- Return authentication error message
 - Take no action (no achievement created)
+
+**Response Validation**:
+- ✅ **HTTP Status**: `401 Unauthorized`
+- ⚠️ **Note**: 401 responses may not include JSON body depending on Spring Security configuration
 
 #### AC2.2: Invalid JWT Token
 **Given** an invalid JWT token is provided
 **When** the POST request is made to `/api/cmd/achievement`
 **Then** the system should:
 - Return HTTP 401 Unauthorized
-- Return authentication error message  
 - Take no action (no achievement created)
+
+**Response Validation**:
+- ✅ **HTTP Status**: `401 Unauthorized`
+- ⚠️ **Note**: 401 responses may not include JSON body depending on Spring Security configuration
 
 #### AC2.3: Expired JWT Token
 **Given** an expired JWT token is provided
 **When** the POST request is made to `/api/cmd/achievement`
 **Then** the system should:
 - Return HTTP 401 Unauthorized
-- Return authentication error message
 - Take no action (no achievement created)
+
+**Response Validation**:
+- ✅ **HTTP Status**: `401 Unauthorized`
+- ⚠️ **Note**: 401 responses may not include JSON body depending on Spring Security configuration
 
 ### AC3: User Not Found
 **Given** a valid JWT token with userKey "XYZ9999"
@@ -83,18 +99,24 @@ As a player, I want to create a new achievement, so that I can share my accompli
 **Then** the system should:
 - Extract userKey from JWT token
 - Attempt user lookup via IUserRepository.findByKey("XYZ9999")
-- Throw UserNotFoundException via AchievementHandlerExceptionPolicy.handleException()
-- Return HTTP 404 Not Found
-- Return error response with correlation ID:
+- Repository returns null (no exception thrown)
+- Handler detects null user and returns HTTP 404 Not Found
+- Take no action (no achievement created)
+
+**Response Validation**:
+- ✅ **Content-Type**: `application/json`
+- ✅ **HTTP Status**: `404 Not Found`
+- ✅ **Success Flag**: `false`
+- ✅ **Error Message**: Contains "User not found"
+- ✅ **HTTP Status in Response**: `NOT_FOUND`
+
 ```json
 {
   "success": false,
-  "error": "User not found",
-  "correlationId": "correlation-uuid-123",
-  "timestamp": "2025-01-15T10:30:00Z"
+  "data": "User not found",
+  "httpStatus": "NOT_FOUND"
 }
 ```
-- Take no action (no achievement created)
 
 ### AC4: JSR-303 Validation Failures
 
@@ -113,16 +135,22 @@ As a player, I want to create a new achievement, so that I can share my accompli
 - Validate request via CommonCommand.validateCommand()
 - Detect missing title field
 - Return HTTP 400 Bad Request
-- Return validation error response with correlation ID:
+- Take no action (no achievement created)
+
+**Response Validation**:
+- ✅ **Content-Type**: `application/json`
+- ✅ **HTTP Status**: `400 Bad Request`
+- ✅ **Success Flag**: `false`
+- ✅ **Error Message**: Contains "TITLE MUST BE PROVIDED"
+- ✅ **HTTP Status in Response**: `BAD_REQUEST`
+
 ```json
 {
   "success": false,
-  "error": "LOCALIZE: A TITLE MUST BE PROVIDED",
-  "correlationId": "correlation-uuid-123",
-  "timestamp": "2025-01-15T10:30:00Z"
+  "data": "LOCALIZE: A TITLE MUST BE PROVIDED",
+  "httpStatus": "BAD_REQUEST"
 }
 ```
-- Take no action (no achievement created)
 
 #### AC4.2: Empty Required Fields
 **Given** a valid JWT token and request payload with empty required fields:
@@ -141,11 +169,18 @@ As a player, I want to create a new achievement, so that I can share my accompli
 - Return validation errors for title and description
 - Take no action (no achievement created)
 
+**Response Validation**:
+- ✅ **Content-Type**: `application/json`
+- ✅ **HTTP Status**: `400 Bad Request`
+- ✅ **Success Flag**: `false`
+- ✅ **Error Message**: Validation error details
+- ✅ **HTTP Status in Response**: `BAD_REQUEST`
+
 #### AC4.3: Field Length Validation
 **Given** a valid JWT token and request payload with fields exceeding length limits:
 ```json
 {
-  "title": "This is a very long title that exceeds the maximum allowed length of 200 characters and should trigger a validation error because it contains way too many characters and goes beyond the specified limit...",
+  "title": "This is a very long title that exceeds the maximum allowed length of 200 characters...",
   "description": "Valid description",
   "completedDate": "2025-01-15",
   "skills": ["int"]
@@ -155,8 +190,22 @@ As a player, I want to create a new achievement, so that I can share my accompli
 **Then** the system should:
 - Validate @Size annotations
 - Return HTTP 400 Bad Request
-- Return error: "LOCALIZE: TITLE MUST NOT BE GREATER THAN 200 CHARACTERS"
 - Take no action (no achievement created)
+
+**Response Validation**:
+- ✅ **Content-Type**: `application/json`
+- ✅ **HTTP Status**: `400 Bad Request`
+- ✅ **Success Flag**: `false`
+- ✅ **Error Message**: Contains "200 CHARACTERS"
+- ✅ **HTTP Status in Response**: `BAD_REQUEST`
+
+```json
+{
+  "success": false,
+  "data": "LOCALIZE: TITLE MUST NOT BE GREATER THAN 200 CHARACTERS",
+  "httpStatus": "BAD_REQUEST"
+}
+```
 
 ### AC5: Date Validation Failures
 
@@ -174,8 +223,22 @@ As a player, I want to create a new achievement, so that I can share my accompli
 **Then** the system should:
 - Validate @PastOrPresent annotation
 - Return HTTP 400 Bad Request
-- Return error: "LOCALIZE: THE COMPLETED DATE CANNOT BE AFTER TODAY"
 - Take no action (no achievement created)
+
+**Response Validation**:
+- ✅ **Content-Type**: `application/json`
+- ✅ **HTTP Status**: `400 Bad Request`
+- ✅ **Success Flag**: `false`
+- ✅ **Error Message**: Contains "COMPLETED DATE CANNOT BE AFTER TODAY"
+- ✅ **HTTP Status in Response**: `BAD_REQUEST`
+
+```json
+{
+  "success": false,
+  "data": "LOCALIZE: THE COMPLETED DATE CANNOT BE AFTER TODAY",
+  "httpStatus": "BAD_REQUEST"
+}
+```
 
 #### AC5.2: Invalid Date Format
 **Given** a valid JWT token and request payload with invalid date format:

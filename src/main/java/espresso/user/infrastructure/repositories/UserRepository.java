@@ -127,8 +127,7 @@ public class UserRepository implements IUserRepository {
             
             T result = this.userJpaRepository.findByKey(entityKey, type);
             
-            UserValidator.validateQueryResult(result, entityKey);
-            
+            // Return result as-is (including null) - let handler decide what to do
             return result;
             
         } catch (UserException e) {

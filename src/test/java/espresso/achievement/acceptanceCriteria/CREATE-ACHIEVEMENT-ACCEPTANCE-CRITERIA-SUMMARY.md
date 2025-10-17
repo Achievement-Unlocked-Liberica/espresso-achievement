@@ -38,7 +38,7 @@ The acceptance test includes test cases for **ALL 10 acceptance criteria groups*
   - `invalidJwtToken`: Returns 401 when invalid token provided
 
 - **AC3: User Not Found** (1 test) ✅
-  - `userNotFound`: Returns 400 with "user.not.found" message when user doesn't exist
+  - `userNotFound`: Returns 404 with "User not found" message when user doesn't exist
 
 - **AC4: JSR-303 Validation Failures** (3 tests) ✅
   - `missingRequiredFields`: Returns 400 when required fields are missing or null
@@ -203,7 +203,39 @@ Tests verify both JSR-303 annotations and custom validation:
 
 ## Test Patterns and Best Practices
 
-### 1. **Behavior-Driven Structure**
+### 1. **Comprehensive Response Validation**
+All tests follow a **complete validation pattern** that checks:
+- ✅ **Content-Type**: `application/json` (for JSON responses)
+- ✅ **HTTP Status Code**: Appropriate code (200, 201, 400, 401, 500)
+- ✅ **Success Flag**: `success` field value (true/false)
+- ✅ **Response Data**: Expected data content or error messages
+- ✅ **HTTP Status in Response**: `httpStatus` field matches actual HTTP status
+
+**Success Response Pattern**:
+```java
+result.andExpect(status().isCreated())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+    .andExpect(jsonPath("$.success").value(true))
+    .andExpect(jsonPath("$.data.entityKey").value(expectedKey))
+    .andExpect(jsonPath("$.httpStatus").value("CREATED"));
+```
+
+**Error Response Pattern (400 Bad Request)**:
+```java
+result.andExpect(status().isBadRequest())
+    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+    .andExpect(jsonPath("$.success").value(false))
+    .andExpect(jsonPath("$.data").value(containsString(errorMessage)))
+    .andExpect(jsonPath("$.httpStatus").value("BAD_REQUEST"));
+```
+
+**Authentication Error Pattern (401 Unauthorized)**:
+```java
+result.andExpect(status().isUnauthorized());
+// Note: 401 responses may not include JSON body
+```
+
+### 2. **Behavior-Driven Structure**
 Each test follows Given/When/Then pattern with clear comments:
 ```java
 // Given: Valid authentication and request data
@@ -211,20 +243,22 @@ Each test follows Given/When/Then pattern with clear comments:
 // Then: Achievement is created and 201 response returned with entity key
 ```
 
-### 2. **Comprehensive Assertions**
-Tests verify multiple aspects:
-- HTTP status code
-- Response structure (success flag, data field, httpStatus)
-- Error messages (for failure cases)
-- Repository interactions (using Mockito verify)
+### 3. **Helper Method Abstraction**
+Tests use helper methods to reduce duplication:
+- `assertSuccessfulCreation()` - Complete success validation
+- `assertValidationError()` - Complete error validation with message
+- `assertUnauthorized()` - Authentication failure validation
+- `performCreateAchievement()` - Execute API request
+- `validCommand()` - Create valid command builder
+- `setupSuccessfulCreationMocks()` - Configure happy path mocks
 
-### 3. **Edge Case Coverage**
+### 4. **Edge Case Coverage**
 - Case sensitivity (skills accept mixed case)
 - Whitespace handling (skills trimmed)
 - Empty arrays (skills validation)
 - Boundary conditions (max length, max array size)
 
-### 4. **Error Scenario Coverage**
+### 5. **Error Scenario Coverage**
 - Authentication failures (401)
 - Validation failures (400)
 - User not found (400)
