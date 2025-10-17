@@ -80,12 +80,29 @@ class CreateAchievementAcceptanceTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    /**
+     * Mock bean for Achievement repository.
+     * Note: @MockBean is deprecated since Spring Boot 3.4.0 and marked for removal.
+     * Migration to @MockitoBean or @TestConfiguration with @Primary beans is recommended
+     * for future Spring Boot versions.
+     */
+    @SuppressWarnings("removal")
     @MockBean
     private AchievementPSQLProvider achievementPSQLProvider;
 
+    /**
+     * Mock bean for Achievement Media S3 provider.
+     * Note: @MockBean is deprecated since Spring Boot 3.4.0 and marked for removal.
+     */
+    @SuppressWarnings("removal")
     @MockBean
     private AchievementMediaS3Provider achievementMediaS3Provider;
 
+    /**
+     * Mock bean for User repository.
+     * Note: @MockBean is deprecated since Spring Boot 3.4.0 and marked for removal.
+     */
+    @SuppressWarnings("removal")
     @MockBean
     private UserPSQLProvider userPSQLProvider;
 
